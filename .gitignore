@@ -33,4 +33,5 @@ build/
 .vscode/
 
 .gitattributes
-.mvnw*
+mvnw*
+.mvn/wrapper/
