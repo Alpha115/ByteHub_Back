@@ -1,4 +1,4 @@
-package com.bytehub.controller;
+package com.bytehub.main;
 
 import java.util.HashMap;
 import java.util.Map;
