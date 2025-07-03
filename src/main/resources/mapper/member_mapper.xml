@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 아이디 중복 체크 -->
+<mapper namespace="com.bytehub.member.MemberDAO">
+    
+    <select id="countById" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM member WHERE user_id = #{id}
+    </select>
+
+    <insert id="insertMember" parameterType="com.bytehub.member.MemberDTO">
+        INSERT INTO member (
+            user_id, file_idx, dept_idx, lv_idx, password, name, email, gender, hire_date
+        ) VALUES (
+            #{user_id}, #{file_idx}, #{dept_idx}, #{lv_idx}, #{password}, #{name}, #{email}, #{gender}, #{hire_date}
+        )
+    </insert>
+</mapper>
+
 <!-- <mapper namespace="">
 
 </mapper> -->
