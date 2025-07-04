@@ -1,4 +1,4 @@
-package com.bytehub.config;
+package com.bytehub.utils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-public class JwtToken {
+public class JwtUtils {
 	private static SecretKey pri_key = null;
 
 	public static SecretKey getPri_key() {
@@ -19,7 +19,7 @@ public class JwtToken {
 	}
 
 	public static void setPri_key() {
-		JwtToken.pri_key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+		JwtUtils.pri_key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 	}
 
 	// 토큰생성

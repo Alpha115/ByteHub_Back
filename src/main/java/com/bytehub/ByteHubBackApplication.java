@@ -3,7 +3,7 @@ package com.bytehub;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.bytehub.config.JwtToken;
+import com.bytehub.utils.JwtUtils;
 
 @SpringBootApplication
 public class ByteHubBackApplication {
@@ -12,8 +12,8 @@ public class ByteHubBackApplication {
 		SpringApplication.run(ByteHubBackApplication.class, args);
 		godHelpUs();
 		
-		if(JwtToken.getPri_key()==null) {
-			JwtToken.setPri_key();
+		if(JwtUtils.getPri_key()==null) {
+			JwtUtils.setPri_key();
 		}
 	}
 
