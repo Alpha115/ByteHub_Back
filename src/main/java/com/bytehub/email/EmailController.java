@@ -50,7 +50,7 @@ public class EmailController {
 		props.setProperty("mail.smtp.starttls.enable", enable);
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 		
-		resp.put("msg", service.emergencySendMail());	// 반환값: 이메일 발송 메시지를 반환합니다.
+		resp.put("msg", service.emergencySendMail());	// 반환값: 이메일 발송 메시지를 반환합니다. ({"
 		
 		return resp;
 	}
