@@ -35,6 +35,8 @@ public class EmailController {
 		randomNum=(int) ((Math.random()*90000)+100000);
 		return randomNum;
 	}
+	
+	
 
 	// ---------비상연락망 메일 돌리기---------
 	@PostMapping("/email/emergency")
@@ -54,7 +56,7 @@ public class EmailController {
 		props.setProperty("mail.smtp.starttls.enable", enable);
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 
-		resp.put("msg", service.emergencySendMail()); // 반환값: 이메일 발송 메시지를 반환합니다. ({"
+		resp.put("msg", service.emergencySendMail(props, mail)); // 반환값: 이메일 발송 메시지를 반환합니다. ({"
 
 		return resp;
 	}
