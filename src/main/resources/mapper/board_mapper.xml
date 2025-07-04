@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="board_mapper">
-    <!-- 쿼리 작성 -->
+<mapper namespace="com.bytehub.board.BoardDAO">
+    
+    <!-- 게시글 작성 -->
+    <insert id="postWrite" parameterType="com.bytehub.board.BoardDTO" useGeneratedKeys="true" keyProperty="post_idx" keyColumn="post_idx">
+		    INSERT INTO board (post_idx, user_id, category, subject, content, pinned, draft)
+		    VALUES (#{post_idx}, #{user_id},#{category}, #{subject}, #{content}, #{pinned}, #{draft})
+	</insert>
+		
 </mapper>

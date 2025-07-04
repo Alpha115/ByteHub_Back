@@ -1,5 +1,77 @@
 package com.bytehub.board;
 
+import java.sql.Timestamp;
+import com.bytehub.board.BoardCategory;
+
 public class BoardDTO {
+	
+	private int post_idx; // 게시글 인덱스
+	private String user_id; // 작성자
+	private String subject; // 제목
+	private String content; // 내용
+	private boolean pinned; // 상단 고정 여부
+	private boolean draft; // 임시 저장
+	private Timestamp reg_date; // 작성시간
+	private int file_idx; // 파일 인덱스
+
+	private BoardCategory category; // 게시판 종류
+    public BoardCategory getCategory() {
+        return category;
+    }
+    public void setCategory(BoardCategory category) {
+        this.category = category;
+    }
+	
+	public int getPost_idx() {
+		return post_idx;
+	}
+	public void setPost_idx(int post_idx) {
+		this.post_idx = post_idx;
+	}
+	public String getUser_id() {
+		return user_id;
+	}
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public boolean isPinned() {
+		return pinned;
+	}
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
+	public boolean isDraft() {
+		return draft;
+	}
+	public void setDraft(boolean draft) {
+		this.draft = draft;
+	}
+	public Timestamp getReg_date() {
+		return reg_date;
+	}
+	public void setReg_date(Timestamp reg_date) {
+		this.reg_date = reg_date;
+	}
+	public int getFile_idx() {
+		return file_idx;
+	}
+	public void setFile_idx(int file_idx) {
+		this.file_idx = file_idx;
+	}
+	
+	
+	
 
 }

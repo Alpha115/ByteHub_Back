@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailController {
 
 	Map<String, Object> resp = null;
-	private final EmailService service;
+	private final EmailService service = new EmailService();
 
 	// ---------이메일서비스 초기값---------
 	String host = "smtp.gmail.com";
