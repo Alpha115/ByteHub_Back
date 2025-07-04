@@ -25,7 +25,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// ★여기에다가 addPathPatterns 추가해서 어떤 url에서 로그인 체크할건지 설정하시면 됩니다~
-		registry.addInterceptor(checker);
+		registry.addInterceptor(checker).excludePathPatterns("/login");
 	}
 
 	@Bean
