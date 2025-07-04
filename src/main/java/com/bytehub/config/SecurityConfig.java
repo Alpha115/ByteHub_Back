@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 //configure file
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
@@ -23,7 +24,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		//
+		// ★여기에다가 addPathPatterns 추가해서 어떤 url에서 로그인 체크할건지 설정하시면 됩니다~
 		registry.addInterceptor(checker);
 	}
 
@@ -32,7 +33,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 		return new BCryptPasswordEncoder();
 	}
 
-	// 여기에서 로그인이 필요한 url을 거릅니다
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http.httpBasic().disable().build();
@@ -40,6 +40,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 		// 그런데 next.js는 안뜬대서…
 	}
 
-
+	
 
 }
