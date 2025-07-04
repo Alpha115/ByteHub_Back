@@ -20,11 +20,15 @@
         draft = #{draft},
         file_idx = #{file_idx}
     WHERE post_idx = #{post_idx}
-</update>
+	</update>
 	
 	<!-- 작성자 ID 가져오기 (post_idx 에 맞는) -->
     <select id="postWriter" parameterType="int" resultType="String">
         SELECT user_id FROM board WHERE post_idx = #{post_idx}
     </select>
+    
+    <delete id="postDel">
+		DELETE FROM board WHERE post_idx = #{post_idx}
+	</delete>
 		
 </mapper>

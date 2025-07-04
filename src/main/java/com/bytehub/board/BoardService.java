@@ -19,7 +19,6 @@ public class BoardService {
 		
 		int row = dao.postWrite(dto);
 	    return row > 0;
-	    
 	}
 
 	// 게시글 수정
@@ -31,6 +30,12 @@ public class BoardService {
 	// 컨트롤러가 게시글 작성자 ID를 가져오기 위한 헬퍼 메소드
 	public String postWriter(int post_idx) {
 		return dao.postWriter(post_idx);
+	}
+
+	// 게시글 삭제
+	public boolean postDel(BoardDTO dto) {
+		int row = dao.postDel(dto.getPost_idx());
+		return row > 0;
 	}
 
 }
