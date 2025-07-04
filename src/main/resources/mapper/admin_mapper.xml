@@ -4,7 +4,23 @@
 
 <!--adminDAO와 연결됩니다. -->
 <mapper namespace="com.bytehub.admin.AdminDAO">
+
 	<update id="withdraw">
 		UPDATE member SET withdraw = NOT withdraw WHERE user_id=#{param1}
 	</update>
+	
+	<select id="list" resultType="map">
+		select 
+			user_id,
+			name,
+			file_idx,
+			(select dept_name from department where dept_idx = m.dept_idx) as dept_name,
+			(select lv_name from level where lv_idx=m.lv_idx) as lv_name,
+			email,
+			gender,
+			hire_date,
+			withdraw
+		FROM member m
+	</select>
+	
 </mapper>
