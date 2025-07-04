@@ -37,7 +37,15 @@
         SELECT 
             post_idx, user_id, category, subject, content, pinned, draft, reg_date, file_idx
         FROM board
-        ORDER BY post_idx DESC
+        ORDER BY 
+        	pinned DESC, post_idx DESC
     </select>
+    
+   	<!-- 상단 고정 3개까지 ㄱㄴ -->
+	<select id="cntPinned" resultType="int">
+	    SELECT COUNT(*) FROM board WHERE pinned = 1
+	</select>
+    
+    
 		
 </mapper>

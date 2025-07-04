@@ -22,4 +22,7 @@ public interface BoardDAO {
 	// 게시글 리스트
 	List<BoardDTO> postList(int offset, int post_count);
 
+	// 상단 고정 3개까지 ㄱㄴ
+	int cntPinned();
+
 }

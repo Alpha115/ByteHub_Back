@@ -21,9 +21,23 @@ public class BoardService {
 	// 게시글 작성
 	public boolean postWrite(BoardDTO dto) {
 		
+		// 상단 고정 선택 3개까지 ㄱㄴ
+		if (dto.isPinned()) {
+	        int pinnedCnt = dao.cntPinned();
+	        if (pinnedCnt >= 3) {
+	            // 상단 고정 3개 초과 불가
+	            return false;
+	        }
+	    }
+		
 		int row = dao.postWrite(dto);
 		
 	    return row > 0;
+	}
+	
+	// 상단 고정 게시글 개수 조
+	public int cntPinned() {
+	    return dao.cntPinned();
 	}
 
 	// 게시글 수정
@@ -55,5 +69,6 @@ public class BoardService {
 		int offset = (page - 1) * post_count; // 페이지 시작 위치 계산
 		return dao.postList(offset, post_count);
 	}
+
 
 }

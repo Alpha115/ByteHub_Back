@@ -148,15 +148,22 @@ public class BoardController {
             login = true;
         }
 
-        List<BoardDTO> list = svc.postList(page); // Service에서 게시글 리스트만 받아옴
+        List<BoardDTO> list = svc.postList(page); // svc에서 게시글 리스트만 받아옴
 
         result.put("success", true);
         result.put("loginYN", login);
         result.put("loginId", loginId);
+        
         result.put("list", list); // 게시글 리스트
         result.put("page", page); // 페이지 정보
 		
         return result;
+    }
+    
+    // 상단 고정 게시글 개수 조회
+    @GetMapping("/post/pinnedCnt")
+    public int getPinnedCnt() {
+        return svc.cntPinned();
     }
     
     
