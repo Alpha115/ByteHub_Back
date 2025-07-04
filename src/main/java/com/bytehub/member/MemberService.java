@@ -16,15 +16,11 @@ public class MemberService {
 	@Autowired MemberDAO dao;
 
 	public boolean login(Map<String, String> info) {
-		// 사용자 정보 조회
-		MemberDTO member = dao.getMemberById(info.get("id"));
-		if (member == null) {
-			return false; // 사용자가 존재하지 않음
-		}
-		
-		// BCrypt로 비밀번호 비교
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		return passwordEncoder.matches(info.get("password"), member.getPassword());
+		log.info("Service: Login attempt for user: {}", info.get("id"));
+		int row = dao.login(info);
+		boolean result = row > 0 ? true : false;
+		log.info("Service: Login result: {}", result);
+		return result;
 	}
 
     public boolean overlay(String id) {
@@ -63,4 +59,6 @@ public class MemberService {
         }
         return resp;
     }
+
+
 }

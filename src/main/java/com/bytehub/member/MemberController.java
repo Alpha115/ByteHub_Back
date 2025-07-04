@@ -17,6 +17,9 @@ public class MemberController {
     @Autowired
     private MemberService service;
 
+    Map<String, Object> result = null;
+
+    
     // 회원가입
     @PostMapping("/join")
     public Map<String, Object> join(@RequestBody Map<String, Object> param, HttpSession session) {
@@ -32,19 +35,20 @@ public class MemberController {
 
     // 로그인
     @PostMapping(value="/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> info, HttpSession session){
-        Map<String, Object> result = new HashMap<>();
-        boolean success = service.login(info);
-        
-        if (success) {
-            // 세션에 로그인 정보 저장 (LoginChecker가 요구하는 부분)
-            session.setAttribute("loginId", info.get("id"));
-            String token = JwtUtils.getToken("id", info.get("id"));
-            result.put("token", token);
-            result.put("success", success);
-        }
-        return result;
-    }
+	public Map<String, Object> login(@RequestBody Map<String, String> info){
+		
+		result = new HashMap<String, Object>();
+		boolean success = service.login(info);
+		
+		if (success) {
+			String token = JwtUtils.getToken("id", info.get("id"));
+			result.put("token", token);
+			
+		}
+		result.put("success", success); 
+		return result;
+	}
+
 
     // 아이디 중복체크
     @GetMapping("/overlay/{id}")
