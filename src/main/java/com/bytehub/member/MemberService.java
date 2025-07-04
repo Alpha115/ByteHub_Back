@@ -15,9 +15,6 @@ public class MemberService {
 
     @Autowired MemberDAO dao;
 
-    // 32바이트(256비트) 이상 안전한 시크릿 키
-    private static final String SECRET_KEY = "bytehub_super_secret_key_1234567890_ABCDEFGH";
-
     public boolean overlay(String id) {
         log.info("Service: " + id + " 중복체크");
         int cnt = dao.countById(id);
@@ -45,20 +42,9 @@ public class MemberService {
             // DB 저장
             dao.insertMember(member);
 
-            // JWT 토큰 생성
-            String jwt = io.jsonwebtoken.Jwts.builder()
-                    .setSubject(member.getUser_id())
-                    .claim("name", member.getName())
-                    .claim("email", member.getEmail())
-                    .setIssuedAt(new java.util.Date())
-                    .setExpiration(new java.util.Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                    .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
-                    .compact(); // signWith 는 jwt 토큰 위변조 방지(=서명)
-
             resp.put("success", true);
             resp.put("msg", "회원가입 성공");
             resp.put("user_id", member.getUser_id());
-            resp.put("token", jwt);
         } catch (Exception e) {
             resp.put("success", false);
             resp.put("msg", "회원가입 중 오류 발생: " + e.getMessage());
