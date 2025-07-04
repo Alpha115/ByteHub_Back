@@ -1,5 +1,8 @@
 package com.bytehub.admin;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,10 @@ public class AdminService {
 	public boolean withdraw(String id) {
 		int row = dao.withdraw(id);
 		return row > 0;
+	}
+
+	public ArrayList<Map<String, Object>> list() {
+		return dao.list();
 	}
 
 }
