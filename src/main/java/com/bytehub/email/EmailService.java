@@ -11,7 +11,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ public class EmailService {
 		ArrayList<String> receivers = (ArrayList<String>) mail.get("receiver");
 
 		Session session = Session.getInstance(props, new Authenticator() {
-			protected PasswordAuthentication getAuthentication() {
+			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(sender, key);
 			}
 		});
@@ -42,8 +41,8 @@ public class EmailService {
 				msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 				msg.setSubject((String) mail.get("subject"));
 				msg.setText((String) mail.get("content"));
+				
 				Transport.send(msg);
-				log.info("email send: {}", to);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
