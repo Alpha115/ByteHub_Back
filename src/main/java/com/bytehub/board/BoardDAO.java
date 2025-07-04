@@ -1,5 +1,7 @@
 package com.bytehub.board;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -16,5 +18,8 @@ public interface BoardDAO {
 
 	// 게시글 삭제
 	int postDel(int post_idx);
+
+	// 게시글 리스트
+	List<BoardDTO> postList(int offset, int post_count);
 
 }

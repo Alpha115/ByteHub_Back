@@ -1,12 +1,14 @@
 package com.bytehub.board;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytehub.utils.JwtUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@CrossOrigin
+@Slf4j
 @RestController
 public class BoardController {
 
-    Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired BoardService svc;
     
@@ -28,9 +33,10 @@ public class BoardController {
     		@RequestBody BoardDTO dto, 
     		@RequestHeader Map<String,String> header) {
     	
-		log.info("header : "+header); // 요청 헤더 로그 출력
+    	log.info("header : "+header); // 요청 헤더 로그 출력
         
     	Map<String,Object> result = new HashMap<>(); // 응답 데이터 저장용
+    	
     	String loginId = null;
     	boolean login = false;
     	boolean success = false;
@@ -102,6 +108,7 @@ public class BoardController {
     	Map<String, Object> result = new HashMap<>(); // 응답 데이터 저장용
     	
         boolean login = false;
+        
         String token = header.get("authorization");
 		Map<String, Object> payload = JwtUtils.readToken(token);
 		String loginId = (String) payload.get("id");
@@ -119,7 +126,37 @@ public class BoardController {
 		}
 		
 		result.put("loginYN", login); // 로그인 여부
+		
 		return result;
+    }
+    
+    // 게시글 리스트
+    @GetMapping ("/post/list/{page}")
+    public Map<String, Object> postList(
+    		@PathVariable int page,
+    		@RequestHeader Map<String, String> header){
+    	
+    	Map<String, Object> result = new HashMap<>(); // 응답 데이터 저장용
+
+    	String loginId = null;
+        boolean login = false;
+        
+    	// JWT 토큰에서 로그인 ID 추출
+    	loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+        
+    	if (loginId != null && !loginId.isEmpty()) {
+            login = true;
+        }
+
+        List<BoardDTO> list = svc.postList(page); // Service에서 게시글 리스트만 받아옴
+
+        result.put("success", true);
+        result.put("loginYN", login);
+        result.put("loginId", loginId);
+        result.put("list", list); // 게시글 리스트
+        result.put("page", page); // 페이지 정보
+		
+        return result;
     }
     
     

@@ -27,8 +27,17 @@
         SELECT user_id FROM board WHERE post_idx = #{post_idx}
     </select>
     
+    <!-- 게시글 삭제 -->
     <delete id="postDel">
 		DELETE FROM board WHERE post_idx = #{post_idx}
 	</delete>
+		
+    <!-- 게시글 전체 리스트 조회 -->
+    <select id="postList" resultType="com.bytehub.board.BoardDTO">
+        SELECT 
+            post_idx, user_id, category, subject, content, pinned, draft, reg_date, file_idx
+        FROM board
+        ORDER BY post_idx DESC
+    </select>
 		
 </mapper>
