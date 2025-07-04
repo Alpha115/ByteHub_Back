@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.bytehub.utils.JwtUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @SpringBootApplication
 public class ByteHubBackApplication {
 
@@ -14,6 +17,7 @@ public class ByteHubBackApplication {
 		
 		if(JwtUtils.getPri_key()==null) {
 			JwtUtils.setPri_key();
+			log.info("JWT Key 발행: {}", JwtUtils.getPri_key());
 		}
 	}
 

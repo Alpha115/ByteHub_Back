@@ -26,7 +26,7 @@ public class JwtUtils {
 	public static String getToken(Map<String, Object> map) {
 
 		return Jwts.builder().setHeaderParam("alg", "HS256").setHeaderParam("typ", "JWT").setClaims(map)
-				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 30)))
+				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 *24)))
 				.signWith(pri_key).compact();
 	}
 
