@@ -12,8 +12,20 @@ import java.util.Map;
 @Slf4j
 @Service
 public class MemberService {
+	
+	@Autowired MemberDAO dao;
 
-    @Autowired MemberDAO dao;
+	public boolean login(Map<String, String> info) {
+		// 사용자 정보 조회
+		MemberDTO member = dao.getMemberById(info.get("id"));
+		if (member == null) {
+			return false; // 사용자가 존재하지 않음
+		}
+		
+		// BCrypt로 비밀번호 비교
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		return passwordEncoder.matches(info.get("password"), member.getPassword());
+	}
 
     public boolean overlay(String id) {
         log.info("Service: " + id + " 중복체크");

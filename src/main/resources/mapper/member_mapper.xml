@@ -4,7 +4,6 @@
 
 <!-- 아이디 중복 체크 -->
 <mapper namespace="com.bytehub.member.MemberDAO">
-    
     <select id="countById" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM member WHERE user_id = #{id}
     </select>
@@ -16,6 +15,17 @@
             #{user_id}, #{file_idx}, #{dept_idx}, #{lv_idx}, #{password}, #{name}, #{email}, #{gender}, #{hire_date}
         )
     </insert>
+
+    <select id="getMemberById" parameterType="String" resultType="com.bytehub.member.MemberDTO">
+        SELECT user_id, file_idx, dept_idx, lv_idx, password, name, email, gender, hire_date 
+        FROM member 
+        WHERE user_id = #{user_id}
+    </select>
+
+    <select id="login" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM member 
+        WHERE user_id = #{id} AND password = #{password}
+    </select>
 </mapper>
 
 <!-- <mapper namespace="">
