@@ -22,4 +22,15 @@ public class BoardService {
 	    
 	}
 
+	// 게시글 수정
+	public boolean postUpdate(BoardDTO dto) {
+		int row = dao.postUpdate(dto);
+	    return row>0;
+	}
+	
+	// 컨트롤러가 게시글 작성자 ID를 가져오기 위한 헬퍼 메소드
+	public String postWriter(int post_idx) {
+		return dao.postWriter(post_idx);
+	}
+
 }
