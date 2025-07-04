@@ -14,12 +14,18 @@ import java.util.Map;
 public class MemberService {
 	
 	@Autowired MemberDAO dao;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	public boolean login(Map<String, String> info) {
 		log.info("Service: Login attempt for user: {}", info.get("id"));
+		
+		// encoder.matches([입력받은 pw], [db에 저장된 pw])
+		
 		int row = dao.login(info);
 		boolean result = row > 0 ? true : false;
 		log.info("Service: Login result: {}", result);
+		
+		
 		return result;
 	}
 
@@ -33,8 +39,7 @@ public class MemberService {
         Map<String, Object> resp = new HashMap<>();
         try {
             String rawPassword = (String) param.get("password");
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String encodedPassword = passwordEncoder.encode(rawPassword);
+            String encodedPassword = encoder.encode(rawPassword);
 
             MemberDTO member = new MemberDTO();
             member.setUser_id((String) param.get("user_id"));

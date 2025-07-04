@@ -39,10 +39,10 @@ public class EmailController {
 		Map<String, Object> mail = new HashMap<String, Object>();
 
 		mail.put("sender", sender);
-		mail.put("receiver", info.get("receiver")); // <post를 통해 입력받은 유저 이메일들(ArrayList<String>)
+		mail.put("receiver", info.get("receiver")); // <입력받은 유저 이메일들(ArrayList<String>)
 		mail.put("key", key);
-		mail.put("subject", info.get("subject"));	// <입력받은 메일 제목
-		mail.put("content", info.get("content"));	// <입력받은 메일 본문
+		mail.put("subject", info.get("subject"));	// <메일 제목
+		mail.put("content", info.get("content"));	// <메일 본문
 
 		props.setProperty("mail.smtp.host", host);
 		props.setProperty("mail.smtp.port", port);
@@ -50,7 +50,7 @@ public class EmailController {
 		props.setProperty("mail.smtp.starttls.enable", enable);
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 		
-		resp.put("msg", service.emergencySendMail());	// 반환값: 이메일 발송 메시지(String)
+		resp.put("msg", service.emergencySendMail());	// 반환값: 이메일 발송 메시지를 반환합니다.
 		
 		return resp;
 	}
