@@ -19,15 +19,26 @@ public class MemberService {
 	public boolean login(Map<String, String> info) {
 		log.info("Service: Login attempt for user: {}", info.get("id"));
 		
+		// 사용자 정보 조회
+		MemberDTO member = dao.getMemberById(info.get("id"));
+		if (member == null) {
+			log.info("Service: User not found: {}", info.get("id"));
+			return false; // 사용자가 존재하지 않음
+		}
+		
 		// encoder.matches([입력받은 pw], [db에 저장된 pw])
+		boolean passwordMatch = encoder.matches(info.get("password"), member.getPassword());
+		log.info("Service: Password match result: {}", passwordMatch);
 		
-		int row = dao.login(info);
-		boolean result = row > 0 ? true : false;
-		log.info("Service: Login result: {}", result);
-		
-		
-		return result;
+		return passwordMatch;
 	}
+
+    public String findUserId(String name, String email) {
+        log.info("Service: Finding user ID for name: {}, email: {}", name, email);
+        String userId = dao.findUserId(name, email);
+        log.info("Service: Found user ID: {}", userId);
+        return userId;
+    }
 
     public boolean overlay(String id) {
         log.info("Service: " + id + " 중복체크");

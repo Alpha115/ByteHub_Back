@@ -26,8 +26,9 @@
         SELECT COUNT(*) FROM member 
         WHERE user_id = #{id} AND password = #{password}
     </select>
+
+    <select id="findUserId" parameterType="Map" resultType="String">
+        SELECT user_id FROM member 
+        WHERE name = #{name} AND email = #{email}
+    </select>
 </mapper>
-
-<!-- <mapper namespace="">
-
-</mapper> -->

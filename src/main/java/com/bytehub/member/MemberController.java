@@ -59,4 +59,26 @@ public class MemberController {
         result.put("use", success);
         return result;
     }
+
+    // 아이디 찾기
+    @PostMapping("/find-id")
+    public Map<String, Object> findUserId(@RequestBody Map<String, String> info) {
+        log.info("아이디 찾기 요청 - 이름: {}, 이메일: {}", info.get("name"), info.get("email"));
+        Map<String, Object> result = new HashMap<>();
+        
+        String userId = service.findUserId(info.get("name"), info.get("email"));
+        
+        if (userId != null && !userId.isEmpty()) {
+            result.put("success", true);
+            result.put("user_id", userId);
+            result.put("message", "아이디를 찾았습니다: " + userId);
+            log.info("아이디 찾기 성공: {}", userId);
+        } else {
+            result.put("success", false);
+            result.put("message", "해당 정보로 등록된 아이디가 없습니다.");
+            log.info("아이디 찾기 실패: 해당 정보 없음");
+        }
+        
+        return result;
+    }
 }

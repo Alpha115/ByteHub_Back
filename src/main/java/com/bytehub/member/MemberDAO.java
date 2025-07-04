@@ -10,4 +10,5 @@ public interface MemberDAO {
     int insertMember(MemberDTO member);
     MemberDTO getMemberById(String user_id);
     int login(Map<String, String> info);
+    String findUserId(@Param("name") String name, @Param("email") String email);
 }
