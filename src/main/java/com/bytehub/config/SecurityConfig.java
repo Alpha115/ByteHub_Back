@@ -40,9 +40,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http.httpBasic().disable().build();
-		// ^^^ csrf 문제가 생기면 csrf도 disable합니다.
-		// 그런데 next.js는 안뜬대서…
+		return http.httpBasic().disable().csrf().disable().build();
 	}
 
 	
