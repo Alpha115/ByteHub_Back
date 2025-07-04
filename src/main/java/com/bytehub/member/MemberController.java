@@ -39,12 +39,10 @@ public class MemberController {
         if (success) {
             // 세션에 로그인 정보 저장 (LoginChecker가 요구하는 부분)
             session.setAttribute("loginId", info.get("id"));
-            
             String token = JwtUtils.getToken("id", info.get("id"));
             result.put("token", token);
             result.put("success", success);
         }
-        
         return result;
     }
 

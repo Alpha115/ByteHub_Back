@@ -10,12 +10,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.bytehub.utils.LoginChecker;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 //configure file
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
@@ -25,7 +27,8 @@ public class SecurityConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// ★여기에다가 addPathPatterns 추가해서 어떤 url에서 로그인 체크할건지 설정하시면 됩니다~
-		registry.addInterceptor(checker).excludePathPatterns("/member*");
+		registry.addInterceptor(checker).excludePathPatterns("/**");
+		
 	}
 
 	@Bean
