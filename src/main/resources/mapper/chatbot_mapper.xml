@@ -2,6 +2,9 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="chatbot_mapper">
+<mapper namespace="com.bytehub.chatbot.ChatBotDAO">
     <!-- 쿼리 작성 -->
+   	<insert id="insertKeyword">
+		insert into search(user_id,keyword,response) value(#{user_id},#{keyword},#{response})
+	</insert>
 </mapper>
