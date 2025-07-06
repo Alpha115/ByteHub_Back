@@ -1,5 +1,6 @@
 package com.bytehub.chatbot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,5 +34,40 @@ public class ChatBotController {
 		
 		return resp;
 	}
-
+	
+	@PostMapping("/list")
+	public Map<String, Object> listKeyword(){
+		
+		resp = new HashMap<String, Object>();
+		
+		ArrayList<SearchDTO> list = service.listKeyword();
+		
+		resp.put("list", list);
+		
+		return resp;
+	}
+	
+	@PostMapping("/update")
+	public Map<String, Object> updateKeyword(@RequestBody SearchDTO dto){
+		
+		resp = new HashMap<String, Object>();
+		
+		boolean suc = service.updateKeyword(dto);
+		
+		resp.put("suc", suc);
+		
+		return resp;
+	}
+	
+	@PostMapping("/delete")
+	public Map<String, Object> delKeyword(@RequestBody SearchDTO dto){
+		
+		resp = new HashMap<String, Object>();
+		
+		boolean suc = service.delKeyword(dto);
+		
+		resp.put("suc", suc);
+		
+		return resp;
+	}
 }
