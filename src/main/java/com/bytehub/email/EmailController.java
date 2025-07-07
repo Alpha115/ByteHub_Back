@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailController {
 
 	Map<String, Object> resp = null;
+
 	private final EmailService service;
 		private final MemberService memberService;
 	int randomNum = -1;

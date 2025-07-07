@@ -28,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
 	
-	private final LoginChecker checker;
+	private final LoginChecker checker = new LoginChecker();
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
