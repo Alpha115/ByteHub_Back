@@ -31,4 +31,10 @@
         SELECT user_id FROM member 
         WHERE name = #{name} AND email = #{email}
     </select>
+
+    <update id="updatePassword" parameterType="Map">
+        UPDATE member 
+        SET password = #{password} 
+        WHERE user_id = #{user_id}
+    </update>
 </mapper>

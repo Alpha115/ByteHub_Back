@@ -76,5 +76,31 @@ public class MemberService {
         return resp;
     }
 
+    // 아이디와 이메일로 사용자 확인
+    public boolean checkUserByIdAndEmail(String userId, String email) {
+        log.info("Service: Checking user by ID: {} and email: {}", userId, email);
+        MemberDTO member = dao.getMemberById(userId);
+        if (member != null && email.equals(member.getEmail())) {
+            log.info("Service: User found and email matches");
+            return true;
+        }
+        log.info("Service: User not found or email doesn't match");
+        return false;
+    }
+
+    // 비밀번호 업데이트
+    public boolean updatePassword(String userId, String newPassword) {
+        log.info("Service: Updating password for user: {}", userId);
+        try {
+            String encodedPassword = encoder.encode(newPassword);
+            int result = dao.updatePassword(userId, encodedPassword);
+            boolean success = result > 0;
+            log.info("Service: Password update result: {}", success);
+            return success;
+        } catch (Exception e) {
+            log.error("Service: Password update failed: {}", e.getMessage(), e);
+            return false;
+        }
+    }
 
 }
