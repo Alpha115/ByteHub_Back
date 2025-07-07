@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="dept_mapper">
-    <!-- 쿼리 작성 -->
+<mapper namespace="com.bytehub.department.DeptDAO">
+
+   	<insert id="deptInsert" parameterType="com.bytehub.department.DeptDTO">
+		insert into department(dept_name) value(#{dept_name})
+	</insert>
+	
+	<select id="deptList" parameterType="com.bytehub.department.DeptDTO">
+		select * from department
+	</select>
+	
+	<update id="deptUpdate" parameterType="com.bytehub.department.DeptDTO">
+	    UPDATE department
+	    SET
+	        dept_name = #{dept_name}
+	    WHERE dept_idx = #{dept_idx}
+	</update>
+	
+	<update id="deptDelete" parameterType="com.bytehub.department.DeptDTO">
+	    UPDATE department
+	    SET
+	        status = 1
+	    WHERE dept_idx = #{dept_idx}
+	</update>
+	
 </mapper>
