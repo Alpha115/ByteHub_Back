@@ -22,6 +22,7 @@ public class EmailService {
 	// 비상연락망단체메일보내기
 	public String emergencySendMail(Properties props, Map<String, Object> mail) {
 
+		// 여기서부터
 		String sender = (String) mail.get("sender");
 		String key = (String) mail.get("key");
 		@SuppressWarnings("unchecked")
@@ -36,7 +37,7 @@ public class EmailService {
 		Message msg = new MimeMessage(session);
 
 		try {
-			for (String to : receivers) {
+			for (String to : receivers) {	// for문 빼고
 				msg.setFrom(new InternetAddress(sender));
 				msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 				msg.setSubject((String) mail.get("subject"));
@@ -51,5 +52,6 @@ public class EmailService {
 
 		return "이메일을 발송했습니다.";
 	}
+	// 여까지 하면 되실듯?
 
 }
