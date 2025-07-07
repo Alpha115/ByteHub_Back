@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="chatbot_mapper">
+<mapper namespace="com.bytehub.chatbot.ChatBotDAO">
     <!-- 쿼리 작성 -->
+   	<insert id="insertKeyword">
+		insert into search(user_id,keyword,response) value(#{user_id},#{keyword},#{response})
+	</insert>
+	
+	<select id="listKeyword">
+		select * from search
+	</select>
+	
+	<update id="updateKeyword"  parameterType="com.bytehub.chatbot.SearchDTO">
+	    UPDATE search
+	    SET
+	        user_id = #{user_id},
+	        keyword = #{keyword},
+	        response = #{response}
+	    WHERE key_idx = #{key_idx}
+	</update>
+	
+	<update id="delKeyword"  parameterType="com.bytehub.chatbot.SearchDTO">
+		UPDATE search
+		SET status = NOT status
+		WHERE key_idx = #{key_idx}
+	</update>
 </mapper>
