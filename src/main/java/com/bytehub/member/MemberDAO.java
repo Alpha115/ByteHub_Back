@@ -12,4 +12,5 @@ public interface MemberDAO {
     int login(Map<String, String> info);
     String findUserId(@Param("name") String name, @Param("email") String email);
     int updatePassword(@Param("user_id") String user_id, @Param("password") String password);
+    int updateMember(MemberDTO member);
 }

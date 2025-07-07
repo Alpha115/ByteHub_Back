@@ -81,4 +81,12 @@ public class MemberController {
         
         return result;
     }
+    @PostMapping("/logout")
+    public Map<String, Object> logout(HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        session.invalidate(); // 세션 전체 무효화 (모든 세션 데이터 삭제)
+        result.put("success", true);
+        result.put("message", "로그아웃 되었습니다.");
+        return result;
+}
 }

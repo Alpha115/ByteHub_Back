@@ -37,4 +37,11 @@
         SET password = #{password} 
         WHERE user_id = #{user_id}
     </update>
+
+    <update id="updateMember" parameterType="com.bytehub.member.MemberDTO">
+        UPDATE member 
+        SET email = #{email},
+            password = #{password}
+        WHERE user_id = #{user_id}
+    </update>
 </mapper>
