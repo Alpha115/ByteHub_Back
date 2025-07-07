@@ -1,6 +1,7 @@
 package com.bytehub.chatbot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -32,6 +33,21 @@ public class ChatBotService {
 	public boolean delKeyword(SearchDTO dto) {
 		int row = dao.delKeyword(dto);
 		return row > 0 ? true : false;
+	}
+
+	public boolean faqInsert(FAQDTO dto) {
+		
+		int row = dao.faqInsert(dto);
+		
+		return row > 0 ? true : false;
+	}
+
+	public ArrayList<FAQDTO> faqList(FAQDTO dto) {
+		return dao.faqList(dto);
+	}
+
+	public List<FAQDTO> faqTop5() {
+		return dao.faqTop5();
 	}
 
 }

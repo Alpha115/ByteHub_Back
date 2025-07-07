@@ -12,5 +12,6 @@ public class SearchDTO {
 	private String keyword;
 	private String response;
 	private boolean status;
+	private String keyword_active;
 
 }

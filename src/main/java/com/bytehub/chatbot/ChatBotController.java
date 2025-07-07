@@ -2,6 +2,7 @@ package com.bytehub.chatbot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -81,4 +82,37 @@ public class ChatBotController {
 		
 		return resp;
 	}
+	
+	@PostMapping("/faq/insert")
+	public Map<String, Object> faqInsert(@RequestBody FAQDTO dto){
+		
+		resp = new HashMap<String, Object>();
+		
+		boolean suc = service.faqInsert(dto);
+		
+		resp.put("suc", suc);
+		
+		return resp;
+	}
+	
+	@PostMapping("/faq/list")
+	public Map<String, Object> faqList(@RequestBody FAQDTO dto){
+		
+		resp = new HashMap<String, Object>();
+		
+		ArrayList<FAQDTO> list = service.faqList(dto);
+		
+		resp.put("list", list);
+		
+		return resp;
+	}
+	
+    @PostMapping("/faq/top5")
+    public Map<String, Object> faqTop5() {
+        Map<String, Object> resp = new HashMap<>();
+        List<FAQDTO> list = service.faqTop5();
+        
+        resp.put("list", list);
+        return resp;
+    }
 }

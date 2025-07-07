@@ -24,5 +24,21 @@
 	<update id="delKeyword" parameterType="com.bytehub.chatbot.SearchDTO">
 	    UPDATE search SET status = 1 WHERE key_idx = #{key_idx}
 	</update>
+	
+   	<insert id="faqInsert" parameterType="com.bytehub.chatbot.FAQDTO">
+		insert into faq(question,answer) value(#{question},#{answer})
+	</insert>
+	
+	<select id="faqList">
+		select * from faq
+	</select>
+	
+	<select id="faqTop5" resultType="com.bytehub.chatbot.FAQDTO">
+	  SELECT question, answer, COUNT(*) AS cnt
+	  FROM faq
+	  GROUP BY question
+	  ORDER BY cnt DESC
+	  LIMIT 5
+	</select>
 
 </mapper>
