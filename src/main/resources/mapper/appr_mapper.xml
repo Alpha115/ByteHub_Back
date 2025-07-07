@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- ApprDAO와 연결됩니다. -->
+<mapper namespace="com.bytehub.approval.ApprDAO">
+
+	<insert id="createAppr" parameterType="com.bytehub.approval.ApprDTO" useGeneratedKeys="true" keyProperty="appr_idx">
+		INSERT INTO approval (writer_id, subject, content, appr_date, appr_type)
+		VALUES (#{writer_id}, #{subject}, #{content}, #{appr_date}, #{appr_type})
+	</insert>
+
+	<insert id="appr_checker" parameterType="map">
+		INSERT INTO appr_history (appr_idx, step, lv_idx, checker_id, status, check_time, reason)
+		VALUES (#{appr_idx}, #{step}, #{lv_idx}, #{checker_id}, #{status}, #{check_time}, #{reason})
+	</insert>
+
+	<select id="getApprLine" resultType="com.bytehub.approval.ApprLineDTO">
+		SELECT step, lv_idx, user_id FROM appr_line ORDER BY step ASC
+	</select>
+
+	<update id="updateStatus" parameterType="map">
+		UPDATE appr_history
+		SET status = #{status},
+			reason = #{reason},
+			check_time = #{check_time}
+		WHERE appr_his_idx = #{appr_his_idx}
+	</update>
+	
+</mapper>
