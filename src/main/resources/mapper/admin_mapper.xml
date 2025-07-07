@@ -21,6 +21,7 @@
 			hire_date,
 			withdraw
 		FROM member m
+		ORDER BY withdraw ASC
 	</select>
 	
 </mapper>
