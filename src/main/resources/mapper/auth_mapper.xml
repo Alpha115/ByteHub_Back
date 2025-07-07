@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="auth_mapper">
-    <!-- 쿼리 작성 -->
+<mapper namespace="com.bytehub.auth.AuthDAO">
+
+    <insert id="addAuth" parameterType="map">
+    	insert into auth(user_id, access_type, access_idx, auth)
+		values (#{user_id}, #{access_type}, #{access_idx}, #{auth})
+    </insert>
+    
+    <delete id="delAuth" parameterType="map">
+    	delete from auth where 
+    	user_id = #{user_id}
+    	and access_type = #{access_type} 
+    	and access_idx = #{access_idx}
+    </delete>
+    
+    <select id="grantId" resultType="com.bytehub.auth.AuthDTO">
+    	select * from auth where user_id=#{param1}
+    </select>
+    
 </mapper>
