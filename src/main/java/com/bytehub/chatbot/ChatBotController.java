@@ -24,15 +24,26 @@ public class ChatBotController {
 	Map<String, Object> resp=null;
 	
 	@PostMapping("/insert")
-	public Map<String, Object> insertKeyword(@RequestBody Map<String, Object> param){
-		
-		resp = new HashMap<String, Object>();
-		
-		boolean suc = service.insertKeyword(param);
-		
-		resp.put("suc", suc);
-		
-		return resp;
+	public Map<String, Object> insertKeyword(@RequestBody Map<String, Object> param) {
+	    Map<String, Object> resp = new HashMap<>();
+	    try {
+	        boolean suc = service.insertKeyword(param);
+	        resp.put("suc", suc);
+	    } catch (Exception e) {
+	        // MySQL/MariaDB Duplicate Key 에러코드: 1062
+	        if (e.getCause() != null && e.getCause() instanceof java.sql.SQLIntegrityConstraintViolationException) {
+	            java.sql.SQLIntegrityConstraintViolationException sqlEx = (java.sql.SQLIntegrityConstraintViolationException) e.getCause();
+	            if (sqlEx.getErrorCode() == 1062) {
+	                resp.put("suc", false);
+	                resp.put("code", 1062);
+	                resp.put("message", "이미 등록된 키워드입니다.");
+	                return resp;
+	            }
+	        }
+	        resp.put("suc", false);
+	        resp.put("message", e.getMessage());
+	    }
+	    return resp;
 	}
 	
 	@PostMapping("/list")

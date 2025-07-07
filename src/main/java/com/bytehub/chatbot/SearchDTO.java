@@ -11,5 +11,6 @@ public class SearchDTO {
 	private String user_id;
 	private String keyword;
 	private String response;
+	private boolean status;
 
 }

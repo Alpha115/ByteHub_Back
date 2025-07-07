@@ -21,9 +21,8 @@
 	    WHERE key_idx = #{key_idx}
 	</update>
 	
-	<update id="delKeyword"  parameterType="com.bytehub.chatbot.SearchDTO">
-		UPDATE search
-		SET status = NOT status
-		WHERE key_idx = #{key_idx}
+	<update id="delKeyword" parameterType="com.bytehub.chatbot.SearchDTO">
+	    UPDATE search SET status = 1 WHERE key_idx = #{key_idx}
 	</update>
+
 </mapper>
