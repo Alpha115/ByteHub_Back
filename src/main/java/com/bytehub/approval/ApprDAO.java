@@ -12,4 +12,6 @@ public interface ApprDAO {
     int updateStatus(Map<String, Object> param);
     List<Map<String, Object>> getMyAppr(String writer_id);
     List<Map<String, Object>> getMyHistory(String checker_id);
+    List<Map<String, Object>> getAllApprovals();
+    Map<String, Object> getApprovalDetail(int appr_idx);
 }
