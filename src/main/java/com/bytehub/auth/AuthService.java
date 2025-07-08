@@ -20,6 +20,7 @@ public class AuthService {
 	public boolean grant(ArrayList<Map<String, Object>> info) {
 		int row = 0;
 		// 여기에서 update 하기
+		// 중복되는거 좀 없었으면 좋겠는디...
 		for (Map<String, Object> map : info) {
 			if((boolean) map.get("checked")) {
 				row+=dao.addAuth(map);
