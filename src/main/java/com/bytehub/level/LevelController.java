@@ -1,4 +1,4 @@
-package com.bytehub.department;
+package com.bytehub.level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytehub.member.MemberDTO;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,46 +17,43 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/dept")
-public class DeptController {
+@RequestMapping("/level")
+public class LevelController {
 
-	private final DeptService service;
+	private final LevelService service;
 	
 	Map<String, Object> resp=null;
 	
-	@PostMapping("/insert")
-	public Map<String, Object> deptInsert(@RequestBody DeptDTO dto){
+	@PostMapping("/list")
+	public Map<String, Object> lvList(LevelDTO dto){
 		
 		resp = new HashMap<String, Object>();
-		System.out.println("user_id in DTO: " + dto.getUser_id());
-		boolean suc = service.deptInsert(dto);
+		
+		ArrayList<LevelDTO> list = service.lvList(dto);
+		
+		resp.put("list", list);
+		
+		return resp;
+	}
+	
+	@PostMapping("/insert")
+	public Map<String, Object> lvInsert(@RequestBody LevelDTO dto){
+		
+		resp = new HashMap<String, Object>();
+
+		boolean suc = service.lvInsert(dto);
 		
 		resp.put("suc", suc);
 		
 		return resp;
 	}
 	
-	
-	@PostMapping("/list")
-	public Map<String, Object> deptList(DeptDTO dto, MemberDTO mem){
-
-		resp = new HashMap<String, Object>();
-		
-		ArrayList<DeptDTO> list = service.deptList(dto);
-		ArrayList<MemberDTO> member = service.memberList(mem);
-		
-		resp.put("list", list);
-		resp.put("member", member);
-		
-		return resp;
-	}
-	
 	@PostMapping("/update")
-	public Map<String, Object> deptUpdate(@RequestBody DeptDTO dto){
-
+	public Map<String, Object> lvUpdate(@RequestBody LevelDTO dto){
+		
 		resp = new HashMap<String, Object>();
 		
-		boolean suc = service.deptUpdate(dto);
+		boolean suc = service.lvUpdate(dto);
 		
 		resp.put("suc", suc);
 		
@@ -66,14 +61,17 @@ public class DeptController {
 	}
 	
 	@PostMapping("/delete")
-	public Map<String, Object> deptDelete(@RequestBody DeptDTO dto){
+	public Map<String, Object> lvDelete(@RequestBody LevelDTO dto){
 		
 		resp = new HashMap<String, Object>();
 		
-		boolean suc = service.deptDelete(dto);
+		boolean suc = service.lvDelete(dto);
 		
 		resp.put("suc", suc);
 		
 		return resp;
+		
 	}
+	
 }
+	

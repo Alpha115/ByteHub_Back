@@ -8,7 +8,8 @@ import lombok.Setter;
 public class DeptDTO {
 
 	private int dept_idx;
-	private String dpet_name;
+	private String dept_name;
 	private boolean status;
+	private String user_id;
 	
 }
