@@ -53,7 +53,7 @@
 		FROM board
 		WHERE post_idx = #{idx}
 	</select>
-    
+
     
 		
 </mapper>

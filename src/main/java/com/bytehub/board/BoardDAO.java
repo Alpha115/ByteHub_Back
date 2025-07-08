@@ -29,4 +29,5 @@ public interface BoardDAO {
 	// 게시글 상세보기
 	BoardDTO postDetail(int idx);
 
+
 }
