@@ -69,9 +69,9 @@ public class BoardService {
 	}
 
 	// 게시글 상세보기
-	public BoardDTO postDetail(int idx) {
-		return dao.postDetail(idx);
-	}
+		public BoardDTO postDetail(int idx) {
+			return dao.postDetail(idx);
+		}
 
 
 }

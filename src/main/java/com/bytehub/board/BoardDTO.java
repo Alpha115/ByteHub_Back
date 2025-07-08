@@ -1,6 +1,8 @@
 package com.bytehub.board;
 
 import java.sql.Timestamp;
+import java.util.List;
+
 import com.bytehub.board.BoardCategory;
 
 public class BoardDTO {
@@ -15,6 +17,8 @@ public class BoardDTO {
 	private int file_idx; // 파일 인덱스
 
 	private BoardCategory category; // 게시판 종류
+	
+
 
 	// 게시판 종류 getter/setter
     public BoardCategory getCategory() {
@@ -79,7 +83,7 @@ public class BoardDTO {
 	public void setFile_idx(int file_idx) {
 		this.file_idx = file_idx;
 	}
-	
+
 	
 	
 
