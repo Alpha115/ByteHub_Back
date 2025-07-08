@@ -96,30 +96,4 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/list")
-    public Map<String, Object> getAllApprovals() {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result.put("success", true);
-            result.put("data", service.getAllApprovals());
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("msg", "조회 실패: " + e.getMessage());
-        }
-        return result;
-    }
-
-    @GetMapping("/detail/{appr_idx}")
-    public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result.put("success", true);
-            result.put("data", service.getApprovalDetail(appr_idx));
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("msg", "조회 실패: " + e.getMessage());
-        }
-        return result;
-    }
-
 }
