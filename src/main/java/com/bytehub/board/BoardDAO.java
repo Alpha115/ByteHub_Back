@@ -1,6 +1,7 @@
 package com.bytehub.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,5 +25,8 @@ public interface BoardDAO {
 
 	// 상단 고정 3개까지 ㄱㄴ
 	int cntPinned();
+
+	// 게시글 상세보기
+	BoardDTO postDetail(int idx);
 
 }

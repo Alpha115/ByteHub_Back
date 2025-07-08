@@ -41,8 +41,13 @@ public class BoardController {
     	boolean login = false;
     	boolean success = false;
     	
-    	// JWT 토큰에서 로그인 ID 추출
-    	loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+    	// JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+    	try {
+    		loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+    	} catch (Exception e) {
+    		log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+    		loginId = null;
+    	}
     	
     	result.put("success", false);
     	result.put("loginYN", false);
@@ -75,8 +80,20 @@ public class BoardController {
         boolean login = false;
         boolean success = false;
         
-	    // JWT 토큰에서 로그인 ID 추출
-	    loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+	    // JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+	    try {
+	    	String token = header.get("authorization");
+	    	log.info("수정 API - 받은 토큰: {}", token);
+	    	Map<String, Object> tokenData = JwtUtils.readToken(token);
+	    	log.info("수정 API - 토큰 파싱 결과: {}", tokenData);
+	    	loginId = (String) tokenData.get("id");
+	    	log.info("수정 API - 추출된 loginId: {}", loginId);
+	    } catch (Exception e) {
+	    	log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+	    	// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용
+	    	loginId = dto.getUser_id();
+	    	log.info("JWT 파싱 실패로 인해 프론트엔드에서 전송한 사용자 ID 사용: {}", loginId);
+	    }
 	    result.put("success", false);
 		result.put("loginYN", false);
 		
@@ -84,10 +101,13 @@ public class BoardController {
 		if (loginId != null && !loginId.isEmpty()) {
 	        login = true;
 			String postWriter = svc.postWriter(dto.getPost_idx()); // DB에서 게시글 작성자 ID 조회
+			log.info("수정 권한 확인 - loginId: {}, postWriter: {}, post_idx: {}", loginId, postWriter, dto.getPost_idx());
 	        if (postWriter != null && loginId.equals(postWriter)) {
 	        	success = svc.postUpdate(dto); // 게시글 수정
+	        	log.info("수정 성공: {}", success);
 			}else {
 				success = false; // 작성자 불일치
+				log.warn("수정 실패 - 작성자 불일치: loginId={}, postWriter={}", loginId, postWriter);
 			}
 	    }
 		
@@ -110,18 +130,30 @@ public class BoardController {
         boolean login = false;
         
         String token = header.get("authorization");
-		Map<String, Object> payload = JwtUtils.readToken(token);
-		String loginId = (String) payload.get("id");
+		String loginId = null;
+		try {
+			Map<String, Object> payload = JwtUtils.readToken(token);
+			loginId = (String) payload.get("id");
+		} catch (Exception e) {
+			log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+			// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용
+			loginId = dto.getUser_id();
+			log.info("JWT 파싱 실패로 인해 프론트엔드에서 전송한 사용자 ID 사용: {}", loginId);
+		}
 		
 		// 로그인 ID가 있으면 게시글 작성자와 일치하는지 확인
 		if (loginId != null && !loginId.isEmpty()) {
 			
 			String postWriter = svc.postWriter(dto.getPost_idx()); // DB에서 게시글 작성자 ID 조회
+			log.info("삭제 권한 확인 - loginId: {}, postWriter: {}, post_idx: {}", loginId, postWriter, dto.getPost_idx());
 			
 			if (loginId.equals(postWriter)) {
 				boolean success = svc.postDel(dto); // 게시글 삭제
 				result.put("success", success); // 성공 여부
 				login = true;
+				log.info("삭제 성공: {}", success);
+			} else {
+				log.warn("삭제 실패 - 작성자 불일치: loginId={}, postWriter={}", loginId, postWriter);
 			}
 		}
 		
@@ -141,8 +173,13 @@ public class BoardController {
     	String loginId = null;
         boolean login = false;
         
-    	// JWT 토큰에서 로그인 ID 추출
-    	loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+    	// JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+    	try {
+    		loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+    	} catch (Exception e) {
+    		log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+    		loginId = null;
+    	}
         
     	if (loginId != null && !loginId.isEmpty()) {
             login = true;
@@ -165,6 +202,58 @@ public class BoardController {
     public int getPinnedCnt() {
         return svc.cntPinned();
     }
+    
+    // 게시글 상세보기
+    @GetMapping("/post/detail/{post_idx}")
+    public Map<String, Object> postDetail(
+    		@PathVariable int post_idx,
+    		@RequestHeader Map<String, String> header){
+    	
+    	Map<String, Object> result = new HashMap<>(); // 응답 데이터 저장용
+    	
+    	String loginId = null;
+        boolean login = false;
+        
+	     // JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+		try {
+			loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
+		} catch (Exception e) {
+			log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+			loginId = null;
+		}
+	    
+		if (loginId != null && !loginId.isEmpty()) {
+	        login = true;
+	    }
+		
+		// 게시글 상세 정보 가져오기
+		BoardDTO postData = svc.postDetail(post_idx);
+		
+		if (postData != null) {
+			// BoardDTO의 필드들을 Map에 추가
+			result.put("post_idx", postData.getPost_idx());
+			result.put("user_id", postData.getUser_id());
+			result.put("subject", postData.getSubject());
+			result.put("content", postData.getContent());
+			result.put("pinned", postData.isPinned());
+			result.put("draft", postData.isDraft());
+			result.put("reg_date", postData.getReg_date());
+			result.put("file_idx", postData.getFile_idx());
+			result.put("category", postData.getCategory());
+			
+			// 로그인 정보 추가
+			result.put("success", true);
+			result.put("loginYN", login);
+			result.put("loginId", loginId);
+		} else {
+			result.put("success", false);
+			result.put("message", "게시글을 찾을 수 없습니다.");
+		}
+		
+	    return result;
+    	
+    }
+    
     
     
     

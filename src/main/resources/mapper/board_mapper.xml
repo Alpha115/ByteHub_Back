@@ -45,6 +45,14 @@
 	<select id="cntPinned" resultType="int">
 	    SELECT COUNT(*) FROM board WHERE pinned = 1
 	</select>
+	
+	<!-- 게시글 상세보기 -->
+	<select id="postDetail" parameterType="int" resultType="com.bytehub.board.BoardDTO">
+		SELECT
+		post_idx, user_id, category, subject, content, pinned, draft, reg_date, file_idx
+		FROM board
+		WHERE post_idx = #{idx}
+	</select>
     
     
 		

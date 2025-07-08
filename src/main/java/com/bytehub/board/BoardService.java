@@ -50,8 +50,6 @@ public class BoardService {
 	
 	// 컨트롤러가 게시글 작성자 ID를 가져오기 위한 헬퍼 메소드
 	public String postWriter(int post_idx) {
-		
-		
 		return dao.postWriter(post_idx);
 	}
 
@@ -68,6 +66,11 @@ public class BoardService {
 		
 		int offset = (page - 1) * post_count; // 페이지 시작 위치 계산
 		return dao.postList(offset, post_count);
+	}
+
+	// 게시글 상세보기
+	public BoardDTO postDetail(int idx) {
+		return dao.postDetail(idx);
 	}
 
 
