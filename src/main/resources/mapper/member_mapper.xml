@@ -44,4 +44,10 @@
             password = #{password}
         WHERE user_id = #{user_id}
     </update>
+    
+    <select id="memberList">
+    	select * from member m
+		join level l on m.lv_idx = l.lv_idx 
+		join department d on d.dept_idx  = m.dept_idx ;
+    </select>
 </mapper>

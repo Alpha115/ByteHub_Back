@@ -2,6 +2,8 @@ package com.bytehub.member;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.ArrayList;
 import java.util.Map;
 
 @Mapper
@@ -13,4 +15,5 @@ public interface MemberDAO {
     String findUserId(@Param("name") String name, @Param("email") String email);
     int updatePassword(@Param("user_id") String user_id, @Param("password") String password);
     int updateMember(MemberDTO member);
+	ArrayList<MemberDTO> memberList(MemberDTO dto);
 }

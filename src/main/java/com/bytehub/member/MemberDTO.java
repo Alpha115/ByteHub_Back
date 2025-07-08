@@ -14,4 +14,6 @@ public class MemberDTO {
     private String email;
     private String gender;
     private Date hire_date;
+    private String lv_name;
+    private String dept_name;
 }
