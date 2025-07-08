@@ -10,4 +10,6 @@ public interface ApprDAO {
     int appr_checker(Map<String, Object> param);
     List<ApprLineDTO> getApprLine();
     int updateStatus(Map<String, Object> param);
+    List<Map<String, Object>> getMyAppr(String writer_id);
+    List<Map<String, Object>> getMyHistory(String checker_id);
 }

@@ -26,5 +26,26 @@
 			check_time = #{check_time}
 		WHERE appr_his_idx = #{appr_his_idx}
 	</update>
+
+	<select id="getMyAppr" resultType="map">
+		SELECT 
+			a.*,
+			CASE 
+				WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
+				WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
+				ELSE '대기중'
+			END as final_status
+		FROM approval a 
+		WHERE a.writer_id = #{writer_id} 
+		ORDER BY a.appr_date DESC
+	</select>
+
+    <select id="getMyHistory" resultType="map">
+        SELECT h.*, a.subject, a.writer_id, a.appr_date, a.appr_type
+        FROM appr_history h
+        JOIN approval a ON h.appr_idx = a.appr_idx
+        WHERE h.checker_id = #{checker_id}
+        ORDER BY h.check_time DESC
+    </select>
 	
 </mapper>

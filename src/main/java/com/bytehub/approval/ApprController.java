@@ -6,10 +6,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
@@ -62,6 +64,32 @@ public class ApprController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("msg", "상태 변경 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/my")
+    public Map<String, Object> getMyAppr(@RequestParam String writer_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getMyAppr(writer_id));
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/history")
+    public Map<String, Object> getMyHistory(@RequestParam String checker_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getMyHistory(checker_id));
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
         }
         return result;
     }

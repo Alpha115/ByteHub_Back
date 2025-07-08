@@ -38,4 +38,12 @@ public class ApprService {
     public int updateStatus(Map<String, Object> param) {
         return dao.updateStatus(param);
     }
+
+    public List<Map<String, Object>> getMyAppr(String writer_id) {
+        return dao.getMyAppr(writer_id);
+    }
+
+    public List<Map<String, Object>> getMyHistory(String checker_id) {
+        return dao.getMyHistory(checker_id);
+    }
 }
