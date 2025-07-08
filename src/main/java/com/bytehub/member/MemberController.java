@@ -3,6 +3,8 @@ package com.bytehub.member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,5 +90,13 @@ public class MemberController {
         result.put("success", true);
         result.put("message", "로그아웃 되었습니다.");
         return result;
-}
+	}
+    
+    @PostMapping("/list")
+    public Map<String, Object> memberList(MemberDTO dto){
+        Map<String, Object> result = new HashMap<>();
+        ArrayList<MemberDTO> list = service.memberList(dto);
+    	result.put("list", list);
+    	return result;
+    }
 }
