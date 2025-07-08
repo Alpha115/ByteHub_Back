@@ -46,4 +46,12 @@ public class ApprService {
     public List<Map<String, Object>> getMyHistory(String checker_id) {
         return dao.getMyHistory(checker_id);
     }
+
+    public List<Map<String, Object>> getAllApprovals() {
+        return dao.getAllApprovals();
+    }
+
+    public Map<String, Object> getApprovalDetail(int appr_idx) {
+        return dao.getApprovalDetail(appr_idx);
+    }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,7 @@ public class ApprController {
             service.createApprWithLine(appr);
             result.put("success", true);
             result.put("msg", "결재 문서와 결재라인 내역이 등록되었습니다.");
+            result.put("appr_idx", appr.getAppr_idx());
         } catch (Exception e) {
             result.put("success", false);
             result.put("msg", "등록 실패: " + e.getMessage());
@@ -87,6 +89,32 @@ public class ApprController {
         try {
             result.put("success", true);
             result.put("data", service.getMyHistory(checker_id));
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/list")
+    public Map<String, Object> getAllApprovals() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getAllApprovals());
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/detail/{appr_idx}")
+    public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getApprovalDetail(appr_idx));
         } catch (Exception e) {
             result.put("success", false);
             result.put("msg", "조회 실패: " + e.getMessage());
