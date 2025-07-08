@@ -95,7 +95,6 @@ public class ApprController {
         }
         return result;
     }
-<<<<<<< Updated upstream
 
     @GetMapping("/list")
     public Map<String, Object> getAllApprovals() {
@@ -122,14 +121,5 @@ public class ApprController {
         }
         return result;
     }
-=======
-    
-    // 총 연차 조회
-    // 사용 연차 조회
-    // 잔여 연차 조회
-    // 연차 상세 내역 조회
-    
 
-    
->>>>>>> Stashed changes
 }
