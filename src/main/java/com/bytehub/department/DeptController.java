@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytehub.member.MemberDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class DeptController {
 	public Map<String, Object> deptInsert(@RequestBody DeptDTO dto){
 		
 		resp = new HashMap<String, Object>();
-		
+		System.out.println("user_id in DTO: " + dto.getUser_id());
 		boolean suc = service.deptInsert(dto);
 		
 		resp.put("suc", suc);
@@ -37,14 +38,17 @@ public class DeptController {
 		return resp;
 	}
 	
+	
 	@PostMapping("/list")
-	public Map<String, Object> deptList(@RequestBody DeptDTO dto){
+	public Map<String, Object> deptList(DeptDTO dto, MemberDTO mem){
 
 		resp = new HashMap<String, Object>();
 		
 		ArrayList<DeptDTO> list = service.deptList(dto);
+		ArrayList<MemberDTO> member = service.memberList(mem);
 		
 		resp.put("list", list);
+		resp.put("member", member);
 		
 		return resp;
 	}

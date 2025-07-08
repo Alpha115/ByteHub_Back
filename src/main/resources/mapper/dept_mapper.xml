@@ -5,17 +5,22 @@
 <mapper namespace="com.bytehub.department.DeptDAO">
 
    	<insert id="deptInsert" parameterType="com.bytehub.department.DeptDTO">
-		insert into department(dept_name) value(#{dept_name})
+		insert into department(dept_name,user_id) values(#{dept_name},#{user_id})
 	</insert>
 	
 	<select id="deptList" parameterType="com.bytehub.department.DeptDTO">
 		select * from department
 	</select>
 	
+	<select id="memberList" parameterType="com.bytehub.member.MemberDTO">
+		select * from member join level on lv_name = "팀장"
+	</select>
+	
 	<update id="deptUpdate" parameterType="com.bytehub.department.DeptDTO">
 	    UPDATE department
 	    SET
-	        dept_name = #{dept_name}
+	        dept_name = #{dept_name},
+	        user_id = #{user_id}
 	    WHERE dept_idx = #{dept_idx}
 	</update>
 	

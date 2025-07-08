@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.bytehub.member.MemberDTO;
+
 @Mapper
 public interface DeptDAO {
 
@@ -14,5 +16,7 @@ public interface DeptDAO {
 	int deptUpdate(DeptDTO dto);
 
 	int deptDelete(DeptDTO dto);
+
+	ArrayList<MemberDTO> memberList(MemberDTO dto);
 
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
+import com.bytehub.member.MemberDTO;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,6 +31,10 @@ public class DeptService {
 	public boolean deptDelete(DeptDTO dto) {
 		int row = dao.deptDelete(dto);
 		return row > 0 ? true : false;
+	}
+
+	public ArrayList<MemberDTO> memberList(MemberDTO dto) {
+		return dao.memberList(dto);
 	}
 
 }
