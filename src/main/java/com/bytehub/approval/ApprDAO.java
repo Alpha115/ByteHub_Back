@@ -22,4 +22,7 @@ public interface ApprDAO {
 	
 	// 입사 1년 이상자 대상 연차 생성
 	void annualLeave();
+	
+    // 개인 잔여 연차 조회
+    List<LeaveHistoryDTO> myLeave(String writer_id);
 }

@@ -72,4 +72,9 @@ public class ApprService {
 		dao.annualLeave();
 		
 	}
+	
+    // 개인 잔여 연차 조회
+    public List<LeaveHistoryDTO> myLeave(String loginId) {
+        return dao.myLeave(loginId);
+    }
 }

@@ -116,5 +116,13 @@
               WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
           )
     </insert>
+    
+    <!-- 개인 연차 조회 -->
+    <select id="myLeave" resultType="com.bytehub.approval.LeaveHistoryDTO">
+        SELECT * 
+        FROM leave_history
+        WHERE writer_id = #{writer_id}
+        ORDER BY years DESC LIMIT 1
+    </select>
 	
 </mapper>

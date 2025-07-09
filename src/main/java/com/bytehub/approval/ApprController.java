@@ -170,6 +170,28 @@ public class ApprController {
     }
     
     // 개인 잔여 연차 조회 (GET)
+    @GetMapping("/leave/my")
+    public Map<String, Object> myLeave(@RequestHeader("Authorization") String token) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String userId = (String) tokenData.get("id");
+            if (userId == null) {
+                result.put("success", false);
+                result.put("msg", "유효하지 않은 토큰입니다.");
+                return result;
+            }
+            Object leave = service.myLeave(userId);
+            result.put("success", true);
+            result.put("data", leave);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "연차/월차 조회 중 오류가 발생했습니다.");
+            result.put("error", e.getMessage());
+        }
+        return result;
+    }
+    
     // 사용 이력 조회 (GET)
 
     
