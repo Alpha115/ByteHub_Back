@@ -6,12 +6,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bytehub.utils.JwtUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,15 +26,25 @@ public class MypageController {
     @Autowired
     private MypageService service;
 
-    // 내 정보 조회
-    @GetMapping("/info/{user_id}")
-    public Map<String, Object> getMyInfo(@PathVariable String user_id) {
-        log.info("내 정보 조회 요청 - 사용자 ID: {}", user_id);
-        
+    // 내 정보 조회 (토큰에서 userId 추출)
+    @GetMapping("/info")
+    public Map<String, Object> getMyInfo(@RequestHeader("Authorization") String token) {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            MemberDTO member = service.getMemberInfo(user_id);
+            // 토큰에서 userId 추출
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String userId = (String) tokenData.get("id");
+            
+            if (userId == null) {
+                result.put("success", false);
+                result.put("message", "유효하지 않은 토큰입니다.");
+                return result;
+            }
+            
+            log.info("내 정보 조회 요청 - 사용자 ID: {}", userId);
+            
+            MemberDTO member = service.getMemberInfo(userId);
             
             if (member != null) {
                 result.put("success", true);
@@ -52,15 +64,25 @@ public class MypageController {
         return result;
     }
 
-    // 비밀번호 검증
+    // 비밀번호 검증 (토큰에서 userId 추출)
     @PostMapping("/verify-password")
-    public Map<String, Object> verifyPassword(@RequestBody Map<String, String> request) {
-        log.info("비밀번호 검증 요청 - 사용자 ID: {}", request.get("user_id"));
-        
+    public Map<String, Object> verifyPassword(@RequestHeader("Authorization") String token, 
+                                             @RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String userId = request.get("user_id");
+            // 토큰에서 userId 추출
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String userId = (String) tokenData.get("id");
+            
+            if (userId == null) {
+                result.put("success", false);
+                result.put("message", "유효하지 않은 토큰입니다.");
+                return result;
+            }
+            
+            log.info("비밀번호 검증 요청 - 사용자 ID: {}", userId);
+            
             String password = request.get("password");
             
             boolean isValid = service.verifyPassword(userId, password);
@@ -82,15 +104,25 @@ public class MypageController {
         return result;
     }
 
-    // 회원 정보 수정
+    // 회원 정보 수정 (토큰에서 userId 추출)
     @PutMapping("/update")
-    public Map<String, Object> updateMemberInfo(@RequestBody Map<String, Object> request) {
-        log.info("회원 정보 수정 요청 - 사용자 ID: {}", request.get("user_id"));
-        
+    public Map<String, Object> updateMemberInfo(@RequestHeader("Authorization") String token,
+                                               @RequestBody Map<String, Object> request) {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String userId = (String) request.get("user_id");
+            // 토큰에서 userId 추출
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String userId = (String) tokenData.get("id");
+            
+            if (userId == null) {
+                result.put("success", false);
+                result.put("message", "유효하지 않은 토큰입니다.");
+                return result;
+            }
+            
+            log.info("회원 정보 수정 요청 - 사용자 ID: {}", userId);
+            
             String email = (String) request.get("email");
             String newPassword = (String) request.get("new_password");
             
