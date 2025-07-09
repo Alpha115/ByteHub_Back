@@ -15,4 +15,11 @@ public interface ApprDAO {
     List<Map<String, Object>> getAllApprovals();
     Map<String, Object> getApprovalDetail(int appr_idx);
     List<Map<String, Object>> getApprovalHistory(int appr_idx);
+    
+
+	// 신규 입사자 (입사 1년 미만) 대상 월차 생성 
+	void monthlyLeave();
+	
+	// 입사 1년 이상자 대상 연차 생성
+	void annualLeave();
 }

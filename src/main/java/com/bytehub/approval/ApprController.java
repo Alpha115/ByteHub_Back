@@ -11,19 +11,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytehub.utils.JwtUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
 @CrossOrigin
+@Slf4j
 @RestController
-@RequestMapping("/appr")
+// @RequestMapping("/appr")
 public class ApprController {
 
     @Autowired
     private ApprService service;
 
-    @PostMapping("/create")
+    @PostMapping("/appr/create")
     public Map<String, Object> createApproval(@RequestBody Map<String, Object> param) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -44,7 +50,7 @@ public class ApprController {
         }
         return result;
     }
-    @PutMapping("/status")
+    @PutMapping("/appr/status")
     public Map<String, Object> updateStatus(@RequestBody Map<String, Object> param) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -70,7 +76,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/my")
+    @GetMapping("/appr/my")
     public Map<String, Object> getMyAppr(@RequestParam String writer_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -83,7 +89,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/history")
+    @GetMapping("/appr/history")
     public Map<String, Object> getMyHistory(@RequestParam String checker_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -96,7 +102,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/detail/{appr_idx}")
+    @GetMapping("/appr/detail/{appr_idx}")
     public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -109,7 +115,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/history/{appr_idx}")
+    @GetMapping("/appr/history/{appr_idx}")
     public Map<String, Object> getApprovalHistory(@PathVariable int appr_idx) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -121,6 +127,52 @@ public class ApprController {
         }
         return result;
     }
+    
+    // 연/월차 생성
+    @PostMapping("/leave/generate")
+   public Map<String, Object> generateLeave(
+		   @RequestBody LeaveHistoryDTO dto,
+		   @RequestHeader Map<String, String> header) {
+    	
+    	Map<String, Object> result = new HashMap<>(); // 응답 데이터 저~장~
+    	
+    	String loginId = null;
+        boolean success = false;
+        
+        // JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+	    try {
+	    	String token = header.get("authorization");
+	    	log.info("수정 API - 받은 토큰: {}", token);
+	    	Map<String, Object> tokenData = JwtUtils.readToken(token);
+	    	log.info("수정 API - 토큰 파싱 결과: {}", tokenData);
+	    	loginId = (String) tokenData.get("id");
+	    	log.info("수정 API - 추출된 loginId: {}", loginId);
+	    } catch (Exception e) {
+	    	log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+	    	// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용
+	    	loginId = dto.getWriter_id();
+	    	log.info("JWT 파싱 실패로 인해 프론트엔드에서 전송한 사용자 ID 사용: {}", loginId);
+	    }
+	    
+	    try {
+	        service.generateLeave();
+	        success = true;
+	    } catch (Exception e) {
+	        log.error("연차 생성 실패", e);
+	        success = false;
+	    }
+    	
+    	result.put("success", success); // 성공 여부
+        result.put("msg", success ? "연차/월차 생성 완료" : "연차 생성 실패");
+
+       return result;
+    	
+    }
+    
+    // 개인 잔여 연차 조회 (GET)
+    // 사용 이력 조회 (GET)
 
     
 }
+
+

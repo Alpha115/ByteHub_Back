@@ -83,5 +83,38 @@
         WHERE h.appr_idx = #{appr_idx}
         ORDER BY h.step ASC
     </select>
+    
+    <!-- 신규 입사자 (입사 1년 미만) 대상 월차 생성  -->
+	<insert id="monthlyLeave">
+        INSERT INTO leave_history (writer_id, years, remain_days)
+        SELECT 
+            user_id,
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-12-31'), '%Y-%m-%d') AS years,
+            TIMESTAMPDIFF(MONTH, hire_date, DATE_FORMAT(CURDATE(), '%Y-12-31')) AS remain_days
+        FROM member
+        WHERE YEAR(hire_date) = YEAR(CURDATE())
+          AND TIMESTAMPDIFF(MONTH, hire_date, CURDATE()) &lt; 12
+          AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &lt; 1
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-12-31'), '%Y-%m-%d')
+          )
+    </insert>
+
+	
+	<!-- 입사 1년 이상자 대상 연차 생성 -->
+	<insert id="annualLeave">
+        INSERT INTO leave_history (writer_id, years, remain_days)
+        SELECT
+            user_id,
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d') AS years,
+            15 + TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) - 1 AS remain_days
+        FROM member
+        WHERE TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) >= 1
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+          )
+    </insert>
 	
 </mapper>

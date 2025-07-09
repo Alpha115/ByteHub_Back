@@ -58,4 +58,18 @@ public class ApprService {
     public List<Map<String, Object>> getApprovalHistory(int appr_idx) {
         return dao.getApprovalHistory(appr_idx);
     }
+    
+    // 연/월차 생성
+	public void generateLeave() {
+
+		/* 신규 입사자 (입사 1년 미만) 대상 월차 생성 
+	       1달에 1개씩, 최대 12개까지 발생 (입사월 ~ 12월까지)*/
+		dao.monthlyLeave();
+
+        /* 입사 1년 이상자 대상 연차 생성
+           입사 다음 해 1월 1일부터는 기본 15개 부여
+           이후 입사일 기준 1년마다 +1개씩 추가 */
+		dao.annualLeave();
+		
+	}
 }
