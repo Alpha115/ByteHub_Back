@@ -24,15 +24,23 @@ public class MemberController {
     
     // 회원가입
     @PostMapping("/join")
-    public Map<String, Object> join(@RequestBody Map<String, Object> param, HttpSession session) {
-        Map<String, Object> result = service.join(param);
-        
-        if ((Boolean) result.get("success")) {
-            // 회원가입 성공 시 자동 로그인
-            session.setAttribute("loginId", param.get("user_id"));
+    public Map<String, Object> join(@RequestBody Map<String, Object> param) {
+        try {
+            // dept_idx와 lv_idx가 없거나 0이면 기본값 설정
+            if (param.get("dept_idx") == null || (Integer) param.get("dept_idx") == 0) {
+                param.put("dept_idx", 1); // 기본 부서 ID
+            }
+            if (param.get("lv_idx") == null || (Integer) param.get("lv_idx") == 0) {
+                param.put("lv_idx", 1); // 기본 직급 ID
+            }
+            
+            return service.join(param);
+        } catch (Exception e) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", false);
+            result.put("msg", "회원가입 중 오류가 발생했습니다: " + e.getMessage());
+            return result;
         }
-        
-        return result;
     }
 
     // 로그인
