@@ -2,7 +2,10 @@ package com.bytehub.approval;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,34 +18,73 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bytehub.utils.JwtUtils;
+import com.bytehub.member.FileDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin
 @Slf4j
 @RestController
-// @RequestMapping("/appr")
+@RequestMapping("/appr")
 public class ApprController {
 
     @Autowired
     private ApprService service;
 
-    @PostMapping("/appr/create")
-    public Map<String, Object> createApproval(@RequestBody Map<String, Object> param) {
+    // 결재 문서 생성 (파일 업로드 포함, @RequestParam 방식)
+    @PostMapping("/create")
+    public Map<String, Object> createApproval(
+        @RequestParam("writer_id") String writerId,
+        @RequestParam("subject") String subject,
+        @RequestParam("content") String content,
+        @RequestParam("appr_type") String apprType,
+        @RequestParam(value = "vac_start", required = false) String vacStart,
+        @RequestParam(value = "vac_end", required = false) String vacEnd,
+        @RequestParam(value = "files", required = false) List<MultipartFile> files
+    ) {
         Map<String, Object> result = new HashMap<>();
         try {
             ApprDTO appr = new ApprDTO();
-            appr.setWriter_id((String) param.get("writer_id"));
-            appr.setSubject((String) param.get("subject"));
-            appr.setAppr_type((String) param.get("appr_type"));
-            appr.setContent((String) param.get("content"));
+            appr.setWriter_id(writerId);
+            appr.setSubject(subject);
+            appr.setAppr_type(apprType);
+            appr.setContent(content);
             appr.setAppr_date(LocalDateTime.now());
+            // 연차일 경우 vac_start, vac_end도 저장 (필드가 있다면)
+            // appr.setVac_start(vacStart);
+            // appr.setVac_end(vacEnd);
 
-            service.createApprWithLine(appr);
+            // 파일 저장: FileDTO 리스트 생성
+            List<FileDTO> fileDTOList = new ArrayList<>();
+            String uploadDir = "C:/upload";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    if (!file.isEmpty()) {
+                        String oriFilename = file.getOriginalFilename();
+                        String newFilename = System.currentTimeMillis() + "_" + oriFilename;
+                        String uploadPath = uploadDir + "/" + newFilename;
+                        file.transferTo(new File(uploadPath));
+
+                        FileDTO fileDTO = new FileDTO();
+                        fileDTO.setOri_filename(oriFilename);
+                        fileDTO.setNew_filename(newFilename);
+                        fileDTO.setFile_type("approval");
+                        // appr_idx는 service에서 set
+                        fileDTOList.add(fileDTO);
+                    }
+                }
+            }
+
+            service.createApprWithLineAndFiles(appr, fileDTOList);
             result.put("success", true);
-            result.put("msg", "결재 문서와 결재라인 내역이 등록되었습니다.");
+            result.put("msg", "결재 문서와 결재라인, 파일이 등록되었습니다.");
             result.put("appr_idx", appr.getAppr_idx());
         } catch (Exception e) {
             result.put("success", false);
@@ -50,7 +92,7 @@ public class ApprController {
         }
         return result;
     }
-    @PutMapping("/appr/status")
+    @PutMapping("/status")
     public Map<String, Object> updateStatus(@RequestBody Map<String, Object> param) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -76,7 +118,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/appr/my")
+    @GetMapping("/my")
     public Map<String, Object> getMyAppr(@RequestParam String writer_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -89,7 +131,7 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/appr/history")
+    @GetMapping("/history")
     public Map<String, Object> getMyHistory(@RequestParam String checker_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -102,12 +144,12 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/appr/detail/{appr_idx}")
-    public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
+    @GetMapping("/toapprove")
+    public Map<String, Object> getToApproveList(@RequestParam String user_id) {
         Map<String, Object> result = new HashMap<>();
         try {
             result.put("success", true);
-            result.put("data", service.getApprovalDetail(appr_idx));
+            result.put("data", service.getToApproveList(user_id));
         } catch (Exception e) {
             result.put("success", false);
             result.put("msg", "조회 실패: " + e.getMessage());
@@ -115,7 +157,37 @@ public class ApprController {
         return result;
     }
 
-    @GetMapping("/appr/history/{appr_idx}")
+    @GetMapping("/all")
+    public Map<String, Object> getAllApprovals() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getAllApprovals());
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/detail/{appr_idx}")
+public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
+    Map<String, Object> result = new HashMap<>();
+    try {
+        Map<String, Object> detail = service.getApprovalDetail(appr_idx);
+        // 파일 리스트 추가
+        List<FileDTO> files = service.getFilesByApprIdx(appr_idx);
+        detail.put("files", files);
+        result.put("success", true);
+        result.put("data", detail);
+    } catch (Exception e) {
+        result.put("success", false);
+        result.put("msg", "조회 실패: " + e.getMessage());
+    }
+    return result;
+}
+
+    @GetMapping("/history/{appr_idx}")
     public Map<String, Object> getApprovalHistory(@PathVariable int appr_idx) {
         Map<String, Object> result = new HashMap<>();
         try {

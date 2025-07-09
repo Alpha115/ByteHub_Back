@@ -10,6 +10,15 @@
 		VALUES (#{writer_id}, #{subject}, #{content}, #{appr_date}, #{appr_type})
 	</insert>
 
+    <insert id="insertFile" parameterType="com.bytehub.member.FileDTO">
+        INSERT INTO file (ori_filename, new_filename, file_type, appr_idx)
+        VALUES (#{ori_filename}, #{new_filename}, #{file_type}, #{appr_idx})
+    </insert>
+
+    <select id="getFilesByApprIdx" resultType="com.bytehub.member.FileDTO">
+        SELECT * FROM file WHERE appr_idx = #{appr_idx}
+    </select>
+    
 	<insert id="appr_checker" parameterType="map">
 		INSERT INTO appr_history (appr_idx, step, lv_idx, checker_id, status, check_time, reason)
 		VALUES (#{appr_idx}, #{step}, #{lv_idx}, #{checker_id}, #{status}, #{check_time}, #{reason})
@@ -46,6 +55,20 @@
         JOIN approval a ON h.appr_idx = a.appr_idx
         WHERE h.checker_id = #{checker_id}
         ORDER BY h.check_time DESC
+    </select>
+
+    <select id="getToApproveList" resultType="map">
+        SELECT 
+            a.*,
+            CASE 
+                WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
+                WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
+                ELSE '대기중'
+            END as final_status
+        FROM approval a 
+        JOIN appr_history h ON a.appr_idx = h.appr_idx
+        WHERE h.checker_id = #{user_id}
+        ORDER BY a.appr_date DESC
     </select>
 
     <select id="getAllApprovals" resultType="map">

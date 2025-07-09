@@ -6,6 +6,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import com.bytehub.member.FileDTO;
 
 @Service
 public class ApprService {
@@ -13,7 +14,7 @@ public class ApprService {
     @Autowired
     private ApprDAO dao;
 
-    public int createApprWithLine(ApprDTO appr) {
+    public int createApprWithLineAndFiles(ApprDTO appr, List<FileDTO> fileList) {
         // 1. approval 문서 생성
         dao.createAppr(appr);
         int appr_idx = appr.getAppr_idx();
@@ -22,6 +23,32 @@ public class ApprService {
         List<ApprLineDTO> apprLineList = dao.getApprLine();
         
         // 3. appr_history row 생성
+        for (ApprLineDTO line : apprLineList) {
+            Map<String, Object> history = new HashMap<>();
+            history.put("appr_idx", appr_idx);
+            history.put("checker_id", line.getUser_id());
+            history.put("step", line.getStep());
+            history.put("lv_idx", line.getLv_idx());
+            history.put("status", "대기중");
+            history.put("reason", null);
+            history.put("check_time", LocalDateTime.now());
+            dao.appr_checker(history);
+        }
+
+        // 4. 파일 정보 저장
+        if (fileList != null) {
+            for (FileDTO fileDTO : fileList) {
+                fileDTO.setAppr_idx(appr_idx);
+                dao.insertFile(fileDTO);
+            }
+        }
+        return appr_idx;
+    }
+
+    public int createApprWithLine(ApprDTO appr) {
+        dao.createAppr(appr);
+        int appr_idx = appr.getAppr_idx();
+        List<ApprLineDTO> apprLineList = dao.getApprLine();
         for (ApprLineDTO line : apprLineList) {
             Map<String, Object> history = new HashMap<>();
             history.put("appr_idx", appr_idx);
@@ -47,6 +74,10 @@ public class ApprService {
         return dao.getMyHistory(checker_id);
     }
 
+    public List<Map<String, Object>> getToApproveList(String user_id) {
+        return dao.getToApproveList(user_id);
+    }
+
     public List<Map<String, Object>> getAllApprovals() {
         return dao.getAllApprovals();
     }
@@ -57,6 +88,10 @@ public class ApprService {
 
     public List<Map<String, Object>> getApprovalHistory(int appr_idx) {
         return dao.getApprovalHistory(appr_idx);
+    }
+    
+    public List<FileDTO> getFilesByApprIdx(int appr_idx) {
+        return dao.getFilesByApprIdx(appr_idx);
     }
     
     // 연/월차 생성
