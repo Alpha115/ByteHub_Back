@@ -96,5 +96,31 @@ public class ApprController {
         return result;
     }
 
+    @GetMapping("/detail/{appr_idx}")
+    public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getApprovalDetail(appr_idx));
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/history/{appr_idx}")
+    public Map<String, Object> getApprovalHistory(@PathVariable int appr_idx) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("success", true);
+            result.put("data", service.getApprovalHistory(appr_idx));
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 실패: " + e.getMessage());
+        }
+        return result;
+    }
+
     
 }

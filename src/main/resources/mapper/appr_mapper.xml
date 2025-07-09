@@ -71,5 +71,17 @@
         FROM approval a 
         WHERE a.appr_idx = #{appr_idx}
     </select>
+
+    <select id="getApprovalHistory" resultType="map">
+        SELECT 
+            h.*,
+            l.lv_name as level_name,
+            u.name as checker_name
+        FROM appr_history h
+        LEFT JOIN level l ON h.lv_idx = l.lv_idx
+        LEFT JOIN member u ON h.checker_id = u.user_id
+        WHERE h.appr_idx = #{appr_idx}
+        ORDER BY h.step ASC
+    </select>
 	
 </mapper>
