@@ -2,6 +2,23 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="project_mapper">
-    <!-- 쿼리 작성 -->
+<mapper namespace="com.bytehub.project.ProjectDAO">
+    
+    <insert id="insertProj" 
+    parameterType="com.bytehub.project.ProjectDTO"
+    useGeneratedKeys="true" keyColumn="project_idx" keyProperty="project_idx"
+    >
+    	insert into project (user_id, subject, content, start_date, end_date, priority)
+		values(#{user_id}, #{subject}, #{content}, #{start_date}, #{end_date}, #{priority})
+    </insert>
+
+	<insert id="insertFile">
+		INSERT INTO project_file (project_idx, file_idx)
+		VALUES
+		<foreach collection="file_idx" item="file" separator=",">
+			(#{project_idx}, #{file})
+		</foreach>
+	</insert>
+    
+
 </mapper>

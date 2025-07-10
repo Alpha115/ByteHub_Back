@@ -15,6 +15,5 @@ public interface AdminDAO {
 	// 관리자의 아이디로 직원의 리스트(MemberDTO, array)를 불러오는 함수입니다.
 	ArrayList<Map<String, Object>> list();
 	
-	// 부서번호/직급번호 => 부서명, 직급명으로 변환
 
 }

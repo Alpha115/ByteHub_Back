@@ -1,5 +1,9 @@
 package com.bytehub.project;
 
-public class ProjectFileDTO {
+import lombok.Data;
 
+@Data
+public class ProjectFileDTO {
+	private int project_idx;
+	private int file_idx;
 }
