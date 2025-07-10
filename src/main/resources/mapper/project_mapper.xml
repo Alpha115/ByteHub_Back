@@ -75,7 +75,7 @@
 	</select>
     
     <select id="list" resultType="map">
-    	select * from project
+    	select * from project order by priority
     </select>
 
 </mapper>
