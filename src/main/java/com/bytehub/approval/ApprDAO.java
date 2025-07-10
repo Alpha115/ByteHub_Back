@@ -7,6 +7,7 @@ import com.bytehub.member.FileDTO;
 
 @Mapper
 public interface ApprDAO {
+	
     int createAppr(ApprDTO appr);
     int appr_checker(Map<String, Object> param);
     List<ApprLineDTO> getApprLine();
@@ -30,6 +31,9 @@ public interface ApprDAO {
 	
     // 개인 잔여 연차 조회
     List<LeaveHistoryDTO> myLeave(String writer_id);
+	
+    // 연차 상세 내역 조회
+    List<ApprDTO> leaveDetail(String loginId);
 
     
 }
