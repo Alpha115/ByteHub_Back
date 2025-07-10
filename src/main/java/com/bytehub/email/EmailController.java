@@ -164,7 +164,7 @@ public class EmailController {
 		receivers.add(userEmail);
 
 		mail.put("sender", sender);
-		mail.put("receiver", receivers); // 오직 DB에서 가져온 이메일만 사용
+		mail.put("receiver", receivers); // DB에서 가져온 이메일 사용
 		mail.put("key", key);
 		mail.put("subject", subject);
 		mail.put("content", content);
@@ -175,8 +175,8 @@ public class EmailController {
 		props.setProperty("mail.smtp.starttls.enable", enable);
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 
-		resp.put("msg", service.attMail(props, mail, tempPasswordStr));
-		resp.put("authCode", tempPasswordStr);
+		resp.put("msg", service.attMail(props, mail, tempPasswordStr)); // 반환값: 이메일 발송 메시지를 반환합니다. ({"msg":"이메일 발송에 성공했습니다."})
+		resp.put("authCode", tempPasswordStr); // 얘를 프론트에서 저장해서 인증번호 확인 서비스에 전달
 
 		return resp;
 	}
