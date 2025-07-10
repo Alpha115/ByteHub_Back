@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.bytehub.chatbot.AttDAO">
-    <!-- 쿼리 작성 -->
+<mapper namespace="com.bytehub.attendance.AttDAO">
+    <insert id="insertAttendance" parameterType="com.bytehub.attendance.AttDTO" useGeneratedKeys="true" keyProperty="att_idx">
+        INSERT INTO attendance (user_id, att_date, in_time, out_time, att_type)
+        VALUES (#{user_id}, #{att_date}, #{in_time}, #{out_time}, #{att_type})
+    </insert>
+    <insert id="insertAttHistory" parameterType="com.bytehub.attendance.AttHistoryDTO" useGeneratedKeys="true" keyProperty="cert_his_idx">
+        INSERT INTO att_history (att_idx, cert_no, cert_status, cert_time)
+        VALUES (#{att_idx, jdbcType=INTEGER}, #{cert_no}, #{cert_status}, #{cert_time})
+    </insert>
 </mapper>
