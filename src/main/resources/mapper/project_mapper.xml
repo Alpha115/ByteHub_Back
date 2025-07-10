@@ -5,9 +5,10 @@
 <mapper namespace="com.bytehub.project.ProjectDAO">
     
     <insert id="insertProj" 
-    parameterType="com.bytehub.project.ProjectDTO"
-    useGeneratedKeys="true" keyColumn="project_idx" keyProperty="project_idx"
-    >
+		    parameterType="com.bytehub.project.ProjectDTO"
+		    useGeneratedKeys="true" 
+		    keyColumn="project_idx" 
+		    keyProperty="project_idx">
     	insert into project (user_id, subject, content, start_date, end_date, priority)
 		values(#{user_id}, #{subject}, #{content}, #{start_date}, #{end_date}, #{priority})
     </insert>
@@ -19,6 +20,62 @@
 			(#{project_idx}, #{file})
 		</foreach>
 	</insert>
+	
+	<insert id="insertUser">
+		INSERT INTO project_emp (project_idx, user_id)
+		VALUES
+		<foreach collection="user_id" item="user" separator=",">
+			(#{project_idx}, #{user})
+		</foreach>
+	</insert>
+	
+	<update id="updateProj" parameterType="com.bytehub.project.ProjectDTO">
+		update project set 
+			user_id=#{user_id}, 
+			subject=#{subject}, 
+			content=#{content}, 
+			start_date=#{start_date}, 
+			end_date=#{end_date}, 
+			priority=#{priority}
+		where project_idx = #{project_idx};
+	</update>
+
+	<delete id="deleteFile">
+		delete from project_file where
+		project_idx = #{project_idx}
+	</delete>
+	
+	<delete id="deleteUser">
+		delete from project_emp where
+		project_idx = #{project_idx}
+	</delete>	
+	
+	<delete id="delete">
+		delete from project where project_idx=#{param1}
+	</delete>
+	
+	<select id="detail" resultType="map">
+	 	select
+			p.project_idx,
+			p.subject ,
+			p.priority ,
+			(select dept_name from department d where dept_idx = (select dept_idx from member where user_id=p.user_id)) as dept_name,
+			p.start_date ,
+			p.end_date
+		from project p where project_idx = #{param1}
+	</select>
+	
+	<select id="files">
+		select file_idx from project_file where project_idx = #{param1}
+	</select>
+	
+	<select id="members" resultType="map">
+		select user_id, name from member m where user_id
+		in (select user_id from project_emp pe where project_idx=#{param1})
+	</select>
     
+    <select id="list" resultType="map">
+    	select * from project
+    </select>
 
 </mapper>
