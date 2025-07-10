@@ -2,6 +2,53 @@
 <!DOCTYPE mapper PUBLIC   "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="chat_mapper">
-    <!-- 쿼리 작성 -->
+<!-- ChatMapper.xml -->
+<mapper namespace="com.bytehub.chat.ChatDAO">
+
+    <!-- 채팅방 목록 -->
+    <select id="selectAllRooms" resultType="com.bytehub.chat.ChatRoomDTO">
+        SELECT * FROM chat
+    </select>
+
+    <!-- 채팅방 상세 -->
+    <select id="selectRoomById" parameterType="int" resultType="com.bytehub.chat.ChatRoomDTO">
+        SELECT * FROM chat WHERE chat_idx = #{chat_idx}
+    </select>
+
+    <!-- 채팅방 생성 -->
+    <insert id="insertRoom" parameterType="com.bytehub.chat.ChatRoomDTO" useGeneratedKeys="true" keyProperty="chat_idx">
+        INSERT INTO chat (chat_name, avatar, archived, last_msg, last_time, last_active, reg_date)
+        VALUES (#{chat_name}, #{avatar}, #{archived}, #{last_msg}, #{last_time}, #{last_active}, NOW())
+    </insert>
+
+    <!-- 채팅방 멤버 관리 -->
+    <insert id="insertRoomMember" parameterType="com.bytehub.chat.ChatMemberDTO">
+        INSERT INTO chat_member (chat_idx, user_id, unread) VALUES (#{chat_idx}, #{user_id}, #{unread})
+    </insert>
+    <delete id="deleteRoomMembers" parameterType="int">
+        DELETE FROM chat_member WHERE chat_idx = #{chat_idx}
+    </delete>
+    <select id="selectRoomMembers" parameterType="int" resultType="string">
+        SELECT user_id FROM chat_member WHERE chat_idx = #{chat_idx}
+    </select>
+
+    <!-- 메시지 관리 -->
+    <select id="selectMessagesByRoom" parameterType="int" resultType="com.bytehub.chat.ChatMsgDTO">
+        SELECT * FROM chat_msg WHERE chat_idx = #{chat_idx} ORDER BY reg_date ASC
+    </select>
+    <insert id="insertMessage" parameterType="com.bytehub.chat.ChatMsgDTO" useGeneratedKeys="true" keyProperty="msg_idx">
+        INSERT INTO chat_msg (chat_idx, user_id, content, msg_type, reg_date, is_read)
+        VALUES (#{chat_idx}, #{user_id}, #{content}, #{msg_type}, NOW(), #{is_read})
+    </insert>
+
+    <!-- 파일 관리 -->
+    <select id="selectFilesByRoom" parameterType="int" resultType="com.bytehub.chat.ChatFileDTO">
+        SELECT f.* FROM chat_file f
+        JOIN chat_msg m ON f.msg_idx = m.msg_idx
+        WHERE m.chat_idx = #{chat_idx}
+    </select>
+    <insert id="insertFile" parameterType="com.bytehub.chat.ChatFileDTO" useGeneratedKeys="true" keyProperty="file_idx">
+        INSERT INTO chat_file (msg_idx, name, url, size, uploaded_at, expire_at)
+        VALUES (#{msg_idx}, #{name}, #{url}, #{size}, #{uploaded_at}, #{expire_at})
+    </insert>
 </mapper>
