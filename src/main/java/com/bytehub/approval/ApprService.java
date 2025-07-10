@@ -13,6 +13,7 @@ public class ApprService {
 
     @Autowired
     private ApprDAO dao;
+	
 
     public int createApprWithLineAndFiles(ApprDTO appr, List<FileDTO> fileList) {
         // 1. approval 문서 생성
@@ -112,4 +113,12 @@ public class ApprService {
     public List<LeaveHistoryDTO> myLeave(String loginId) {
         return dao.myLeave(loginId);
     }
+
+    // 연차 상세 내역 조회
+	public List<ApprDTO> leaveDetail(String loginId) {
+		return dao.leaveDetail(loginId);
+	}
+    
+    
+    
 }
