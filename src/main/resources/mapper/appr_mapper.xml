@@ -5,33 +5,40 @@
 <!-- ApprDAO와 연결됩니다. -->
 <mapper namespace="com.bytehub.approval.ApprDAO">
 
+	<!-- 결재 문서 생성 -->
 	<insert id="createAppr" parameterType="com.bytehub.approval.ApprDTO" useGeneratedKeys="true" keyProperty="appr_idx">
 		INSERT INTO approval (writer_id, subject, content, appr_date, appr_type)
 		VALUES (#{writer_id}, #{subject}, #{content}, #{appr_date}, #{appr_type})
 	</insert>
 
+    <!-- 첨부 파일 정보 저장 -->
     <insert id="insertFile" parameterType="com.bytehub.member.FileDTO">
         INSERT INTO file (ori_filename, new_filename, file_type, appr_idx)
         VALUES (#{ori_filename}, #{new_filename}, #{file_type}, #{appr_idx})
     </insert>
 
+    <!-- 결재 문서별 첨부 파일 목록 조회 -->
     <select id="getFilesByApprIdx" resultType="com.bytehub.member.FileDTO">
         SELECT * FROM file WHERE appr_idx = #{appr_idx}
     </select>
     
+    <!-- 파일 ID로 파일 정보 조회 -->
     <select id="getFileById" resultType="com.bytehub.member.FileDTO">
         SELECT * FROM file WHERE file_idx = #{file_idx}
     </select>
     
+	<!-- 결재 이력 생성 -->
 	<insert id="appr_checker" parameterType="map">
 		INSERT INTO appr_history (appr_idx, step, lv_idx, checker_id, status, check_time, reason)
 		VALUES (#{appr_idx}, #{step}, #{lv_idx}, #{checker_id}, #{status}, #{check_time}, #{reason})
 	</insert>
 
+	<!-- 결재 라인 조회 (기존 고정 결재 라인) -->
 	<select id="getApprLine" resultType="com.bytehub.approval.ApprLineDTO">
 		SELECT step, lv_idx, user_id FROM appr_line ORDER BY step ASC
 	</select>
 
+	<!-- 결재 상태 변경 (승인/반려) -->
 	<update id="updateStatus" parameterType="map">
 		UPDATE appr_history
 		SET status = #{status},
@@ -40,6 +47,7 @@
 		WHERE appr_his_idx = #{appr_his_idx}
 	</update>
 
+	<!-- 내가 작성한 결재 문서 목록 조회 -->
 	<select id="getMyAppr" resultType="map">
 		SELECT 
 			a.*,
@@ -53,6 +61,7 @@
 		ORDER BY a.appr_date DESC
 	</select>
 
+    <!-- 내가 결재한 문서 이력 조회 -->
     <select id="getMyHistory" resultType="map">
         SELECT h.*, a.subject, a.writer_id, a.appr_date, a.appr_type
         FROM appr_history h
@@ -61,6 +70,7 @@
         ORDER BY h.check_time DESC
     </select>
 
+    <!-- 내가 결재할 문서 목록 조회 -->
     <select id="getToApproveList" resultType="map">
         SELECT 
             a.*,
@@ -75,6 +85,7 @@
         ORDER BY a.appr_date DESC
     </select>
 
+    <!-- 전체 결재 문서 목록 조회 (관리자용) -->
     <select id="getAllApprovals" resultType="map">
         SELECT 
             a.*,
@@ -87,6 +98,7 @@
         ORDER BY a.appr_date DESC
     </select>
 
+    <!-- 결재 문서 상세 정보 조회 -->
     <select id="getApprovalDetail" resultType="map">
         SELECT 
             a.*,
@@ -99,6 +111,7 @@
         WHERE a.appr_idx = #{appr_idx}
     </select>
 
+    <!-- 결재 문서의 결재 이력 조회 -->
     <select id="getApprovalHistory" resultType="map">
         SELECT 
             h.*,
