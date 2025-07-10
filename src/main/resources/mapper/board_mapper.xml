@@ -54,6 +54,18 @@
 		WHERE post_idx = #{idx}
 	</select>
 
+    <insert id="AiInsert" parameterType="com.bytehub.board.SummaryDTO">
+    	insert into board_ai(summary,post_idx) values(#{summary}, #{post_idx})
+    </insert>
     
+    <select id="AiList" parameterType="com.bytehub.board.SummaryDTO">
+    	select * from board_ai where post_idx = #{post_idx}
+    </select>
+    
+    <update id="AiUpdate" parameterType="com.bytehub.board.SummaryDTO">
+   	    UPDATE board_ai
+	    SET summary = #{summary}
+	    WHERE post_idx = #{post_idx}
+    </update>
 		
 </mapper>

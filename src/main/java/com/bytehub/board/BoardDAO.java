@@ -1,7 +1,7 @@
 package com.bytehub.board;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -28,4 +28,10 @@ public interface BoardDAO {
 
 	// 게시글 상세보기
 	BoardDTO postDetail(int idx);
+
+	int AiInsert(SummaryDTO dto);
+
+	ArrayList<SummaryDTO> AiList(SummaryDTO dto);
+
+	int AiUpdate(SummaryDTO dto);
 }

@@ -1,5 +1,6 @@
 package com.bytehub.board;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -254,23 +255,43 @@ public class BoardController {
     	
     }
     
+    @PostMapping("/ai/insert")
+    public Map<String, Object> AiInsert(@RequestBody SummaryDTO dto){
+    	
+    	Map<String,Object> result = new HashMap<>();
+    	
+    	boolean suc = svc.AiInsert(dto);
+    	
+    	result.put("suc", suc);
+    	
+    	return result;
+    }
     
     
+    @PostMapping("/ai/list")
+    public Map<String, Object> AiList(@RequestBody SummaryDTO dto){
+    	
+    	Map<String,Object> result = new HashMap<>();
+    	
+    	ArrayList<SummaryDTO> list = svc.AiList(dto);
+    	
+    	result.put("list", list);
+    	
+    	return result;
+    	
+    }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    @PostMapping("/ai/update")
+    public Map<String, Object> AiUpdate(@RequestBody SummaryDTO dto){
+    	
+    	Map<String,Object> result = new HashMap<>();
+    	
+    	boolean suc = svc.AiUpdate(dto);
+    	
+    	result.put("suc", suc);
+    	
+    	return result;
+    }
     
     
 }

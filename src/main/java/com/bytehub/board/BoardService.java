@@ -1,9 +1,7 @@
 package com.bytehub.board;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,9 +67,23 @@ public class BoardService {
 	}
 
 	// 게시글 상세보기
-		public BoardDTO postDetail(int idx) {
-			return dao.postDetail(idx);
-		}
+	public BoardDTO postDetail(int idx) {
+		return dao.postDetail(idx);
+	}
+
+	public boolean AiInsert(SummaryDTO dto) {
+		int row = dao.AiInsert(dto);
+		return row > 0 ? true : false;
+	}
+
+	public ArrayList<SummaryDTO> AiList(SummaryDTO dto) {
+		return dao.AiList(dto);
+	}
+
+	public boolean AiUpdate(SummaryDTO dto) {
+		int row = dao.AiUpdate(dto);
+		return row > 0 ? true : false;
+	}
 
 
 }
