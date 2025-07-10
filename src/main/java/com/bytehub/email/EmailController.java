@@ -52,7 +52,7 @@ public class EmailController {
 	// ---------비밀번호 재설정 서비스---------
 	@Service
 	@RequiredArgsConstructor
-	public static class PasswordResetService {
+	public class PasswordResetService {
 		
 		        // 여기서부터
 		private final MemberService memberService;
@@ -73,7 +73,7 @@ public class EmailController {
 				}
 				
 				// 임시 비밀번호 생성
-				int tempPassword = (int) ((Math.random() * 90000) + 100000);
+				int tempPassword = createPw();
 				String tempPasswordStr = String.valueOf(tempPassword);
 				
 				// 비밀번호 업데이트
