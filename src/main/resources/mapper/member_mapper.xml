@@ -16,10 +16,16 @@
         )
     </insert>
 
+    <!-- 회원 정보 조회 -->
     <select id="getMemberById" parameterType="String" resultType="com.bytehub.member.MemberDTO">
-        SELECT user_id, file_idx, dept_idx, lv_idx, password, name, email, gender, hire_date 
-        FROM member 
-        WHERE user_id = #{user_id}
+        SELECT 
+            m.user_id, m.file_idx, m.dept_idx, m.lv_idx, m.password, m.name, m.email, m.gender, m.hire_date,
+            d.dept_name,
+            l.lv_name
+        FROM member m
+        LEFT JOIN department d ON m.dept_idx = d.dept_idx
+        LEFT JOIN level l ON m.lv_idx = l.lv_idx
+        WHERE m.user_id = #{user_id}
     </select>
 
     <select id="login" parameterType="Map" resultType="int">

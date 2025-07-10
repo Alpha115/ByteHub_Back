@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +39,12 @@ public class ApprController {
 	@Autowired
 	private ApprService service;
 
-	// 결재 문서 생성 (파일 업로드 포함, @RequestParam 방식)
+	/**
+	 * 결재 문서 생성 API
+	 * - 결재 문서 정보와 첨부 파일을 함께 저장
+	 * - 결재 라인과 결재 이력 자동 생성
+	 * - 파일은 임시 디렉토리에 저장
+	 */
 	@PostMapping("/appr/create")
 	public Map<String, Object> createApproval(@RequestParam("writer_id") String writerId,
 			@RequestParam("subject") String subject, @RequestParam("content") String content,
@@ -119,6 +123,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 결재 상태 변경 API
+	 * - 결재 승인 또는 반려 처리
+	 * - 결재 이력에 처리 시간과 사유 기록
+	 */
 	@PutMapping("/appr/status")
 	public Map<String, Object> updateStatus(@RequestBody Map<String, Object> param) {
 		Map<String, Object> result = new HashMap<>();
@@ -145,6 +154,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 내가 작성한 결재 문서 조회 API
+	 * - 특정 사용자가 작성한 모든 결재 문서 목록 조회
+	 * - 결재 상태별로 필터링 가능
+	 */
 	@GetMapping("/appr/my")
 	public Map<String, Object> getMyAppr(@RequestParam String writer_id) {
 		Map<String, Object> result = new HashMap<>();
@@ -158,6 +172,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 내가 결재한 문서 이력 조회 API
+	 * - 특정 사용자가 결재 처리한 모든 문서 목록 조회
+	 * - 결재 처리 시간과 결과 포함
+	 */
 	@GetMapping("/appr/history")
 	public Map<String, Object> getMyHistory(@RequestParam String checker_id) {
 		Map<String, Object> result = new HashMap<>();
@@ -171,6 +190,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 내가 결재할 문서 목록 조회 API
+	 * - 현재 사용자가 결재 처리해야 할 문서 목록 조회
+	 * - 대기중인 결재 문서만 표시
+	 */
 	@GetMapping("/appr/toapprove")
 	public Map<String, Object> getToApproveList(@RequestParam String user_id) {
 		Map<String, Object> result = new HashMap<>();
@@ -184,6 +208,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 전체 결재 문서 목록 조회 API
+	 * - 시스템의 모든 결재 문서 목록 조회
+	 * - 관리자 권한이 필요한 기능
+	 */
 	@GetMapping("/appr/all")
 	public Map<String, Object> getAllApprovals() {
 		Map<String, Object> result = new HashMap<>();
@@ -197,6 +226,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 결재 문서 상세 조회 API
+	 * - 특정 결재 문서의 상세 정보 조회
+	 * - 첨부 파일 목록과 결재 이력 포함
+	 */
 	@GetMapping("/appr/detail/{appr_idx}")
 	public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
 		Map<String, Object> result = new HashMap<>();
@@ -214,6 +248,11 @@ public class ApprController {
 		return result;
 	}
 
+	/**
+	 * 결재 문서의 결재 이력 조회 API
+	 * - 특정 결재 문서의 모든 결재 처리 이력 조회
+	 * - 결재자 정보와 처리 시간 포함
+	 */
 	@GetMapping("/appr/history/{appr_idx}")
 	public Map<String, Object> getApprovalHistory(@PathVariable int appr_idx) {
 		Map<String, Object> result = new HashMap<>();
@@ -227,7 +266,11 @@ public class ApprController {
 		return result;
 	}
 
-	// 파일 다운로드
+	/**
+	 * 첨부 파일 다운로드 API
+	 * - 결재 문서에 첨부된 파일 다운로드
+	 * - 원본 파일명으로 다운로드 제공
+	 */
 	@GetMapping("/appr/download/{file_idx}")
 	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable int file_idx) {
 		try {
@@ -264,7 +307,7 @@ public class ApprController {
 		}
 	}
 
-	// 연/월차 생성
+	// 연차/월차 자동 생성 API
 	@PostMapping("/leave/generate")
 	public Map<String, Object> generateLeave(@RequestBody LeaveHistoryDTO dto,
 			@RequestHeader Map<String, String> header) {
@@ -304,7 +347,7 @@ public class ApprController {
 
 	}
 
-	// 개인 잔여 연차 조회 (GET)
+	// 개인 잔여 연차 조회 API
 	@GetMapping("/leave/my")
 	public Map<String, Object> myLeave(@RequestHeader("Authorization") String token) {
 		Map<String, Object> result = new HashMap<>();
