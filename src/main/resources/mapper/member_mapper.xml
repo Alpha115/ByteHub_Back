@@ -50,4 +50,11 @@
 		join level l on m.lv_idx = l.lv_idx 
 		join department d on d.dept_idx  = m.dept_idx ;
     </select>
+    
+    <!-- 이메일 확인 -->
+    <select id="findEmail" parameterType="string" resultType="string">
+    SELECT email FROM member WHERE user_id = #{user_id}
+	</select>
+    
+    
 </mapper>

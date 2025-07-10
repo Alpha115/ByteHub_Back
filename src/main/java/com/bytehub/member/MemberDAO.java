@@ -16,4 +16,7 @@ public interface MemberDAO {
     int updatePassword(@Param("user_id") String user_id, @Param("password") String password);
     int updateMember(MemberDTO member);
 	ArrayList<MemberDTO> memberList(MemberDTO dto);
+	
+	// 이메일 확인
+	String findEmail(String userId);
 }

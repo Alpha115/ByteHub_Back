@@ -3,6 +3,7 @@ package com.bytehub.email;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,11 +134,22 @@ public class EmailController {
 	
 	
 
-	// 근태 인증번호 발송
+	// 근태 인증번호 발송 OR 재발송
 	@PostMapping("/attendance")
 	public Map<String, Object> attMail(@RequestBody Map<String, Object> info) {
 		resp = new HashMap<String, Object>();
 		Map<String, Object> mail = new HashMap<String, Object>();
+		
+		// user_id로 member 테이블에서 이메일 조회
+	    String userId = (String) info.get("user_id");
+	    
+	    // MemberService에서 이메일 조회
+	    String userEmail = memberService.findEmail(userId);
+	    
+	    if (userEmail == null) {
+	        resp.put("msg", "사용자를 찾을 수 없습니다.");
+	        return resp;
+	    }
 
 		// 6자리 인증번호 생성
 		int tempPassword = createPw();
@@ -147,8 +159,12 @@ public class EmailController {
 		String subject = "[ByteHub] 근태 인증번호 안내";
 		String content = String.format("안녕하세요.\n\n근태 인증번호는 아래와 같습니다.\n\n인증번호: %s\n\n※ 본 인증번호는 10분 후 만료됩니다.", tempPasswordStr);
 
+		// 이메일 리스트 생성 (DB에서 가져온 이메일만 사용)
+		ArrayList<String> receivers = new ArrayList<>();
+		receivers.add(userEmail);
+
 		mail.put("sender", sender);
-		mail.put("receiver", info.get("receiver")); // <입력받은 유저 이메일
+		mail.put("receiver", receivers); // 오직 DB에서 가져온 이메일만 사용
 		mail.put("key", key);
 		mail.put("subject", subject);
 		mail.put("content", content);
@@ -159,8 +175,8 @@ public class EmailController {
 		props.setProperty("mail.smtp.starttls.enable", enable);
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 
-		resp.put("msg", service.attMail(props, mail, tempPasswordStr)); // 반환값: 이메일 발송 메시지를 반환합니다. ({"msg":"이메일 발송에 성공했습니다."})
-		resp.put("authCode", tempPasswordStr); // 얘를 프론트에서 저장해서 인증번호 확인 서비스에 전달
+		resp.put("msg", service.attMail(props, mail, tempPasswordStr));
+		resp.put("authCode", tempPasswordStr);
 
 		return resp;
 	}

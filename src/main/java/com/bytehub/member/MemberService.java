@@ -108,5 +108,11 @@ public class MemberService {
 	public ArrayList<MemberDTO> memberList(MemberDTO dto) {
 		return dao.memberList(dto);
 	}
+	
+	// 이메일 확인
+	public String findEmail(String userId) {
+		 return dao.findEmail(userId);
+	
+	}
 
 }
