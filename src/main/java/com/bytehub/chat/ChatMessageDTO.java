@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ChatMsgDTO {
+public class ChatMessageDTO {
     private Integer msg_idx;
     private Integer chat_idx;
     private String user_id;

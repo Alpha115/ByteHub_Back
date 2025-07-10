@@ -9,16 +9,19 @@ public interface ChatDAO {
 	
 	List<ChatRoomDTO> selectAllRooms();
     ChatRoomDTO selectRoomById(Integer chat_idx);
-    void insertRoom(ChatRoomDTO dto);
 
-    void insertRoomMember(ChatMemberDTO dto);
-    void deleteRoomMembers(Integer chat_idx);
     List<String> selectRoomMembers(Integer chat_idx);
-
-    List<ChatMsgDTO> selectMessagesByRoom(Integer chat_idx);
-    void insertMessage(ChatMsgDTO dto);
-
+    List<ChatMessageDTO> selectMessagesByRoom(Integer chat_idx);
     List<ChatFileDTO> selectFilesByRoom(Integer chat_idx);
+
+    void insertMessage(ChatMessageDTO dto);
     void insertFile(ChatFileDTO dto);
 
+    void insertRoom(ChatRoomDTO dto);
+    void insertRoomMember(Integer chat_idx, String user_id);
+    void deleteRoomMembers(Integer chat_idx);
+
+    void updateRoom(ChatRoomDTO dto);
+    void updateRoomMembers(Integer chat_idx, List<String> user_ids);
+    
 }

@@ -25,7 +25,8 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    // 채팅방 전체 목록
+
+    // 전체 채팅방 목록
     @GetMapping("/rooms")
     public List<ChatRoomDTO> getRooms() {
         return chatService.getAllRooms();
@@ -44,11 +45,10 @@ public class ChatController {
         dto.setChat_name((String) payload.get("name"));
         dto.setAvatar((String) payload.get("avatar"));
         dto.setArchived(false);
-        // lastMsg, lastTime, lastActive 등은 필요시 추가
         List<String> members = (List<String>) payload.get("members");
-        Integer id = chatService.createRoom(dto, members);
+        chatService.createRoom(dto, members);
         Map<String, Object> result = new HashMap<>();
-        result.put("id", id);
+        result.put("id", dto.getChat_idx());
         return result;
     }
 
@@ -58,16 +58,17 @@ public class ChatController {
         chatService.updateRoomMembers(chat_idx, members);
     }
 
-    // 메시지 전송
+    // 메시지 전송 (WebSocket에서 주로 사용, REST도 가능)
     @PostMapping("/room/{chat_idx}/message")
-    public void sendMessage(@PathVariable Integer chat_idx, @RequestBody ChatMsgDTO msg) {
-        chatService.addMessage(chat_idx, msg);
+    public void sendMessage(@PathVariable Integer chat_idx, @RequestBody ChatMessageDTO msg) {
+        msg.setChat_idx(chat_idx);
+        chatService.insertMessage(msg);
     }
 
-    // 파일 업로드 메타 저장 (실제 파일 업로드는 별도 API 필요)
+    // 파일 업로드 메타 저장
     @PostMapping("/room/{chat_idx}/file")
     public void uploadFile(@PathVariable Integer chat_idx, @RequestBody ChatFileDTO file) {
-        chatService.addFile(file);
+        chatService.insertFile(file);
     }
-	
+        
 }

@@ -1,0 +1,25 @@
+package com.bytehub.chat;
+
+import java.time.LocalDateTime;
+
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
+
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RequiredArgsConstructor
+public class ChatWebSocketController {
+
+    private final ChatService chatService;
+
+    @MessageMapping("/chat/{chat_idx}")
+    @SendTo("/topic/chat/{chat_idx}")
+    public ChatMessageDTO sendMessage(@DestinationVariable Integer chat_idx, ChatMessageDTO message) {
+        message.setChat_idx(chat_idx);
+        chatService.insertMessage(message);
+        return message;
+    }
+}

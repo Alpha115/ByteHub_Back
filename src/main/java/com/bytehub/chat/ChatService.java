@@ -33,36 +33,26 @@ public class ChatService {
 	        return room;
 	    }
 
-	    public Integer createRoom(ChatRoomDTO dto, List<String> memberIds) {
+	    public void insertMessage(ChatMessageDTO dto) {
+	        chatMapper.insertMessage(dto);
+	    }
+
+	    public void insertFile(ChatFileDTO dto) {
+	        chatMapper.insertFile(dto);
+	    }
+
+	    public void createRoom(ChatRoomDTO dto, List<String> userIds) {
 	        chatMapper.insertRoom(dto);
-	        for (String userId : memberIds) {
-	            ChatMemberDTO member = new ChatMemberDTO();
-	            member.setChat_idx(dto.getChat_idx());
-	            member.setUser_id(userId);
-	            member.setUnread(0);
-	            chatMapper.insertRoomMember(member);
+	        for (String userId : userIds) {
+	            chatMapper.insertRoomMember(dto.getChat_idx(), userId);
 	        }
-	        return dto.getChat_idx();
 	    }
 
-	    public void updateRoomMembers(Integer chat_idx, List<String> memberIds) {
+	    public void updateRoomMembers(Integer chat_idx, List<String> userIds) {
 	        chatMapper.deleteRoomMembers(chat_idx);
-	        for (String userId : memberIds) {
-	            ChatMemberDTO member = new ChatMemberDTO();
-	            member.setChat_idx(chat_idx);
-	            member.setUser_id(userId);
-	            member.setUnread(0);
-	            chatMapper.insertRoomMember(member);
+	        for (String userId : userIds) {
+	            chatMapper.insertRoomMember(chat_idx, userId);
 	        }
-	    }
-
-	    public void addMessage(Integer chat_idx, ChatMsgDTO msg) {
-	        msg.setChat_idx(chat_idx);
-	        chatMapper.insertMessage(msg);
-	    }
-
-	    public void addFile(ChatFileDTO file) {
-	        chatMapper.insertFile(file);
 	    }
 	
 }

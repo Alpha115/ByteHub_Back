@@ -15,6 +15,6 @@ public class ChatRoomDTO {
     private String last_active;
     private String reg_date;
     private List<String> members;
-    private List<ChatMsgDTO> messages;
+    private List<ChatMessageDTO> messages;
     private List<ChatFileDTO> files;
 }
