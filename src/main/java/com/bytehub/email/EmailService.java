@@ -86,4 +86,52 @@ public class EmailService {
 		}
 	}
 
+	
+	// 근태 인증번호 발송
+	public Object attMail(Properties props, Map<String, Object> mail, String tempPasswordStr) {
+		
+		String sender = (String) mail.get("sender");
+		String key = (String) mail.get("key");
+		@SuppressWarnings("unchecked")
+		ArrayList<String> receivers = (ArrayList<String>) mail.get("receiver");
+
+		Session session = Session.getInstance(props, new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(sender, key);
+			}
+		});
+
+		Message msg = new MimeMessage(session);
+
+		try {
+			log.info("근태 인증번호 이메일 발송 시작 - 수신자: {}", receivers);
+			
+			// 메일 내용 null 체크
+			String subject = (String) mail.get("subject");
+			String content = (String) mail.get("content");
+			
+			if (subject == null || content == null) {
+				log.error("메일 제목 또는 내용이 null입니다. subject: {}, content: {}", subject, content);
+				return "메일 제목 또는 내용이 설정되지 않았습니다.";
+			}
+			
+			for (String to : receivers) {
+				msg.setFrom(new InternetAddress(sender));
+				msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+				msg.setSubject(subject);
+				msg.setText(content);
+				
+				Transport.send(msg);
+				log.info("근태 인증번호 이메일 발송 완료 - 수신자: {}", to);
+			}
+		} catch (Exception e) {
+			log.error("근태 인증번호 이메일 발송 실패: {}", e.getMessage(), e);
+			e.printStackTrace();
+			return "이메일 발송에 실패했습니다.(exception)";
+		}
+
+		return "근태 인증번호 이메일을 발송했습니다.";
+		
+	}
+
 }
