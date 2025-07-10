@@ -19,6 +19,10 @@
         SELECT * FROM file WHERE appr_idx = #{appr_idx}
     </select>
     
+    <select id="getFileById" resultType="com.bytehub.member.FileDTO">
+        SELECT * FROM file WHERE file_idx = #{file_idx}
+    </select>
+    
 	<insert id="appr_checker" parameterType="map">
 		INSERT INTO appr_history (appr_idx, step, lv_idx, checker_id, status, check_time, reason)
 		VALUES (#{appr_idx}, #{step}, #{lv_idx}, #{checker_id}, #{status}, #{check_time}, #{reason})

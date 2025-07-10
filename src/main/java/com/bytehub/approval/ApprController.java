@@ -1,6 +1,9 @@
 package com.bytehub.approval;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +41,7 @@ public class ApprController {
 	private ApprService service;
 
 	// 결재 문서 생성 (파일 업로드 포함, @RequestParam 방식)
-	@PostMapping("/create")
+	@PostMapping("/appr/create")
 	public Map<String, Object> createApproval(@RequestParam("writer_id") String writerId,
 			@RequestParam("subject") String subject, @RequestParam("content") String content,
 			@RequestParam("appr_type") String apprType,
@@ -55,27 +62,50 @@ public class ApprController {
 
 			// 파일 저장: FileDTO 리스트 생성
 			List<FileDTO> fileDTOList = new ArrayList<>();
-			String uploadDir = "C:/upload";
+			String uploadDir = System.getProperty("java.io.tmpdir") + "/upload";
 			File dir = new File(uploadDir);
 			if (!dir.exists()) {
-				dir.mkdirs();
+				boolean created = dir.mkdirs();
+				log.info("업로드 디렉토리 생성: {} - {}", uploadDir, created);
 			}
+			
 			if (files != null) {
+				log.info("업로드할 파일 개수: {}", files.size());
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String oriFilename = file.getOriginalFilename();
-						String newFilename = System.currentTimeMillis() + "_" + oriFilename;
-						String uploadPath = uploadDir + "/" + newFilename;
-						file.transferTo(new File(uploadPath));
+						try {
+							String oriFilename = file.getOriginalFilename();
+							String newFilename = System.currentTimeMillis() + "_" + oriFilename;
+							String uploadPath = uploadDir + "/" + newFilename;
+							
+							log.info("파일 업로드 시작: {} -> {}", oriFilename, uploadPath);
+							
+							File uploadFile = new File(uploadPath);
+							file.transferTo(uploadFile);
+							
+							// 파일이 실제로 생성되었는지 확인
+							if (uploadFile.exists()) {
+								log.info("파일 업로드 성공: {} (크기: {} bytes)", uploadPath, uploadFile.length());
+							} else {
+								log.error("파일 업로드 실패: 파일이 생성되지 않음 - {}", uploadPath);
+							}
 
-						FileDTO fileDTO = new FileDTO();
-						fileDTO.setOri_filename(oriFilename);
-						fileDTO.setNew_filename(newFilename);
-						fileDTO.setFile_type("approval");
-						// appr_idx는 service에서 set
-						fileDTOList.add(fileDTO);
+							FileDTO fileDTO = new FileDTO();
+							fileDTO.setOri_filename(oriFilename);
+							fileDTO.setNew_filename(newFilename);
+							fileDTO.setFile_type("approval");
+							// appr_idx는 service에서 set
+							fileDTOList.add(fileDTO);
+						} catch (IOException e) {
+							log.error("파일 업로드 실패: {} - {}", file.getOriginalFilename(), e.getMessage(), e);
+							// 파일 업로드 실패 시에도 계속 진행
+						}
+					} else {
+						log.warn("빈 파일 발견: {}", file.getOriginalFilename());
 					}
 				}
+			} else {
+				log.info("업로드할 파일이 없습니다.");
 			}
 
 			service.createApprWithLineAndFiles(appr, fileDTOList);
@@ -89,7 +119,7 @@ public class ApprController {
 		return result;
 	}
 
-	@PutMapping("/status")
+	@PutMapping("/appr/status")
 	public Map<String, Object> updateStatus(@RequestBody Map<String, Object> param) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -115,7 +145,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/my")
+	@GetMapping("/appr/my")
 	public Map<String, Object> getMyAppr(@RequestParam String writer_id) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -128,7 +158,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/history")
+	@GetMapping("/appr/history")
 	public Map<String, Object> getMyHistory(@RequestParam String checker_id) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -141,7 +171,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/toapprove")
+	@GetMapping("/appr/toapprove")
 	public Map<String, Object> getToApproveList(@RequestParam String user_id) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -154,7 +184,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/all")
+	@GetMapping("/appr/all")
 	public Map<String, Object> getAllApprovals() {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -167,7 +197,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/detail/{appr_idx}")
+	@GetMapping("/appr/detail/{appr_idx}")
 	public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -184,7 +214,7 @@ public class ApprController {
 		return result;
 	}
 
-	@GetMapping("/history/{appr_idx}")
+	@GetMapping("/appr/history/{appr_idx}")
 	public Map<String, Object> getApprovalHistory(@PathVariable int appr_idx) {
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -195,6 +225,43 @@ public class ApprController {
 			result.put("msg", "조회 실패: " + e.getMessage());
 		}
 		return result;
+	}
+
+	// 파일 다운로드
+	@GetMapping("/appr/download/{file_idx}")
+	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable int file_idx) {
+		try {
+			// 파일 정보 조회
+			FileDTO fileInfo = service.getFileById(file_idx);
+			if (fileInfo == null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			// 파일 경로 설정
+			String uploadDir = System.getProperty("java.io.tmpdir") + "/upload";
+			File file = new File(uploadDir + "/" + fileInfo.getNew_filename());
+			
+			if (!file.exists()) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			// 파일 스트림 생성
+			InputStream inputStream = new FileInputStream(file);
+			InputStreamResource resource = new InputStreamResource(inputStream);
+			
+			// HTTP 헤더 설정
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			headers.setContentDispositionFormData("attachment", fileInfo.getOri_filename());
+			
+			return ResponseEntity.ok()
+					.headers(headers)
+					.body(resource);
+					
+		} catch (IOException e) {
+			log.error("파일 다운로드 실패: {}", e.getMessage(), e);
+			return ResponseEntity.internalServerError().build();
+		}
 	}
 
 	// 연/월차 생성
