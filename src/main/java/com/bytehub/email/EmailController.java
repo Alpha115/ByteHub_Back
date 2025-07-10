@@ -160,9 +160,35 @@ public class EmailController {
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // <Tlsv1.2 버전 추가
 
 		resp.put("msg", service.attMail(props, mail, tempPasswordStr)); // 반환값: 이메일 발송 메시지를 반환합니다. ({"msg":"이메일 발송에 성공했습니다."})
-		resp.put("authCode", tempPasswordStr); // 인증번호도 함께 반환 (테스트용)
+		resp.put("authCode", tempPasswordStr); // 얘를 프론트에서 저장해서 인증번호 확인 서비스에 전달
 
 		return resp;
+	}
+
+	// 인증번호 확인 서비스
+	@PostMapping("/verify")
+	public Map<String, Object> verify(@RequestBody Map<String, String> request) {
+		Map<String, Object> result = new HashMap<>();
+		
+		// 클라이언트에서 전송한 인증번호와 예상 인증번호 추출
+		String inputCode = request.get("authCode");        // 사용자가 입력한 인증번호
+		String expectedCode = request.get("expectedCode"); // 서버에서 생성한 인증번호
+		
+		// 인증번호가 null인지 확인
+		if (inputCode == null || expectedCode == null) {
+			result.put("success", false);
+			result.put("msg", "인증번호를 입력해주세요.");
+			return result;
+		}
+		
+		// 인증번호 일치 여부 확인
+		boolean success = inputCode.equals(expectedCode);
+		
+		// 결과 반환
+		result.put("success", success);
+		result.put("msg", success ? "인증번호가 일치합니다." : "인증번호가 일치하지 않습니다.");
+		
+		return result;
 	}
 
 }
