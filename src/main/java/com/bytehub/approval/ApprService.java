@@ -95,6 +95,10 @@ public class ApprService {
         return dao.getFilesByApprIdx(appr_idx);
     }
     
+    public FileDTO getFileById(int file_idx) {
+        return dao.getFileById(file_idx);
+    }
+    
     // 연/월차 생성
 	public void generateLeave() {
 

@@ -19,6 +19,7 @@ public interface ApprDAO {
     Map<String, Object> getApprovalDetail(int appr_idx);
     List<Map<String, Object>> getApprovalHistory(int appr_idx);
     List<FileDTO> getFilesByApprIdx(int appr_idx);
+    FileDTO getFileById(int file_idx);
     
     // 파일 정보 저장
     int insertFile(FileDTO fileDTO);
