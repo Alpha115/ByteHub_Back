@@ -30,4 +30,5 @@ public interface ChatDAO {
     void increaseUnreadExceptSender(@Param("chat_idx") Integer chat_idx, @Param("user_id") String user_id);
 	void updateLastActive(Integer chat_idx, LocalDateTime now);
 	int archived(ChatRoomDTO dto);
+	int deleteRoomsByLastActive();
 }
