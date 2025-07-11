@@ -104,6 +104,7 @@
         JOIN appr_history h ON a.appr_idx = h.appr_idx
         JOIN member m ON a.writer_id = m.user_id
         WHERE h.checker_id = #{user_id}
+          AND h.status = '대기중'
           AND m.lv_idx > #{checker_lv_idx}
           AND (#{checker_lv_idx} != 3 OR m.dept_idx = #{checker_dept_idx})
         ORDER BY a.appr_date DESC
