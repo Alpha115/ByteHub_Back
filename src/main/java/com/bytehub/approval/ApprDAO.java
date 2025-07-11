@@ -14,7 +14,7 @@ public interface ApprDAO {
     int updateStatus(Map<String, Object> param);
     List<Map<String, Object>> getMyAppr(String writer_id);
     List<Map<String, Object>> getMyHistory(String checker_id);
-    List<Map<String, Object>> getToApproveList(String user_id);
+    List<Map<String, Object>> getToApproveList(Map<String, Object> param);
     List<Map<String, Object>> getAllApprovals();
     Map<String, Object> getApprovalDetail(int appr_idx);
     List<Map<String, Object>> getApprovalHistory(int appr_idx);
@@ -36,5 +36,7 @@ public interface ApprDAO {
     // 연차 상세 내역 조회
     List<ApprDTO> leaveDetail(String loginId);
 
+    // 기안자의 lv_idx와 dept_idx를 받아 결재자 lv_idx 1,2(고정 1명), 3(같은 부서 팀장)만 반환
+    List<ApprLineDTO> getDynamicApprLine(Map<String, Object> param);
     
 }

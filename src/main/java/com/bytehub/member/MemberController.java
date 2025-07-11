@@ -28,10 +28,10 @@ public class MemberController {
         try {
             // dept_idx와 lv_idx가 없거나 0이면 기본값 설정
             if (param.get("dept_idx") == null || (Integer) param.get("dept_idx") == 0) {
-                param.put("dept_idx", 1); // 기본 부서 ID
+                param.put("dept_idx", 11); // 기본 부서 ID
             }
             if (param.get("lv_idx") == null || (Integer) param.get("lv_idx") == 0) {
-                param.put("lv_idx", 1); // 기본 직급 ID
+                param.put("lv_idx", 7); // 기본 직급 ID
             }
             
             return service.join(param);
