@@ -9,5 +9,31 @@
 		VALUES (#{user_id}, #{scd_type}, #{type_idx}, #{subject}, #{start_time}, #{end_time})
     </insert>
     
+    <select id="total" resultType="com.bytehub.schedule.ScdDTO">
+    	select * from schedule order by start_time
+    </select>
+    
+    <update id="update" parameterType="com.bytehub.schedule.ScdDTO">
+    	update schedule set
+    	subject =#{subject}
+    	start_time =#{start_time}
+    	end_time =#{end_time}
+    	where type_idx = #{type_idx} and scd_type =#{scd_type}
+    </update>
+    
+    <delete id="delete">
+    	delete from schedule where type_idx=#{param1} and scd_type=#{param2}
+    </delete>
+    
+    <delete id="deleteBySubject">
+    	delete from schedule where subject=#{param1}
+    </delete>
+    
+    <select id="today" resultType="int">
+	    SELECT COUNT(subject) AS cnt
+	    FROM schedule
+	    WHERE NOW() &gt; start_time
+	      AND NOW() &lt; end_time
+	</select>
     
 </mapper>
