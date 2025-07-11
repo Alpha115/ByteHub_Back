@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.bytehub.schedule.ScdDTO;
+
 @Mapper
 public interface ProjectDAO {
 
@@ -29,5 +31,12 @@ public interface ProjectDAO {
 	ArrayList<Map<String, String>> members(int idx);
 
 	ArrayList<Map<String, Object>> list();
+	
+	// 일정에 자동으로 추가/업데이트/삭제하는 함수
+	int insertProjToScd(ProjectDTO proj);
+	
+	int updateProjToScd(ProjectDTO proj);
+	
+	int deleteProjFromScd(int idx);
 	
 }

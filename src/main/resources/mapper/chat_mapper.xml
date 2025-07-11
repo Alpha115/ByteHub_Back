@@ -5,8 +5,10 @@
 <!-- ChatMapper.xml -->
 <mapper namespace="com.bytehub.chat.ChatDAO">
 
- <select id="selectAllRooms" resultType="com.bytehub.chat.ChatRoomDTO">
-        SELECT * FROM chat
+ 	<select id="selectAllRooms" resultType="com.bytehub.chat.ChatRoomDTO">
+          SELECT c.*, COALESCE(cm.unread, 0) AS unread
+	    FROM chat c
+	    LEFT JOIN chat_member cm ON c.chat_idx = cm.chat_idx AND cm.user_id = #{user_id}
     </select>
     <select id="selectRoomById" parameterType="int" resultType="com.bytehub.chat.ChatRoomDTO">
         SELECT * FROM chat WHERE chat_idx = #{chat_idx}
@@ -40,4 +42,24 @@
         INSERT INTO chat_file (msg_idx, name, url, size, uploaded_at, expire_at)
         VALUES (#{msg_idx}, #{name}, #{url}, #{size}, #{uploaded_at}, #{expire_at})
     </insert>
+    
+    <update id="resetUnread">
+	    UPDATE chat_member
+	    SET unread = 0
+	    WHERE chat_idx = #{chat_idx} AND user_id = #{user_id}
+	</update>
+	
+	<update id="increaseUnreadExceptSender">
+	  UPDATE chat_member
+	  SET unread = unread + 1
+	  WHERE chat_idx = #{chat_idx} AND user_id != #{user_id}
+	</update>
+	
+	<update id="updateLastActive">
+	  UPDATE chat SET last_active = NOW() WHERE chat_idx = #{chat_idx}
+	</update>
+	
+	<update id="archived" parameterType="com.bytehub.chat.ChatRoomDTO">
+	 	UPDATE chat SET archived = NOT archived WHERE chat_idx = #{chat_idx}
+	</update>
 </mapper>

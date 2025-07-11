@@ -77,5 +77,31 @@
     <select id="list" resultType="map">
     	select * from project order by priority
     </select>
+    
+    
+    <!-- 일정 연동 관련 -->
+    <insert id="insertProjToScd"
+    		parameterType="com.bytehub.project.ProjectDTO"
+		    useGeneratedKeys="true" 
+		    keyColumn="project_idx" 
+		    keyProperty="project_idx">
+    	INSERT INTO schedule (user_id, scd_type, type_idx, subject, start_time, end_time)
+		VALUES (#{user_id}, 'project', #{project_idx}, #{subject}, #{start_date}, #{end_date})
+    </insert>
+    
+    <update id="updateProjToScd" parameterType="com.bytehub.project.ProjectDTO">
+    	update schedule set 
+    	user_id=#{user_id}, 
+    	subject =#{subject}, 
+    	start_time =#{start_date}, 
+    	end_time =#{end_date} 
+    	where type_idx = #{project_idx} and scd_type ='project'
+    </update>
+    
+    <delete id="deleteProjFromScd">
+    	delete from schedule
+    	where type_idx = #{param1} and scd_type ='project';
+    </delete>
+    
 
 </mapper>
