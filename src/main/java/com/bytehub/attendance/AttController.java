@@ -1,13 +1,21 @@
 package com.bytehub.attendance;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bytehub.utils.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AttController {
 
-    private final AttService service;
+    private final AttService svc;
     
     // 출퇴근 기록 생성 및 인증 기록 생성
 
@@ -43,7 +51,7 @@ public class AttController {
                 att.setOut_time(LocalDateTime.now());
                 att.setAtt_type("퇴근");
             }
-            service.insertAttendance(att);
+            svc.insertAttendance(att);
             attIdx = att.getAtt_idx();
         }
         // 인증 히스토리 기록 (성공/실패 모두)
@@ -56,24 +64,165 @@ public class AttController {
         }
         hist.setCert_status(success);
         hist.setCert_time(LocalDateTime.now());
-        service.insertAttHistory(hist);
+        svc.insertAttHistory(hist);
 
         Map<String, Object> result = new HashMap<>();
         result.put("success", success);
         result.put("msg", success ? "인증 성공" : "인증 실패");
         return result;
     }
+    
+    
+    // 관리자가 출퇴근 기록 수정 할 수 있어야 함
+    
+    @PutMapping("/attendance/update")
+    public Map<String, Object> attUpdate (
+    		@RequestBody AttDTO dto, // AttDTO로 변경
+    		@RequestHeader Map<String, String> header){
+    	
+    	log.info("header : "+header); // 요청 헤더 로그 출력
+    	Map<String, Object> result = new HashMap<>(); // 응답 데이터 저장용
+    	
+        String loginId = null;
+        boolean login = false;
+        
+     // JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
+	    try {
+	    	String token = header.get("authorization");
+	    	Map<String, Object> tokenData = JwtUtils.readToken(token);
+	    	loginId = (String) tokenData.get("id");
+	    	login = true;
+	    } catch (Exception e) {
+	    	log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+	    	result.put("success", false);
+	    	result.put("msg", "인증 실패");
+	    	return result;
+	    }
+		
+		// 출퇴근 기록 수정
+		try {
+			int updateResult = svc.attUpdate(dto);
+			if (updateResult > 0) {
+				result.put("success", true);
+				result.put("msg", "출퇴근 기록이 수정되었습니다.");
+			} else {
+				result.put("success", false);
+				result.put("msg", "수정할 기록을 찾을 수 없습니다.");
+			}
+		} catch (Exception e) {
+			log.error("출퇴근 기록 수정 실패: " + e.getMessage());
+			result.put("success", false);
+			result.put("msg", "수정 중 오류가 발생했습니다.");
+		}
+	    
+	    return result;
+    	
+    }
+    
 
-    // 개인 근태 일정 조회 기능
+    // 출근/퇴근/지각/조퇴/결석 내역 조회 기능
+    @GetMapping("/attendance/list")
+    public Map<String, Object> attList(@RequestParam String user_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<AttDTO> list = svc.attList(user_id);
+            result.put("success", true);
+            result.put("data", list);
+        } catch (Exception e) {
+            log.error("출퇴근 기록 조회 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
 
-    // 출근/퇴근/지각/조퇴 내역 조회 기능
+    // 특정 출퇴근 기록 조회
+    @GetMapping("/attendance/detail")
+    public Map<String, Object> attDetail(@RequestParam int att_idx) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            AttDTO dto = svc.attDetail(att_idx);
+            if (dto != null) {
+                result.put("success", true);
+                result.put("data", dto);
+            } else {
+                result.put("success", false);
+                result.put("msg", "해당 기록을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            log.error("출퇴근 기록 상세 조회 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
 
-    // 출/퇴근 시간 자동 기록 및 상태 분류 기능
+    // 출/퇴근 시간 설정 기능 -- 출퇴근 기준 시간 생성
+    @PostMapping("/attendance/setting/create")
+    public Map<String, Object> createAttSetting(@RequestBody AttSettingDTO dto) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int insertResult = svc.createAttSetting(dto);
+            if (insertResult > 0) {
+                result.put("success", true);
+                result.put("msg", "기준 시간이 설정되었습니다.");
+            } else {
+                result.put("success", false);
+                result.put("msg", "설정에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "오류가 발생했습니다.");
+        }
+        return result;
+    }
+    
+    // 출/퇴근 시간 설정 기능 -- 출퇴근 기준 시간 수정
+    @PutMapping("/attendance/setting/update")
+    public Map<String, Object> updateAttSetting(@RequestBody AttSettingDTO dto) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int updateResult = svc.updateAttSetting(dto);
+            if (updateResult > 0) {
+                result.put("success", true);
+                result.put("msg", "기준 시간이 수정되었습니다.");
+            } else {
+                result.put("success", false);
+                result.put("msg", "수정할 설정을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "수정 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
+    
+    // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회
+    @GetMapping("/attendance/setting/current")
+    public Map<String, Object> getCurrentSetting(@RequestParam String user_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            AttSettingDTO setting = svc.getAttSetting(user_id);
+            if (setting != null) {
+                result.put("success", true);
+                result.put("data", setting);
+            } else {
+                result.put("success", false);
+                result.put("msg", "설정된 기준 시간이 없습니다.");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
 
     // 근태 통계 있어야 함;
 
     // 팀 근태 확인 기능 (연차만)
 
     // 시간 되면 인증번호 시도 제한 및 잠금 기능;
+    
+   
 
 }
