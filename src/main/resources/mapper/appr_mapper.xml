@@ -38,6 +38,25 @@
 		SELECT step, lv_idx, user_id FROM appr_line ORDER BY step ASC
 	</select>
 
+    <!-- 기안자의 lv_idx와 dept_idx를 받아 결재자 lv_idx 1,2(고정 1명), 3(같은 부서 팀장)만 반환 -->
+    <select id="getDynamicApprLine" resultType="com.bytehub.approval.ApprLineDTO">
+        SELECT 1 as step, l.lv_idx, m.user_id
+        FROM level l
+        JOIN member m ON l.lv_idx = m.lv_idx
+        WHERE l.lv_idx = 1
+        UNION ALL
+        SELECT 2 as step, l.lv_idx, m.user_id
+        FROM level l
+        JOIN member m ON l.lv_idx = m.lv_idx
+        WHERE l.lv_idx = 2
+        UNION ALL
+        SELECT 3 as step, l.lv_idx, m.user_id
+        FROM level l
+        JOIN member m ON l.lv_idx = m.lv_idx
+        WHERE l.lv_idx = 3 AND m.dept_idx = #{writerDeptIdx}
+        ORDER BY step ASC
+    </select>
+
 	<!-- 결재 상태 변경 (승인/반려) -->
 	<update id="updateStatus" parameterType="map">
 		UPDATE appr_history
@@ -74,6 +93,8 @@
     <select id="getToApproveList" resultType="map">
         SELECT 
             a.*,
+            m.lv_idx as writer_lv_idx,
+            m.dept_idx as writer_dept_idx,
             CASE 
                 WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
                 WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
@@ -81,7 +102,10 @@
             END as final_status
         FROM approval a 
         JOIN appr_history h ON a.appr_idx = h.appr_idx
+        JOIN member m ON a.writer_id = m.user_id
         WHERE h.checker_id = #{user_id}
+          AND m.lv_idx > #{checker_lv_idx}
+          AND (#{checker_lv_idx} != 3 OR m.dept_idx = #{checker_dept_idx})
         ORDER BY a.appr_date DESC
     </select>
 
