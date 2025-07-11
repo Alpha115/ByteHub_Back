@@ -23,6 +23,7 @@ public class ProjectService {
 		int row = 0;
 		if (dao.insertProj(info.proj) > 0) { // project가 들어갔다면
 			row++;
+			dao.insertProjToScd(info.proj);	//일정추가
 			dao.insertUser(info.proj.getProject_idx(), info.user_id);
 			if (info.file_idx.length > 0) { // 파일이 있으면
 				//파일업로드기능추가...
@@ -39,6 +40,7 @@ public class ProjectService {
 		int row = 0;
 		if (dao.updateProj(info.proj) > 0) {
 			row++;
+			dao.updateProjToScd(info.proj);	//일정 수정
 			dao.deleteUser(info.proj.getProject_idx());
 			dao.insertUser(info.proj.getProject_idx(), info.user_id);
 			if (info.file_idx.length > 0) {
@@ -84,5 +86,7 @@ public class ProjectService {
 //		int row = dao.delete(project_idx);
 //		return row > 0;
 //	}
+	
+	// 프로젝트 아카이브 할 때 deleteProjFromScd 하면 될듯
 
 }
