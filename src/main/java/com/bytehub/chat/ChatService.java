@@ -1,8 +1,11 @@
 package com.bytehub.chat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -70,4 +73,11 @@ public class ChatService {
 		
 		return row > 0 ? true : false;
 	}
+
+    
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void autoDeleteExpiredRoomsJob() {
+        int deleted = chatMapper.deleteRoomsByLastActive();
+        System.out.println("10일 지난 채팅방 자동 삭제: " + deleted + "건");
+    }
 }

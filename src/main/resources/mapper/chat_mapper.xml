@@ -59,7 +59,14 @@
 	  UPDATE chat SET last_active = NOW() WHERE chat_idx = #{chat_idx}
 	</update>
 	
+	<delete id="deleteRoomsByLastActive">
+	    DELETE FROM chat
+	    WHERE last_active &lt; DATE_SUB(NOW(), INTERVAL 10 DAY) and archived = false
+	</delete>
+		
 	<update id="archived" parameterType="com.bytehub.chat.ChatRoomDTO">
 	 	UPDATE chat SET archived = NOT archived WHERE chat_idx = #{chat_idx}
 	</update>
+	
+
 </mapper>
