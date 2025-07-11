@@ -10,6 +10,7 @@ public class ChatRoomDTO {
     private String chat_name;
     private String avatar;
     private Boolean archived;
+    private int unread;
     private String last_msg;
     private String last_time;
     private String last_active;
