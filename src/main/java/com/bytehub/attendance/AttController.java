@@ -130,8 +130,10 @@ public class AttController {
         Map<String, Object> result = new HashMap<>();
         try {
             List<AttDTO> list = svc.attList(user_id);
+            
             result.put("success", true);
             result.put("data", list);
+
         } catch (Exception e) {
             log.error("출퇴근 기록 조회 실패: " + e.getMessage());
             result.put("success", false);

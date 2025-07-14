@@ -17,4 +17,7 @@ public class AttDTO {
     private LocalDateTime out_time; // 퇴근 시간
     private String att_type;       // 근태 타입 (정상, 지각, 조퇴 등)
     
+    private String name;
+    private String dept_name;
+    
 }
