@@ -19,4 +19,6 @@ public interface MemberDAO {
 	
 	// 이메일 확인
 	String findEmail(String userId);
+	int memberUpdate(MemberDTO dto);
+	int memberDelete(MemberDTO dto);
 }

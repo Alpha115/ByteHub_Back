@@ -115,4 +115,14 @@ public class MemberService {
 	
 	}
 
+	public boolean memberUpdate(MemberDTO dto) {
+		int row = dao.memberUpdate(dto);
+		return row > 0 ? true : false;
+	}
+
+	public boolean memberDelete(MemberDTO dto) {
+		int row = dao.memberDelete(dto);
+		return row > 0 ? true : false;
+	}
+
 }

@@ -107,4 +107,20 @@ public class MemberController {
     	result.put("list", list);
     	return result;
     }
+    
+    @PostMapping("/list/update")
+    public Map<String, Object> memberUpdate(@RequestBody MemberDTO dto){
+        Map<String, Object> result = new HashMap<>();
+        boolean suc = service.memberUpdate(dto);
+        result.put("suc",suc);
+        return result;
+    }
+    
+    @PostMapping("/list/delete")
+    public Map<String, Object> memberDelete(@RequestBody MemberDTO dto){
+        Map<String, Object> result = new HashMap<>();
+        boolean suc = service.memberDelete(dto);
+        result.put("suc",suc);
+        return result;
+    }
 }

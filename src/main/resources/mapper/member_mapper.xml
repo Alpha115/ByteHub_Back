@@ -62,5 +62,22 @@
     SELECT email FROM member WHERE user_id = #{user_id}
 	</select>
     
-    
+	<update id="memberUpdate" parameterType="com.bytehub.member.MemberDTO">
+	    UPDATE member
+	    SET
+	        lv_idx = #{lv_idx},
+	        dept_idx = #{dept_idx},
+	        status = #{status}
+	    WHERE
+	        user_id = #{user_id}
+	</update>
+	
+	<update id="memberDelete" parameterType="com.bytehub.member.MemberDTO">
+	    UPDATE member
+	    SET
+	        status = '퇴사'
+	    WHERE
+	        user_id = #{user_id}
+	</update>
+	    
 </mapper>
