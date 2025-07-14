@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -49,5 +50,10 @@ public class AttService {
     // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회
 	public AttSettingDTO getAttSetting(String user_id) {
 		return dao.getAttSetting(user_id);
+	}
+
+	// 근태 통계
+	public List<Map<String, Object>> attStat(String user_id) {
+		return dao.attStat(user_id);
 	}
 }

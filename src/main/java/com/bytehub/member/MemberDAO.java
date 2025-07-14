@@ -21,4 +21,8 @@ public interface MemberDAO {
 	String findEmail(String userId);
 	int memberUpdate(MemberDTO dto);
 	int memberDelete(MemberDTO dto);
+
+	// 사용자 정보 조회 (부서명,이름)
+	MemberDTO memberInfo(String user_id);
+	
 }

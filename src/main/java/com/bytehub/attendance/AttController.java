@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytehub.member.MemberDTO;
+import com.bytehub.member.MemberService;
 import com.bytehub.utils.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AttController {
 
     private final AttService svc;
+    private final MemberService msvc;
+
     
     // 출퇴근 기록 생성 및 인증 기록 생성
 
@@ -218,8 +222,35 @@ public class AttController {
     }
 
     // 근태 통계 있어야 함;
+    @GetMapping("/attendance/stat")
+    public Map<String, Object> attStat(@RequestParam String user_id){
+        Map<String, Object> result = new HashMap<>();
 
-    // 팀 근태 확인 기능 (연차만)
+        try {
+        	// 근태 통계 조회
+            List<Map<String, Object>> statList = svc.attStat(user_id);
+            
+            // 사용자 정보 조회 (부서명,이름)
+            MemberDTO member = msvc.memberInfo(user_id);
+            
+            // 이름과 부서명만 추려서 내려주기
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("name", member.getName());
+            userInfo.put("dept_name", member.getDept_name());
+            
+            result.put("success", true);
+            result.put("data", statList);
+            result.put("user_info", userInfo); // 부서명이랑 이름 가져오면 될 듯
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "통계 조회 실패");
+        }
+        return result;
+        
+    }
+
+    // 팀 근태 확인 기능 (연차만) 이거는 권한되고 나서??
 
     // 시간 되면 인증번호 시도 제한 및 잠금 기능;
     

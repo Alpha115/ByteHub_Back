@@ -125,4 +125,12 @@ public class MemberService {
 		return row > 0 ? true : false;
 	}
 
+	// 사용자 정보 조회 (부서명,이름)
+	public MemberDTO memberInfo(String user_id) {
+		return dao.memberInfo(user_id);
+	}
+
+
+	
+
 }

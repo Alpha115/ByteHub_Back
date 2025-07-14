@@ -63,4 +63,12 @@
 	    LIMIT 1
 	</select>
 	
+	<!-- 근태 통계 -->
+	<select id="attStat" resultType="map">
+		SELECT att_type, COUNT(*) as cnt
+		FROM attendance
+		WHERE user_id = #{user_id}
+		GROUP BY att_type
+	</select>
+	
 </mapper>

@@ -89,5 +89,13 @@
 	    WHERE
 	        user_id = #{user_id}
 	</update>
+	
+	<!-- 사용자 정보 조회 (부서명,이름) -->
+	<select id="memberInfo" parameterType="string" resultType="com.bytehub.member.MemberDTO">
+	    SELECT m.*, d.dept_name
+	    FROM member m
+	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
+	    WHERE m.user_id = #{user_id}
+	</select>
 	    
 </mapper>
