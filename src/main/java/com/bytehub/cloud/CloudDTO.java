@@ -4,7 +4,7 @@ public class CloudDTO {
 
     private int file_idx;
     private int dept_idx;
-    private String file_name;
+    private String filename;
 
     public int getFile_idx() {
         return file_idx;
@@ -22,11 +22,11 @@ public class CloudDTO {
         this.dept_idx = dept_idx;
     }
 
-    public String getFile_name() {
-        return file_name;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setFile_name(String file_name) {
-        this.file_name = file_name;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
