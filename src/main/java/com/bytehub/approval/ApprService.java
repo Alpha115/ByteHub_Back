@@ -112,12 +112,31 @@ public class ApprService {
         return dao.getToApproveList(param);
     }
 
-    public List<Map<String, Object>> getAllApprovals() {
-        return dao.getAllApprovals();
+    public List<Map<String, Object>> getAllApprovals(String user_id) {
+        // 사용자 정보 조회
+        MemberDTO user = memberDAO.getMemberById(user_id);
+        int userLvIdx = user != null ? user.getLv_idx() : 7;
+        int userDeptIdx = user != null ? user.getDept_idx() : 11;
+        Map<String, Object> param = new HashMap<>();
+        param.put("checker_lv_idx", userLvIdx);
+        param.put("checker_dept_idx", userDeptIdx);
+        return dao.getAllApprovals(param);
     }
 
-    public Map<String, Object> getApprovalDetail(int appr_idx) {
-        return dao.getApprovalDetail(appr_idx);
+    public Map<String, Object> getApprovalDetail(int appr_idx, String user_id) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("appr_idx", appr_idx);
+        
+        // user_id가 제공된 경우에만 권한 체크
+        if (user_id != null && !user_id.isEmpty()) {
+            MemberDTO user = memberDAO.getMemberById(user_id);
+            int userLvIdx = user != null ? user.getLv_idx() : 7;
+            int userDeptIdx = user != null ? user.getDept_idx() : 11;
+            param.put("checker_lv_idx", userLvIdx);
+            param.put("checker_dept_idx", userDeptIdx);
+        }
+        
+        return dao.getApprovalDetail(param);
     }
 
     public List<Map<String, Object>> getApprovalHistory(int appr_idx) {

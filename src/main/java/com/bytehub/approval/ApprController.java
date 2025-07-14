@@ -214,11 +214,11 @@ public class ApprController {
 	 * - 관리자 권한이 필요한 기능
 	 */
 	@GetMapping("/appr/all")
-	public Map<String, Object> getAllApprovals() {
+	public Map<String, Object> getAllApprovals(@RequestParam(value = "user_id", required = false) String user_id) {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			result.put("success", true);
-			result.put("data", service.getAllApprovals());
+			result.put("data", service.getAllApprovals(user_id));
 		} catch (Exception e) {
 			result.put("success", false);
 			result.put("msg", "조회 실패: " + e.getMessage());
@@ -232,10 +232,10 @@ public class ApprController {
 	 * - 첨부 파일 목록과 결재 이력 포함
 	 */
 	@GetMapping("/appr/detail/{appr_idx}")
-	public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx) {
+	public Map<String, Object> getApprovalDetail(@PathVariable int appr_idx, @RequestParam(value = "user_id", required = false) String user_id) {
 		Map<String, Object> result = new HashMap<>();
 		try {
-			Map<String, Object> detail = service.getApprovalDetail(appr_idx);
+			Map<String, Object> detail = service.getApprovalDetail(appr_idx, user_id);
 			// 파일 리스트 추가
 			List<FileDTO> files = service.getFilesByApprIdx(appr_idx);
 			detail.put("files", files);

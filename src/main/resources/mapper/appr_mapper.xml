@@ -74,7 +74,11 @@
 				WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
 				WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
 				ELSE '대기중'
-			END as final_status
+			END as final_status,
+			CASE 
+				WHEN EXISTS (SELECT 1 FROM file f WHERE f.appr_idx = a.appr_idx) THEN '있음'
+				ELSE '없음'
+			END as has_files
 		FROM approval a 
 		WHERE a.writer_id = #{writer_id} 
 		ORDER BY a.appr_date DESC
@@ -82,7 +86,11 @@
 
     <!-- 내가 결재한 문서 이력 조회 -->
     <select id="getMyHistory" resultType="map">
-        SELECT h.*, a.subject, a.writer_id, a.appr_date, a.appr_type
+        SELECT h.*, a.subject, a.writer_id, a.appr_date, a.appr_type,
+               CASE 
+                   WHEN EXISTS (SELECT 1 FROM file f WHERE f.appr_idx = a.appr_idx) THEN '있음'
+                   ELSE '없음'
+               END as has_files
         FROM appr_history h
         JOIN approval a ON h.appr_idx = a.appr_idx
         WHERE h.checker_id = #{checker_id}
@@ -99,7 +107,11 @@
                 WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
                 WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
                 ELSE '대기중'
-            END as final_status
+            END as final_status,
+            CASE 
+                WHEN EXISTS (SELECT 1 FROM file f WHERE f.appr_idx = a.appr_idx) THEN '있음'
+                ELSE '없음'
+            END as has_files
         FROM approval a 
         JOIN appr_history h ON a.appr_idx = h.appr_idx
         JOIN member m ON a.writer_id = m.user_id
@@ -114,12 +126,22 @@
     <select id="getAllApprovals" resultType="map">
         SELECT 
             a.*,
+            m.lv_idx as writer_lv_idx,
+            m.dept_idx as writer_dept_idx,
             CASE 
                 WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
                 WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
                 ELSE '대기중'
-            END as final_status
+            END as final_status,
+            CASE 
+                WHEN EXISTS (SELECT 1 FROM file f WHERE f.appr_idx = a.appr_idx) THEN '있음'
+                ELSE '없음'
+            END as has_files
         FROM approval a 
+        JOIN member m ON a.writer_id = m.user_id
+        <if test="checker_lv_idx != null and checker_dept_idx != null">
+        WHERE (#{checker_lv_idx} != 3 OR m.dept_idx = #{checker_dept_idx})
+        </if>
         ORDER BY a.appr_date DESC
     </select>
 
@@ -133,7 +155,14 @@
                 ELSE '대기중'
             END as final_status
         FROM approval a 
+        <if test="checker_lv_idx != null and checker_dept_idx != null">
+        JOIN member m ON a.writer_id = m.user_id
         WHERE a.appr_idx = #{appr_idx}
+          AND (#{checker_lv_idx} != 3 OR m.dept_idx = #{checker_dept_idx})
+        </if>
+        <if test="checker_lv_idx == null or checker_dept_idx == null">
+        WHERE a.appr_idx = #{appr_idx}
+        </if>
     </select>
 
     <!-- 결재 문서의 결재 이력 조회 -->

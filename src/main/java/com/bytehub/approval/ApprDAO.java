@@ -15,8 +15,8 @@ public interface ApprDAO {
     List<Map<String, Object>> getMyAppr(String writer_id);
     List<Map<String, Object>> getMyHistory(String checker_id);
     List<Map<String, Object>> getToApproveList(Map<String, Object> param);
-    List<Map<String, Object>> getAllApprovals();
-    Map<String, Object> getApprovalDetail(int appr_idx);
+    List<Map<String, Object>> getAllApprovals(Map<String, Object> param);
+    Map<String, Object> getApprovalDetail(Map<String, Object> param);
     List<Map<String, Object>> getApprovalHistory(int appr_idx);
     List<FileDTO> getFilesByApprIdx(int appr_idx);
     FileDTO getFileById(int file_idx);
