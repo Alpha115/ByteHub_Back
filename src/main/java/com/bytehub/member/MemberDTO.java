@@ -17,4 +17,5 @@ public class MemberDTO {
     private String lv_name;
     private String dept_name;
     private String status;
+    private Date hire_end_date;
 }

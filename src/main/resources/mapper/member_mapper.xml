@@ -67,15 +67,25 @@
 	    SET
 	        lv_idx = #{lv_idx},
 	        dept_idx = #{dept_idx},
-	        status = #{status}
+	        status = #{status},
+	        hire_end_date =
+	        <choose>
+	            <when test="status == '퇴사'">
+	                now()
+	            </when>
+	            <otherwise>
+	                #{hire_end_date}
+	            </otherwise>
+	        </choose>
 	    WHERE
 	        user_id = #{user_id}
 	</update>
-	
+
 	<update id="memberDelete" parameterType="com.bytehub.member.MemberDTO">
 	    UPDATE member
 	    SET
-	        status = '퇴사'
+	        status = '퇴사',
+	        hire_end_date = now()
 	    WHERE
 	        user_id = #{user_id}
 	</update>
