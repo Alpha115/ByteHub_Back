@@ -23,7 +23,7 @@
         WHERE file_idx = #{file_idx}
     </select>
 		
-	<!-- 게시글 수정 -->
+		<!-- 게시글 수정 -->
 	<update id="postUpdate" parameterType="com.bytehub.board.BoardDTO">
     UPDATE board
     SET category = #{category},
@@ -31,9 +31,10 @@
         content = #{content},
         pinned = #{pinned},
         draft = #{draft},
-        file_idx = #{file_idx}
+        file_idx = #{file_idx},
+        reg_date = CURRENT_DATE
     WHERE post_idx = #{post_idx}
-	</update>
+    </update>
 	
 	<!-- 작성자 ID 가져오기 (post_idx 에 맞는) -->
     <select id="postWriter" parameterType="int" resultType="String">
@@ -95,5 +96,11 @@
         WHERE a.scd_type = 'MEETING' AND a.type_idx = #{post_idx}
         ORDER BY m.name
     </select>
+    
+    <!-- 게시글의 기존 참석자 삭제 -->
+    <delete id="deleteAttendeesByPostIdx">
+        DELETE FROM attendee
+        WHERE scd_type = 'MEETING' AND type_idx = #{post_idx}
+    </delete>
 		
 </mapper>

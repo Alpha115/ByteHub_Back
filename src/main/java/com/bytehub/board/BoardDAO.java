@@ -49,4 +49,7 @@ public interface BoardDAO {
 	
 	// 게시글의 참석자 목록 조회
 	List<String> getAttendeesByPostIdx(@Param("post_idx") int post_idx);
+	
+	// 게시글의 기존 참석자 삭제
+	int deleteAttendeesByPostIdx(@Param("post_idx") int post_idx);
 }

@@ -3,21 +3,20 @@ package com.bytehub.board;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bytehub.member.FileDTO;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BoardService {
 		
 	private int post_count = 20; // 페이지 당 게시글 수
 	
-	private final BoardDAO dao;
+	@Autowired BoardDAO dao;
 
 	// 게시판 파일 저장
 	public int insertBoardFile(FileDTO fileDTO) {
@@ -79,8 +78,30 @@ public class BoardService {
 	// 게시글 수정
 	public boolean postUpdate(BoardDTO dto) {
 		
+		log.info("=== 게시글 수정 시작 ===");
+		log.info("수정할 DTO: {}", dto);
+		
 		int row = dao.postUpdate(dto);
 		
+		// 게시글 수정 성공 시 참석자 정보도 수정 (회의록인 경우에만)
+		if (row > 0 && dto.getCategory() == BoardCategory.MEETING) {
+			log.info("회의록 참석자 정보 수정 시작 - post_idx: {}", dto.getPost_idx());
+			
+			// 기존 참석자 삭제
+			boolean deleteResult = deleteAttendeesByPostIdx(dto.getPost_idx());
+			log.info("기존 참석자 삭제 결과: {}", deleteResult);
+			
+			// 새 참석자 저장
+			if (dto.getAttendees() != null && !dto.getAttendees().isEmpty()) {
+				boolean attendeeResult = saveAttendees(dto.getPost_idx(), dto.getAttendees());
+				log.info("새 참석자 저장 결과: {}", attendeeResult);
+				if (!attendeeResult) {
+					log.warn("참석자 정보 수정 실패하였으나 게시글은 수정됨");
+				}
+			}
+		}
+		
+		log.info("=== 게시글 수정 완료 ===");
 	    return row>0;
 	}
 	
@@ -174,6 +195,18 @@ public class BoardService {
 	// 게시글의 참석자 목록 조회
 	public List<String> getAttendeesByPostIdx(int post_idx) {
 		return dao.getAttendeesByPostIdx(post_idx);
+	}
+
+	// 게시글의 기존 참석자 삭제
+	public boolean deleteAttendeesByPostIdx(int post_idx) {
+		try {
+			int result = dao.deleteAttendeesByPostIdx(post_idx);
+			log.info("참석자 삭제 완료 - post_idx: {}, 삭제된 행 수: {}", post_idx, result);
+			return true; // 삭제할 참석자가 없어도 성공으로 처리
+		} catch (Exception e) {
+			log.error("참석자 삭제 중 오류 발생: {}", e.getMessage(), e);
+			return false;
+		}
 	}
 
 
