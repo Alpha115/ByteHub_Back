@@ -19,4 +19,7 @@ public interface CloudDAO {
     
     // 파일 삭제
     int deleteCloudFile(int fileIdx);
+    
+    // 다운로드 로그 저장
+    int insertDownLog(DownLogDTO downLogDTO);
 }

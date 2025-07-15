@@ -47,4 +47,10 @@
     <delete id="deleteCloudFile" parameterType="int">
         DELETE FROM cloud WHERE file_idx = #{fileIdx}
     </delete>
+    
+    <!-- 다운로드 로그 저장 -->
+    <insert id="insertDownLog" parameterType="com.bytehub.cloud.DownLogDTO">
+        INSERT INTO download_log (file_idx, user_id, down_time)
+        VALUES (#{file_idx}, #{user_id}, NOW())
+    </insert>
 </mapper>

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -123,7 +124,9 @@ public class CloudController {
      * 파일 다운로드 API
      */
     @GetMapping("/cloud/download/{file_idx}")
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable int file_idx) {
+    public ResponseEntity<InputStreamResource> downloadFile(
+            @PathVariable int file_idx,
+            @RequestParam("userId") String userId) {
         try {
             // 파일 정보 조회
             Map<String, Object> fileInfo = service.getFileInfo(file_idx);
@@ -144,14 +147,20 @@ public class CloudController {
                 return ResponseEntity.notFound().build();
             }
             
+            // 다운로드 로그 저장
+            service.saveDownLog(file_idx, userId);
+            
             // 파일 스트림 생성
             InputStream inputStream = new FileInputStream(file);
             InputStreamResource resource = new InputStreamResource(inputStream);
             
-            // HTTP 헤더 설정
+            // HTTP 헤더 설정 (한글 파일명 인코딩 처리)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", filename);
+            
+            // 한글 파일명을 URL 인코딩
+            String encodedFilename = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+            headers.setContentDispositionFormData("attachment", encodedFilename);
             
             log.info("파일 다운로드 성공: {} (크기: {} bytes)", filePath, file.length());
             return ResponseEntity.ok()

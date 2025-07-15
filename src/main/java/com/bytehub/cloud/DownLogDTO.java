@@ -1,13 +1,13 @@
 package com.bytehub.cloud;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class DownLogDTO {
 
     private int log_id;
     private int file_idx;
     private String user_id;
-    private Date down_time;
+    private Timestamp down_time;
 
     public int getLog_id() {
         return log_id;
@@ -33,11 +33,11 @@ public class DownLogDTO {
         this.user_id = user_id;
     }
 
-    public Date getDown_time() {
+    public Timestamp getDown_time() {
         return down_time;
     }
 
-    public void setDown_time(Date down_time) {
+    public void setDown_time(Timestamp down_time) {
         this.down_time = down_time;
     }
 }

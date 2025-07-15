@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,27 @@ public class CloudService {
         } catch (Exception e) {
             log.error("파일 삭제 실패: {}", e.getMessage(), e);
             throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
+        }
+    }
+    
+    public void saveDownLog(int fileIdx, String userId) {
+        try {
+            DownLogDTO downLogDTO = new DownLogDTO();
+            downLogDTO.setFile_idx(fileIdx);
+            downLogDTO.setUser_id(userId);
+            downLogDTO.setDown_time(new Timestamp(System.currentTimeMillis()));
+            
+            int result = dao.insertDownLog(downLogDTO);
+            
+            if (result > 0) {
+                log.info("다운로드 로그 저장 성공: file_idx = {}, user_id = {}", fileIdx, userId);
+            } else {
+                log.error("다운로드 로그 저장 실패: file_idx = {}, user_id = {}", fileIdx, userId);
+            }
+            
+        } catch (Exception e) {
+            log.error("다운로드 로그 저장 실패: {}", e.getMessage(), e);
+            // 로그 저장 실패는 다운로드 자체를 막지 않도록 예외를 던지지 않음
         }
     }
 }
