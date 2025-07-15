@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.bytehub.member.FileDTO;
 
 @Mapper
 public interface BoardDAO {
@@ -21,7 +24,7 @@ public interface BoardDAO {
 	int postDel(int post_idx);
 
 	// 게시글 리스트
-	List<BoardDTO> postList(int offset, int post_count);
+	List<BoardDTO> postList(@Param("offset") int offset, @Param("post_count") int post_count);
 
 	// 상단 고정 3개까지 ㄱㄴ
 	int cntPinned();
@@ -34,4 +37,7 @@ public interface BoardDAO {
 	ArrayList<SummaryDTO> AiList(SummaryDTO dto);
 
 	int AiUpdate(SummaryDTO dto);
+
+	// 게시판 파일 저장
+	int insertBoardFile(FileDTO fileDTO);
 }

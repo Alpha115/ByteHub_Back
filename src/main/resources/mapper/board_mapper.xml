@@ -6,9 +6,15 @@
     
     <!-- 게시글 작성 -->
     <insert id="postWrite" parameterType="com.bytehub.board.BoardDTO" useGeneratedKeys="true" keyProperty="post_idx" keyColumn="post_idx">
-		    INSERT INTO board (post_idx, user_id, category, subject, content, pinned, draft)
-		    VALUES (#{post_idx}, #{user_id},#{category}, #{subject}, #{content}, #{pinned}, #{draft})
+		    INSERT INTO board (user_id, category, subject, content, pinned, draft, file_idx, reg_date)
+		    VALUES (#{user_id}, #{category,typeHandler=org.apache.ibatis.type.EnumTypeHandler}, #{subject}, #{content}, #{pinned}, #{draft}, #{file_idx}, CURDATE())
 	</insert>
+    
+    <!-- 게시판 첨부 파일 정보 저장 -->
+    <insert id="insertBoardFile" parameterType="com.bytehub.member.FileDTO" useGeneratedKeys="true" keyProperty="file_idx" keyColumn="file_idx">
+        INSERT INTO file (ori_filename, new_filename, file_type)
+        VALUES (#{ori_filename}, #{new_filename}, #{file_type})
+    </insert>
 		
 	<!-- 게시글 수정 -->
 	<update id="postUpdate" parameterType="com.bytehub.board.BoardDTO">

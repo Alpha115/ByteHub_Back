@@ -14,7 +14,7 @@ public class BoardDTO {
 	private boolean pinned; // 상단 고정 여부
 	private boolean draft; // 임시 저장
 	private Timestamp reg_date; // 작성시간
-	private int file_idx; // 파일 인덱스
+	private Integer file_idx; // 파일 인덱스
 
 	private BoardCategory category; // 게시판 종류
 	
@@ -77,10 +77,10 @@ public class BoardDTO {
 		this.reg_date = reg_date;
 	}
 	// 파일 인덱스 getter/setter
-	public int getFile_idx() {
+	public Integer getFile_idx() {
 		return file_idx;
 	}
-	public void setFile_idx(int file_idx) {
+	public void setFile_idx(Integer file_idx) {
 		this.file_idx = file_idx;
 	}
 
