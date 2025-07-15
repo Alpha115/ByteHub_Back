@@ -15,6 +15,7 @@ public class BoardDTO {
 	private boolean draft; // 임시 저장
 	private Timestamp reg_date; // 작성시간
 	private Integer file_idx; // 파일 인덱스
+	private List<String> attendees; // 참석자 목록 (회의록용)
 
 	private BoardCategory category; // 게시판 종류
 	
@@ -82,6 +83,13 @@ public class BoardDTO {
 	}
 	public void setFile_idx(Integer file_idx) {
 		this.file_idx = file_idx;
+	}
+	// 참석자 목록 getter/setter
+	public List<String> getAttendees() {
+		return attendees;
+	}
+	public void setAttendees(List<String> attendees) {
+		this.attendees = attendees;
 	}
 
 	

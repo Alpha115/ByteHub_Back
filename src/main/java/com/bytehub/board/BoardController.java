@@ -165,6 +165,16 @@ public class BoardController {
     		log.info("프론트엔드에서 보낸 작성자 사용: {}", dto.getUser_id());
     	}
     	
+    	// 참석자 정보 로그 출력
+    	log.info("===== BoardController postWrite 참석자 정보 확인 =====");
+    	log.info("DTO category: {}", dto.getCategory());
+    	log.info("DTO attendees: {}", dto.getAttendees());
+    	log.info("attendees null 여부: {}", dto.getAttendees() == null);
+    	if (dto.getAttendees() != null) {
+    		log.info("attendees 크기: {}", dto.getAttendees().size());
+    		log.info("참석자 목록: {}", dto.getAttendees());
+    	}
+    	
     	log.info("서비스 호출 전 - DTO: {}", dto);
     	success = svc.postWrite(dto, null);
     	
@@ -348,6 +358,12 @@ public class BoardController {
 			result.put("reg_date", postData.getReg_date());
 			result.put("file_idx", postData.getFile_idx());
 			result.put("category", postData.getCategory());
+			
+			// 참석자 정보 추가 (회의록인 경우에만)
+			if (postData.getCategory() == BoardCategory.MEETING && postData.getAttendees() != null) {
+				result.put("attendees", postData.getAttendees());
+				log.info("응답에 참석자 정보 포함 - post_idx: {}, attendees: {}", post_idx, postData.getAttendees());
+			}
 			
 			// 첨부파일 정보 추가
 			if (postData.getFile_idx() != null && postData.getFile_idx() > 0) {

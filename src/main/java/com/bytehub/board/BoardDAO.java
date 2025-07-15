@@ -43,4 +43,10 @@ public interface BoardDAO {
 	
 	// 파일 정보 조회
 	FileDTO getFileByIdx(int file_idx);
+
+	// 참석자 정보 저장
+	int insertAttendee(@Param("user_id") String user_id, @Param("scd_type") String scd_type, @Param("type_idx") int type_idx);
+	
+	// 게시글의 참석자 목록 조회
+	List<String> getAttendeesByPostIdx(@Param("post_idx") int post_idx);
 }
