@@ -15,6 +15,13 @@
         INSERT INTO file (ori_filename, new_filename, file_type)
         VALUES (#{ori_filename}, #{new_filename}, #{file_type})
     </insert>
+    
+    <!-- 파일 정보 조회 -->
+    <select id="getFileByIdx" parameterType="int" resultType="com.bytehub.member.FileDTO">
+        SELECT file_idx, ori_filename, new_filename, file_type, appr_idx
+        FROM file
+        WHERE file_idx = #{file_idx}
+    </select>
 		
 	<!-- 게시글 수정 -->
 	<update id="postUpdate" parameterType="com.bytehub.board.BoardDTO">

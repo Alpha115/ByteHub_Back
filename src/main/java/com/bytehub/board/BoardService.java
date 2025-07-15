@@ -22,6 +22,11 @@ public class BoardService {
 	public int insertBoardFile(FileDTO fileDTO) {
 		return dao.insertBoardFile(fileDTO);
 	}
+	
+	// 파일 정보 조회
+	public FileDTO getFileByIdx(int file_idx) {
+		return dao.getFileByIdx(file_idx);
+	}
 
 	// 게시글 작성
 	public boolean postWrite(BoardDTO dto, List<FileDTO> fileList) {

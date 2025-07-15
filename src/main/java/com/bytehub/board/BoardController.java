@@ -20,6 +20,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.bytehub.member.FileDTO;
 import com.bytehub.utils.JwtUtils;
@@ -342,6 +349,20 @@ public class BoardController {
 			result.put("file_idx", postData.getFile_idx());
 			result.put("category", postData.getCategory());
 			
+			// 첨부파일 정보 추가
+			if (postData.getFile_idx() != null && postData.getFile_idx() > 0) {
+				FileDTO fileInfo = svc.getFileByIdx(postData.getFile_idx());
+				if (fileInfo != null) {
+					// 파일 정보를 배열 형태로 반환 (프론트엔드에서 post.files 형태로 기대)
+					Map<String, Object> fileData = new HashMap<>();
+					fileData.put("name", fileInfo.getOri_filename());
+					fileData.put("url", "/file/download/" + fileInfo.getFile_idx()); // 다운로드 API URL
+					fileData.put("file_idx", fileInfo.getFile_idx());
+					
+					result.put("files", new Object[]{fileData}); // 배열 형태로 반환
+				}
+			}
+			
 			// 로그인 정보 추가
 			result.put("success", true);
 			result.put("loginYN", login);
@@ -393,5 +414,36 @@ public class BoardController {
     	return result;
     }
     
+    // 파일 다운로드 API
+    @GetMapping("/file/download/{file_idx}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable int file_idx) {
+        try {
+            // 파일 정보 조회
+            FileDTO fileInfo = svc.getFileByIdx(file_idx);
+            if (fileInfo == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 파일 경로 설정
+            String uploadDir = System.getProperty("java.io.tmpdir") + "/upload";
+            Path filePath = Paths.get(uploadDir).resolve(fileInfo.getNew_filename());
+            Resource resource = new UrlResource(filePath.toUri());
+            
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 파일 다운로드 응답 생성
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, 
+                            "attachment; filename=\"" + fileInfo.getOri_filename() + "\"")
+                    .body(resource);
+                    
+        } catch (Exception e) {
+            log.error("파일 다운로드 실패: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     
 }

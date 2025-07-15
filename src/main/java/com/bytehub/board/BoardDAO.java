@@ -40,4 +40,7 @@ public interface BoardDAO {
 
 	// 게시판 파일 저장
 	int insertBoardFile(FileDTO fileDTO);
+	
+	// 파일 정보 조회
+	FileDTO getFileByIdx(int file_idx);
 }
