@@ -3,20 +3,21 @@ package com.bytehub.board;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bytehub.member.FileDTO;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BoardService {
 		
 	private int post_count = 20; // 페이지 당 게시글 수
 	
-	@Autowired BoardDAO dao;
+	private final BoardDAO dao;
 
 	// 게시판 파일 저장
 	public int insertBoardFile(FileDTO fileDTO) {
