@@ -26,6 +26,7 @@ public class AuthService {
 				row+=dao.addAuth(map);
 			}
 			else {
+				log.info("deleted.");
 				row+=dao.delAuth(map);
 			}
 		}
