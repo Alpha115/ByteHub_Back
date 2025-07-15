@@ -1,8 +1,6 @@
 package com.bytehub.board;
 
-import java.util.ArrayList;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytehub.member.FileDTO;
 import com.bytehub.utils.JwtUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,13 +33,94 @@ public class BoardController {
 
     @Autowired BoardService svc;
     
-    // 게시글 작성 (JSON)
-    @PostMapping(value = "/board/write", consumes = "application/json")
+    @Value("${spring.servlet.multipart.location:./uploads}")
+    private String uploadPath;
+    
+    // 파일 업로드 API 
+    @PostMapping("/board/file/upload")
+    public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            if (file.isEmpty()) {
+                log.warn("빈 파일입니다.");
+                result.put("success", false);
+                result.put("message", "빈 파일은 업로드할 수 없습니다.");
+                return result;
+            }
+            
+            // 업로드 디렉토리 설정 (결재 시스템과 동일한 방식)
+            String uploadDir = System.getProperty("java.io.tmpdir") + "/upload";
+            File dir = new File(uploadDir);
+            log.info("업로드 디렉토리 경로: {}", dir.getAbsolutePath());
+            
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                log.info("업로드 디렉토리 생성: {} - 성공: {}", uploadDir, created);
+                
+                if (!created) {
+                    log.error("업로드 디렉토리 생성 실패: {}", uploadDir);
+                    result.put("success", false);
+                    result.put("message", "업로드 디렉토리 생성 실패");
+                    return result;
+                }
+            }
+            
+            // 원본 파일명과 확장자 추출
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            
+            // 새 파일명 생성 (UUID + 확장자)
+            String newFilename = UUID.randomUUID().toString() + extension;
+            
+            // 파일 저장
+            File saveFile = new File(dir, newFilename);
+            log.info("파일 저장 경로: {}", saveFile.getAbsolutePath());
+            file.transferTo(saveFile);
+            
+            // FileDTO 생성하고 DB에 저장
+            FileDTO fileDTO = new FileDTO();
+            fileDTO.setOri_filename(originalFilename);
+            fileDTO.setNew_filename(newFilename);
+            fileDTO.setFile_type("board");
+            
+            log.info("DB 저장 시작: {}", fileDTO);
+            
+            int fileResult = svc.insertBoardFile(fileDTO);
+            
+            log.info("DB 저장 결과: {}", fileResult);
+            
+            if (fileResult > 0) {
+                result.put("success", true);
+                result.put("file_idx", fileDTO.getFile_idx());
+                result.put("originalName", originalFilename);
+                result.put("newName", newFilename);
+                log.info("파일 업로드 완료: {} -> {}, file_idx: {}", originalFilename, newFilename, fileDTO.getFile_idx());
+            } else {
+                result.put("success", false);
+                result.put("message", "파일 정보 저장 실패");
+                log.error("파일 정보 DB 저장 실패");
+            }
+            
+        } catch (Exception e) {
+            log.error("파일 업로드 실패: {}", e.getMessage(), e);
+            result.put("success", false);
+            result.put("message", "파일 업로드 실패: " + e.getMessage());
+        }
+        
+        return result;
+    }
+    
+    // 게시글 작성
+    @PostMapping("/board/write")
     public Map<String, Object> postWrite(
     		@RequestBody BoardDTO dto,
     		@RequestHeader Map<String,String> header) {
     	
-    	log.info("=== 게시글 작성 API 호출 (JSON) ===");
+    	log.info("=== 게시글 작성 API 호출 ===");
     	log.info("header : "+header);
     	log.info("dto : "+dto);
         
@@ -81,117 +160,6 @@ public class BoardController {
     	
     	log.info("서비스 호출 전 - DTO: {}", dto);
     	success = svc.postWrite(dto, null);
-    	
-        result.put("idx", dto.getPost_idx()); // 작성한 게시글 idx 가져오기
-        result.put("success", success); // 성공 여부
-	    result.put("loginYN", login); // 로그인 여부
-	    
-    	return result;
-    }
-    
-    // 게시글 작성 (multipart/form-data)
-    @PostMapping(value = "/board/write", consumes = "multipart/form-data")
-    public Map<String, Object> postWriteWithFiles(
-    		@RequestParam(value = "dto", required = false) String dtoJson,
-    		@RequestParam(value = "files", required = false) List<MultipartFile> files,
-    		@RequestHeader Map<String,String> header) {
-    	
-    	log.info("=== 게시글 작성 API 호출 (multipart/form-data) ===");
-    	log.info("header : "+header);
-    	log.info("dtoJson : "+dtoJson);
-    	log.info("files : {}", files != null ? files.size() : 0);
-        
-    	Map<String,Object> result = new HashMap<>(); // 응답 데이터 저장용
-    	
-    	String loginId = null;
-    	boolean login = false;
-    	boolean success = false;
-    	BoardDTO dto = null;
-    	
-    	// JWT 토큰에서 로그인 ID 추출
-    	try {
-    		loginId = (String) JwtUtils.readToken(header.get("authorization")).get("id");
-    		log.info("JWT에서 추출한 loginId: {}", loginId);
-    	} catch (Exception e) {
-    		log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
-    		loginId = null;
-    	}
-    	
-    	result.put("success", false);
-    	result.put("loginYN", false);
-
-    	// JSON 문자열을 DTO로 변환
-    	try {
-    		ObjectMapper mapper = new ObjectMapper();
-    		dto = mapper.readValue(dtoJson, BoardDTO.class);
-    		log.info("파싱된 DTO: {}", dto);
-    	} catch (Exception e) {
-    		log.error("JSON 파싱 실패: " + e.getMessage());
-    		result.put("message", "게시글 데이터 파싱 실패");
-    		return result;
-    	}
-
-    	if (dto == null) {
-    		log.warn("DTO가 null입니다.");
-    		result.put("message", "게시글 데이터가 없습니다.");
-    		return result;
-    	}
-
-    	// 로그인 ID가 있으면 게시글 작성자로 설정, 없으면 프론트엔드에서 보낸 user_id 사용
-    	if(loginId != null && !loginId.isEmpty()) {
-    		login = true;
-    		dto.setUser_id(loginId);
-    		log.info("JWT에서 추출한 작성자 설정: {}", loginId);
-    	} else if(dto.getUser_id() != null && !dto.getUser_id().isEmpty()) {
-    		login = true;
-    		log.info("프론트엔드에서 보낸 작성자 사용: {}", dto.getUser_id());
-    	}
-    	
-    	// 파일 처리
-    	List<FileDTO> fileList = new ArrayList<>();
-    	if (files != null && !files.isEmpty()) {
-    		log.info("파일 처리 시작 - 파일 개수: {}", files.size());
-    		
-    		// 업로드 디렉토리 생성
-    		File uploadDir = new File("uploads"); // 실제 업로드 경로로 변경
-    		if (!uploadDir.exists()) {
-    			uploadDir.mkdirs();
-    			log.info("업로드 디렉토리 생성: {}", uploadDir.getAbsolutePath());
-    		}
-    		
-    		for (MultipartFile file : files) {
-    			if (!file.isEmpty()) {
-    				try {
-    					// 원본 파일명과 확장자 추출
-    					String originalFilename = file.getOriginalFilename();
-    					String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-    					
-    					// 새 파일명 생성 (UUID + 확장자)
-    					String newFilename = UUID.randomUUID().toString() + extension;
-    					
-    					// 파일 저장
-    					File saveFile = new File(uploadDir, newFilename);
-    					file.transferTo(saveFile);
-    					
-    					// FileDTO 생성
-    					FileDTO fileDTO = new FileDTO();
-    					fileDTO.setOri_filename(originalFilename);
-    					fileDTO.setNew_filename(newFilename);
-    					fileDTO.setFile_type(file.getContentType());
-    					
-    					fileList.add(fileDTO);
-    					log.info("파일 저장 완료: {} -> {}", originalFilename, newFilename);
-    				} catch (IOException e) {
-    					log.error("파일 저장 실패: {}", e.getMessage());
-    					result.put("message", "파일 저장 실패");
-    					return result;
-    				}
-    			}
-    		}
-    	}
-    	
-    	log.info("서비스 호출 전 - DTO: {}, 파일 개수: {}", dto, fileList.size());
-    	success = svc.postWrite(dto, fileList);
     	
         result.put("idx", dto.getPost_idx()); // 작성한 게시글 idx 가져오기
         result.put("success", success); // 성공 여부

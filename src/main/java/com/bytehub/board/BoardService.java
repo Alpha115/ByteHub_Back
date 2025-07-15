@@ -18,40 +18,17 @@ public class BoardService {
 	
 	@Autowired BoardDAO dao;
 
+	// 게시판 파일 저장
+	public int insertBoardFile(FileDTO fileDTO) {
+		return dao.insertBoardFile(fileDTO);
+	}
+
 	// 게시글 작성
 	public boolean postWrite(BoardDTO dto, List<FileDTO> fileList) {
 		
 		log.info("=== 게시글 작성 시작 ===");
 		log.info("입력된 DTO: {}", dto);
-		log.info("파일 리스트 크기: {}", fileList != null ? fileList.size() : 0);
-		
-		// 파일 먼저 저장 (file_idx 얻기 위해)
-		Integer file_idx = null;
-		if (fileList != null && !fileList.isEmpty()) {
-			log.info("파일 저장 시작 - 파일 개수: {}", fileList.size());
-            
-            // 첫 번째 파일만 저장 (board.file_idx는 단일 파일 참조)
-            FileDTO fileDTO = fileList.get(0);
-            fileDTO.setFile_type("board");
-            
-            log.info("파일 저장 중: {}", fileDTO);
-            int fileResult = dao.insertBoardFile(fileDTO);
-            
-            if (fileResult > 0) {
-                file_idx = fileDTO.getFile_idx(); // 자동 생성된 file_idx 가져오기
-                log.info("파일 저장 완료 - file_idx: {}", file_idx);
-            } else {
-                log.error("파일 저장 실패");
-                return false;
-            }
-        }
-		
-		// 게시글에 file_idx 설정
-		if (file_idx != null) {
-			dto.setFile_idx(file_idx);
-		} else {
-			dto.setFile_idx(null); // 명시적으로 null 설정
-		}
+		log.info("파일 file_idx: {}", dto.getFile_idx());
 		
 		// 상단 고정 선택 3개까지 ㄱㄴ (게시글 저장 전에 체크)
 		if (dto.isPinned()) {
