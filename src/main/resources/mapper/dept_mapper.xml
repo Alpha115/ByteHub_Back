@@ -9,7 +9,7 @@
 	</insert>
 	
 	<select id="deptList" parameterType="com.bytehub.department.DeptDTO">
-		select * from department
+		select * from department where status = false
 	</select>
 	
 	<select id="memberList" parameterType="com.bytehub.member.MemberDTO">

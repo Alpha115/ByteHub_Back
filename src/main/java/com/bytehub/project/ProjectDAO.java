@@ -1,42 +1,34 @@
 package com.bytehub.project;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-import com.bytehub.schedule.ScdDTO;
+import com.bytehub.member.FileDTO;
 
 @Mapper
 public interface ProjectDAO {
 
-	int insertProj(ProjectDTO proj);
+	  	int insertProject(ProjectDTO proj);
+	    int updateProject(ProjectDTO proj);
 
-	int insertFile(int project_idx, int[] file_idx);
+	    ProjectDTO selectProjectById(int project_idx);
+	    List<ProjectDTO> selectAllProjects();
 
-	int insertUser(int project_idx, String[] user_id);
-	
-	int updateProj(ProjectDTO proj);
+	    int insertProjectEmp(@Param("project_idx") int project_idx, @Param("user_id") String user_id);
+	    int deleteProjectEmpByProjectIdx(int project_idx);
+	    List<String> selectUsersByProjectIdx(int project_idx);
 
-	int deleteFile(int project_idx);
-	
-	int deleteUser(int project_idx);
+	    int insertProjectFile(@Param("project_idx") int project_idx, @Param("file_idx") int file_idx);
+	    int deleteProjectFilesByProjectIdx(int project_idx);
+	    List<FileDTO> selectFilesByProjectIdx(int project_idx);
 
-	int delete(int project_idx);
-
-	Map<String, Object> detail(int idx);
-
-	ArrayList<String> files(int idx);
-	
-	ArrayList<Map<String, String>> members(int idx);
-
-	ArrayList<Map<String, Object>> list();
-	
-	// 일정에 자동으로 추가/업데이트/삭제하는 함수
-	int insertProjToScd(ProjectDTO proj);
-	
-	int updateProjToScd(ProjectDTO proj);
-	
-	int deleteProjFromScd(int idx);
+	    // 파일 저장 (파일 업로드 API에서 사용)
+	    int insertFile(FileDTO file);
+	    FileDTO selectFileById(int file_idx);
+		ArrayList<ProjectFileDTO> fileListByProject();
+		ArrayList<ProjectEmpDTO> empListByProject();
 	
 }

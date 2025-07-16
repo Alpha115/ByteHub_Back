@@ -1,10 +1,9 @@
 package com.bytehub.project;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class ProjectDTO {
@@ -16,5 +15,9 @@ public class ProjectDTO {
 	private Date start_date;
 	private Date end_date;
 	private int priority;
-
+	private int progress;
+	private int dept_idx;
+	
+	private List<ProjectFileDTO> files;
+	private List<ProjectEmpDTO> members;
 }

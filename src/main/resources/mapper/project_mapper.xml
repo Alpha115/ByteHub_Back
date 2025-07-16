@@ -4,104 +4,117 @@
 
 <mapper namespace="com.bytehub.project.ProjectDAO">
     
-    <insert id="insertProj" 
-		    parameterType="com.bytehub.project.ProjectDTO"
-		    useGeneratedKeys="true" 
-		    keyColumn="project_idx" 
-		    keyProperty="project_idx">
-    	insert into project (user_id, subject, content, start_date, end_date, priority)
-		values(#{user_id}, #{subject}, #{content}, #{start_date}, #{end_date}, #{priority})
+     <!-- 프로젝트 등록 -->
+    <insert id="insertProject" parameterType="com.bytehub.project.ProjectDTO" useGeneratedKeys="true" keyProperty="project_idx">
+        INSERT INTO project (user_id, subject, content, start_date, end_date, priority,progress,dept_idx)
+        VALUES (#{user_id}, #{subject}, #{content}, #{start_date}, #{end_date}, #{priority},#{progress},#{dept_idx})
     </insert>
 
-	<insert id="insertFile">
-		INSERT INTO project_file (project_idx, file_idx)
-		VALUES
-		<foreach collection="file_idx" item="file" separator=",">
-			(#{project_idx}, #{file})
-		</foreach>
-	</insert>
-	
-	<insert id="insertUser">
-		INSERT INTO project_emp (project_idx, user_id)
-		VALUES
-		<foreach collection="user_id" item="user" separator=",">
-			(#{project_idx}, #{user})
-		</foreach>
-	</insert>
-	
-	<update id="updateProj" parameterType="com.bytehub.project.ProjectDTO">
-		update project set 
-			user_id=#{user_id}, 
-			subject=#{subject}, 
-			content=#{content}, 
-			start_date=#{start_date}, 
-			end_date=#{end_date}, 
-			priority=#{priority}
-		where project_idx = #{project_idx};
-	</update>
-
-	<delete id="deleteFile">
-		delete from project_file where
-		project_idx = #{project_idx}
-	</delete>
-	
-	<delete id="deleteUser">
-		delete from project_emp where
-		project_idx = #{project_idx}
-	</delete>	
-	
-	<delete id="delete">
-		delete from project where project_idx=#{param1}
-	</delete>
-	
-	<select id="detail" resultType="map">
-	 	select
-			p.project_idx,
-			p.subject ,
-			p.priority ,
-			(select dept_name from department d where dept_idx = (select dept_idx from member where user_id=p.user_id)) as dept_name,
-			p.start_date ,
-			p.end_date
-		from project p where project_idx = #{param1}
-	</select>
-	
-	<select id="files">
-		select file_idx from project_file where project_idx = #{param1}
-	</select>
-	
-	<select id="members" resultType="map">
-		select user_id, name from member m where user_id
-		in (select user_id from project_emp pe where project_idx=#{param1})
-	</select>
-    
-    <select id="list" resultType="map">
-    	select * from project order by priority
-    </select>
-    
-    
-    <!-- 일정 연동 관련 -->
-    <insert id="insertProjToScd"
-    		parameterType="com.bytehub.project.ProjectDTO"
-		    useGeneratedKeys="true" 
-		    keyColumn="project_idx" 
-		    keyProperty="project_idx">
-    	INSERT INTO schedule (user_id, scd_type, type_idx, subject, start_time, end_time)
-		VALUES (#{user_id}, 'project', #{project_idx}, #{subject}, #{start_date}, #{end_date})
-    </insert>
-    
-    <update id="updateProjToScd" parameterType="com.bytehub.project.ProjectDTO">
-    	update schedule set 
-    	user_id=#{user_id}, 
-    	subject =#{subject}, 
-    	start_time =#{start_date}, 
-    	end_time =#{end_date} 
-    	where type_idx = #{project_idx} and scd_type ='project'
+    <!-- 프로젝트 수정 -->
+    <update id="updateProject" parameterType="com.bytehub.project.ProjectDTO">
+        UPDATE project
+        SET user_id = #{user_id},
+            subject = #{subject},
+            content = #{content},
+            start_date = #{start_date},
+            end_date = #{end_date},
+            priority = #{priority},
+            progress = #{progress},
+            dept_idx = #{dept_idx}
+        WHERE project_idx = #{project_idx}
     </update>
-    
-    <delete id="deleteProjFromScd">
-    	delete from schedule
-    	where type_idx = #{param1} and scd_type ='project';
+
+    <!-- 프로젝트-멤버 연결 -->
+    <insert id="insertProjectEmp" parameterType="map">
+        INSERT INTO project_emp (project_idx, user_id)
+        VALUES (#{project_idx}, #{user_id})
+    </insert>
+
+    <delete id="deleteProjectEmpByProjectIdx" parameterType="int">
+        DELETE FROM project_emp WHERE project_idx = #{project_idx}
     </delete>
+
+    <select id="selectUsersByProjectIdx" parameterType="int" resultType="string">
+        SELECT user_id FROM project_emp WHERE project_idx = #{project_idx}
+    </select>
+
+    <!-- 프로젝트-파일 연결 -->
+    <insert id="insertProjectFile" parameterType="map">
+        INSERT INTO project_file (project_idx, file_idx)
+        VALUES (#{project_idx}, #{file_idx})
+    </insert>
+
+    <delete id="deleteProjectFilesByProjectIdx" parameterType="int">
+        DELETE FROM project_file WHERE project_idx = #{project_idx}
+    </delete>
+
+    <select id="selectFilesByProjectIdx" parameterType="int" resultMap="fileMap">
+        SELECT f.file_idx, f.ori_filename, f.new_filename, f.file_type, f.appr_idx
+        FROM file f
+        INNER JOIN project_file pf ON f.file_idx = pf.file_idx
+        WHERE pf.project_idx = #{project_idx}
+    </select>
+
+    <!-- 파일 저장 -->
+    <insert id="insertFile" parameterType="com.bytehub.member.FileDTO" useGeneratedKeys="true" keyProperty="file_idx">
+        INSERT INTO file (ori_filename, new_filename, file_type, appr_idx)
+        VALUES (#{ori_filename}, #{new_filename}, #{file_type}, #{appr_idx})
+    </insert>
+
+    <select id="selectFileById" parameterType="int" resultMap="fileMap">
+        SELECT file_idx, ori_filename, new_filename, file_type, appr_idx
+        FROM file WHERE file_idx = #{file_idx}
+    </select>
+
+    <resultMap id="fileMap" type="com.bytehub.member.FileDTO">
+        <id property="file_idx" column="file_idx"/>
+        <result property="ori_filename" column="ori_filename"/>
+        <result property="new_filename" column="new_filename"/>
+        <result property="file_type" column="file_type"/>
+        <result property="appr_idx" column="appr_idx"/>
+    </resultMap>
+
+    <!-- 프로젝트 단건/전체 조회 -->
+    <select id="selectProjectById" parameterType="int" resultType="com.bytehub.project.ProjectDTO">
+        SELECT * FROM project WHERE project_idx = #{project_idx}
+    </select>
+
+	 <select id="selectAllProjects" resultMap="ProjectMap">
+	    SELECT * FROM project
+	  </select>
+	
+	  <!-- 하위 ResultMap: 파일 -->
+	  <select id="fileListByProject" resultType="com.bytehub.project.ProjectFileDTO">
+	    SELECT * FROM project_file WHERE project_idx = #{project_idx}
+	  </select>
+	
+	  <!-- 하위 ResultMap: 멤버 -->
+	  <select id="empListByProject" resultType="com.bytehub.project.ProjectEmpDTO">
+	    SELECT * FROM project_emp WHERE project_idx = #{project_idx}
+	  </select>
+	
+	  <!-- 메인 ResultMap -->
+	  <resultMap id="ProjectMap" type="com.bytehub.project.ProjectDTO">
+	    <id property="project_idx" column="project_idx"/>
+	    <result property="subject" column="subject"/>
+	    <result property="content" column="content"/>
+	    <result property="start_date" column="start_date"/>
+	    <result property="end_date" column="end_date"/>
+	    <result property="priority" column="priority"/>
+	    <result property="progress" column="progress"/>
+	
+	    <!-- 파일 배열 -->
+	    <collection property="files"
+	                ofType="com.bytehub.project.ProjectFileDTO"
+	                column="project_idx"
+	                select="fileListByProject"/>
+	
+	    <!-- 멤버 배열 -->
+	    <collection property="members"
+	                ofType="com.bytehub.project.ProjectEmpDTO"
+	                column="project_idx"
+	                select="empListByProject"/>
+	  </resultMap>
     
 
 </mapper>
