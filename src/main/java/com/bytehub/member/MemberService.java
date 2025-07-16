@@ -100,7 +100,7 @@ public class MemberService {
             log.info("Service: Password update result: {}", success);
             return success;
         } catch (Exception e) {
-            log.error("Service: Password update failed: {}", e.getMessage(), e);
+            log.info("Service: Password update failed: {}", e.getMessage(), e);
             return false;
         }
     }

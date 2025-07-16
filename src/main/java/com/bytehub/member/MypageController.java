@@ -55,7 +55,7 @@ public class MypageController {
                 result.put("message", "해당 사용자를 찾을 수 없습니다.");
             }
         } catch (Exception e) {
-            log.error("내 정보 조회 중 오류 발생: {}", e.getMessage(), e);
+            log.info("내 정보 조회 중 오류 발생: {}", e.getMessage(), e);
             result.put("success", false);
             result.put("message", "내 정보 조회 중 오류가 발생했습니다.");
             result.put("error", e.getMessage());
@@ -95,7 +95,7 @@ public class MypageController {
                 result.put("message", "비밀번호가 일치하지 않습니다.");
             }
         } catch (Exception e) {
-            log.error("비밀번호 검증 중 오류 발생: {}", e.getMessage(), e);
+            log.info("비밀번호 검증 중 오류 발생: {}", e.getMessage(), e);
             result.put("success", false);
             result.put("message", "비밀번호 검증 중 오류가 발생했습니다.");
             result.put("error", e.getMessage());
@@ -136,7 +136,7 @@ public class MypageController {
                 result.put("message", "회원 정보 수정에 실패했습니다.");
             }
         } catch (Exception e) {
-            log.error("회원 정보 수정 중 오류 발생: {}", e.getMessage(), e);
+            log.info("회원 정보 수정 중 오류 발생: {}", e.getMessage(), e);
             result.put("success", false);
             result.put("message", "회원 정보 수정 중 오류가 발생했습니다.");
             result.put("error", e.getMessage());
