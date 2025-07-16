@@ -145,6 +145,11 @@ public class ProjectService {
 		return dao.empListByProject();
 	}
 
+	public boolean projectDelete(ProjectDTO dto) {
+		int row = dao.projectDelete(dto);
+		return row > 0 ? true : false;
+	}
+
 //	@Transactional
 //	public boolean delete(int project_idx) {
 //		dao.deleteFile(project_idx);

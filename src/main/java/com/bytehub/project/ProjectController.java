@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -105,5 +106,13 @@ public class ProjectController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedName + "\"")
                 .body(resource);
+    }
+    
+    @PostMapping("/delete")
+    public Map<String, Object> projectDelete(@RequestBody ProjectDTO dto){
+        Map<String, Object> resp = new HashMap<>();
+        boolean success = service.projectDelete(dto);
+        resp.put("success", success);
+    	return resp;
     }
 }

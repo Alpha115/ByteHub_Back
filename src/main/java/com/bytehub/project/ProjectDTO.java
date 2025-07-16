@@ -17,6 +17,7 @@ public class ProjectDTO {
 	private int priority;
 	private int progress;
 	private int dept_idx;
+	private boolean status;
 	
 	private List<ProjectFileDTO> files;
 	private List<ProjectEmpDTO> members;

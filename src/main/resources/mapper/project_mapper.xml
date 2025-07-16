@@ -80,7 +80,7 @@
     </select>
 
 	 <select id="selectAllProjects" resultMap="ProjectMap">
-	    SELECT * FROM project
+	    SELECT * FROM project where status = false;
 	  </select>
 	
 	  <!-- 하위 ResultMap: 파일 -->
@@ -115,6 +115,12 @@
 	                column="project_idx"
 	                select="empListByProject"/>
 	  </resultMap>
+	  
+	  <update id="projectDelete" parameterType="com.bytehub.project.ProjectDTO">
+	  	UPDATE project
+	  	SET status = true
+	  	WHERE project_idx = #{project_idx}
+	  </update>
     
 
 </mapper>

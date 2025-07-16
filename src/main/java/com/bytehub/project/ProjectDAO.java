@@ -30,5 +30,6 @@ public interface ProjectDAO {
 	    FileDTO selectFileById(int file_idx);
 		ArrayList<ProjectFileDTO> fileListByProject();
 		ArrayList<ProjectEmpDTO> empListByProject();
+		int projectDelete(ProjectDTO dto);
 	
 }
