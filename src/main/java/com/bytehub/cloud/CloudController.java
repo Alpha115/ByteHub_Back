@@ -37,8 +37,8 @@ public class CloudController {
 
     @Autowired CloudService service;
 
-    // 파일 크기 제한 (10MB)
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
+    // 파일 크기 제한 (100MB)
+    private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;
     
     // 파일 저장 경로 (application.properties 설정 사용)
     private static final String UPLOAD_DIR = "C:/upload/cloud";
@@ -68,7 +68,7 @@ public class CloudController {
         // 파일 크기 제한 체크
         if (file.getSize() > MAX_FILE_SIZE) {
             response.put("success", false);
-            response.put("message", "파일 크기가 10MB를 초과합니다.");
+            response.put("message", "파일 크기가 100MB를 초과합니다.");
             return ResponseEntity.badRequest().body(response);
         }
 
@@ -233,6 +233,29 @@ public class CloudController {
             log.error("파일 목록 조회 실패: {}", e.getMessage(), e);
             response.put("success", false);
             response.put("message", "파일 목록 조회 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 모든 부서 목록 조회
+     */
+    @GetMapping("/cloud/departments")
+    public ResponseEntity<Map<String, Object>> getAllDepartments() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            List<Map<String, Object>> departments = service.getAllDepartments();
+            
+            response.put("success", true);
+            response.put("data", departments);
+            response.put("message", "부서 목록 조회 성공");
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("부서 목록 조회 실패: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "부서 목록 조회 실패: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

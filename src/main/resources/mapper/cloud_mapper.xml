@@ -19,10 +19,13 @@
             c.created_at,
             d.dept_name,
             c.user_id,
-            m.name as uploader_name
+            m.name as uploader_name,
+            m.lv_idx,
+            l.lv_name
         FROM cloud c
         LEFT JOIN department d ON c.dept_idx = d.dept_idx
         LEFT JOIN member m ON c.user_id = m.user_id
+        LEFT JOIN level l ON m.lv_idx = l.lv_idx
         WHERE c.dept_idx = #{dept_idx}
         ORDER BY c.created_at DESC
     </select>
@@ -36,10 +39,13 @@
             c.created_at,
             d.dept_name,
             c.user_id,
-            m.name as uploader_name
+            m.name as uploader_name,
+            m.lv_idx,
+            l.lv_name
         FROM cloud c
         LEFT JOIN department d ON c.dept_idx = d.dept_idx
         LEFT JOIN member m ON c.user_id = m.user_id
+        LEFT JOIN level l ON m.lv_idx = l.lv_idx
         WHERE c.file_idx = #{fileIdx}
     </select>
     
@@ -53,4 +59,15 @@
         INSERT INTO download_log (file_idx, user_id, down_time)
         VALUES (#{file_idx}, #{user_id}, NOW())
     </insert>
+    
+    <!-- 모든 부서 목록 조회 -->
+    <select id="getAllDepartments" resultType="map">
+        SELECT 
+            dept_idx,
+            dept_name
+        FROM department
+        ORDER BY dept_idx ASC
+    </select>
+    
+
 </mapper>

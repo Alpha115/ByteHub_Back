@@ -22,4 +22,6 @@ public interface CloudDAO {
     
     // 다운로드 로그 저장
     int insertDownLog(DownLogDTO downLogDTO);
+
+    List<Map<String, Object>> getAllDepartments();
 }

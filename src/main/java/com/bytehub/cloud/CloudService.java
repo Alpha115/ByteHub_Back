@@ -96,5 +96,16 @@ public class CloudService {
             // 로그 저장 실패는 다운로드 자체를 막지 않도록 예외를 던지지 않음
         }
     }
+    
+    public List<Map<String, Object>> getAllDepartments() {
+        try {
+            return dao.getAllDepartments();
+        } catch (Exception e) {
+            log.error("부서 목록 조회 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("부서 목록 조회 실패: " + e.getMessage());
+        }
+    }
+    
+
 }
 
