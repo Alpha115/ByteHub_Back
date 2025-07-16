@@ -38,5 +38,9 @@ public interface ApprDAO {
 
     // 기안자의 lv_idx와 dept_idx를 받아 결재자 lv_idx 1,2(고정 1명), 3(같은 부서 팀장)만 반환
     List<ApprLineDTO> getDynamicApprLine(Map<String, Object> param);
+	
+    int getApprHistoryIdx(int appr_his_idx);
+	ApprDTO getApprIdx(int appr_idx);
+	void minusLeave(String writer_id);
     
 }

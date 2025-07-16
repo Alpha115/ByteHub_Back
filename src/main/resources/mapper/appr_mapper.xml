@@ -227,5 +227,22 @@
      WHERE ap.writer_id = #{writer_id} AND ap.appr_type = '연차' AND ah.status = '승인완료'
      ORDER BY ap.appr_date DESC
     </select>
+    
+    <select id="getApprHistoryIdx" resultType="int">
+    SELECT appr_idx FROM appr_history WHERE appr_his_idx = #{appr_his_idx}
+	</select>
+	
+	<select id="getApprIdx" resultType="com.bytehub.approval.ApprDTO">
+	    SELECT * FROM approval WHERE appr_idx = #{appr_idx}
+	</select>
+	
+	<update id="minusLeave">
+	    UPDATE leave_history
+	    SET remain_days = remain_days - 1
+	    WHERE writer_id = #{writer_id}
+	      AND remain_days > 0
+	    ORDER BY years DESC
+	    LIMIT 1
+	</update>
 	
 </mapper>

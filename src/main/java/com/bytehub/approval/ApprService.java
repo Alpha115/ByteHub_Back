@@ -89,7 +89,23 @@ public class ApprService {
         return appr_idx;
     }
     public int updateStatus(Map<String, Object> param) {
-        return dao.updateStatus(param);
+
+    int result = dao.updateStatus(param);
+
+    // 결재가 승인될 때만 연차 차감
+    String status = (String) param.get("status");
+    if ("승인완료".equals(status)) {
+        // appr_his_idx로 appr_idx 조회 → appr_idx로 ApprDTO 조회 → appr_type, writer_id 확인
+        int appr_his_idx = (int) param.get("appr_his_idx");
+        int appr_idx = dao.getApprHistoryIdx(appr_his_idx);
+        ApprDTO appr = dao.getApprIdx(appr_idx);
+
+        if ("연차".equals(appr.getAppr_type())) {
+            dao.minusLeave(appr.getWriter_id());
+        }
+    }
+    return result;
+       
     }
 
     public List<Map<String, Object>> getMyAppr(String writer_id) {
