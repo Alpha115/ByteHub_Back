@@ -194,5 +194,14 @@ public class ApprService {
 	public List<Map<String, Object>> getAllMembersLeave() {
 		return dao.getAllMembersLeave();
 	}
+	
+	// 선택된 사원들에게 정책 기반 연차 생성
+	public void generateLeaveForSelected(List<String> selectedMembers) {
+		// 신규 입사자(1년 미만) 월차 생성
+		dao.monthlyLeaveForSelected(selectedMembers);
+		
+		// 기존 사원(1년 이상) 연차 생성  
+		dao.annualLeaveForSelected(selectedMembers);
+	}
     
 }

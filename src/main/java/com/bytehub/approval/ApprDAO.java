@@ -46,4 +46,10 @@ public interface ApprDAO {
     // 전체 사원 연차 현황 조회
     List<Map<String, Object>> getAllMembersLeave();
     
+    // 선택된 사원들 월차 생성 (신규 입사자)
+    void monthlyLeaveForSelected(List<String> selectedMembers);
+    
+    // 선택된 사원들 연차 생성 (기존 사원)
+    void annualLeaveForSelected(List<String> selectedMembers);
+    
 }

@@ -307,44 +307,46 @@ public class ApprController {
 		}
 	}
 
-	// 연차/월차 자동 생성 API
+	// 연차/월차 자동 생성 API (전체 또는 선택 사원)
 	@PostMapping("/leave/generate")
-	public Map<String, Object> generateLeave(@RequestBody LeaveHistoryDTO dto,
-			@RequestHeader Map<String, String> header) {
+	public Map<String, Object> generateLeave(@RequestBody Map<String, Object> request,
+			@RequestHeader("Authorization") String token) {
 
-		Map<String, Object> result = new HashMap<>(); // 응답 데이터 저~장~
+		Map<String, Object> result = new HashMap<>();
 
-		String loginId = null;
-		boolean success = false;
-
-		// JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
 		try {
-			String token = header.get("authorization");
-			log.info("수정 API - 받은 토큰: {}", token);
+			// JWT 토큰 검증
 			Map<String, Object> tokenData = JwtUtils.readToken(token);
-			log.info("수정 API - 토큰 파싱 결과: {}", tokenData);
-			loginId = (String) tokenData.get("id");
-			log.info("수정 API - 추출된 loginId: {}", loginId);
-		} catch (Exception e) {
-			log.info("JWT 토큰 파싱 실패: " + e.getMessage());
-			// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용
-			loginId = dto.getWriter_id();
-			log.info("JWT 파싱 실패로 인해 프론트엔드에서 전송한 사용자 ID 사용: {}", loginId);
-		}
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
 
-		try {
-			service.generateLeave();
-			success = true;
-		} catch (Exception e) {
-			            log.info("연차 생성 실패", e);
-			success = false;
-		}
+			// 선택된 사원 목록 확인
+			List<String> selectedMembers = (List<String>) request.get("selectedMembers");
+			
+			if (selectedMembers == null || selectedMembers.isEmpty()) {
+				// 전체 사원 대상 연차 생성 (기존 방식)
+				service.generateLeave();
+				result.put("success", true);
+				result.put("msg", "전체 사원 연차/월차 생성 완료");
+			} else {
+				// 선택된 사원들만 대상 연차 생성 (새로운 방식)
+				service.generateLeaveForSelected(selectedMembers);
+				result.put("success", true);
+				result.put("msg", selectedMembers.size() + "명의 사원 연차/월차 생성 완료");
+			}
 
-		result.put("success", success); // 성공 여부
-		result.put("msg", success ? "연차/월차 생성 완료" : "연차 생성 실패");
+		} catch (Exception e) {
+			log.error("연차 생성 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 생성 중 오류가 발생했습니다.");
+			result.put("error", e.getMessage());
+		}
 
 		return result;
-
 	}
 
 	// 개인 잔여 연차 조회 API
@@ -390,6 +392,8 @@ public class ApprController {
 		
 		return result;
 	}
+
+
 
 	// 전체 사원 연차 현황 조회 API
 	@GetMapping("/leave/all")
