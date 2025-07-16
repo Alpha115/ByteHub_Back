@@ -89,4 +89,40 @@
 		GROUP BY att_type
 	</select>
 	
+	<!-- 결석 자동 처리: 특정 날짜에 출근 기록이 없는 재직 중인 직원들 조회 -->
+	<select id="getAbsentEmployees" resultType="string">
+		SELECT m.user_id 
+		FROM member m
+		WHERE m.status = '재직'
+		  AND m.user_id NOT IN (
+		      SELECT DISTINCT a.user_id 
+		      FROM attendance a 
+		      WHERE a.att_date = #{targetDate}
+		        AND a.in_time IS NOT NULL
+		  )
+	</select>
+	
+	<!-- 결석 기록 일괄 생성 -->
+	<insert id="insertAbsenceRecords">
+		INSERT INTO attendance (user_id, att_date, att_type)
+		VALUES 
+		<foreach item="userId" collection="userIds" separator=",">
+			(#{userId}, #{targetDate}, '결석')
+		</foreach>
+	</insert>
+	
+	<!-- 개별 결석 처리: 특정 사용자의 특정 날짜 출근 기록 존재 여부 확인 -->
+	<select id="checkAttendanceExists" resultType="int">
+		SELECT COUNT(*)
+		FROM attendance 
+		WHERE user_id = #{userId} 
+		  AND att_date = #{targetDate}
+	</select>
+	
+	<!-- 개별 결석 기록 생성 -->
+	<insert id="insertSingleAbsenceRecord">
+		INSERT INTO attendance (user_id, att_date, att_type)
+		VALUES (#{userId}, #{targetDate}, '결석')
+	</insert>
+	
 </mapper>

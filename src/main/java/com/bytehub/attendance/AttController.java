@@ -2,6 +2,7 @@ package com.bytehub.attendance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +49,24 @@ public class AttController {
             AttDTO att = new AttDTO();
             att.setUser_id(userId);
             att.setAtt_date(LocalDate.now());
+            
+            // 현재 시간
+            LocalDateTime now = LocalDateTime.now();
+            
             if ("in".equals(mode)) {
-                att.setIn_time(LocalDateTime.now());
-                att.setAtt_type("출근");
+                // 출근 처리
+                att.setIn_time(now);
+                att.setAtt_type(determineInAttendanceStatus(userId, now));
             } else {
-                att.setOut_time(LocalDateTime.now());
-                att.setAtt_type("퇴근");
+                // 퇴근 처리
+                att.setOut_time(now);
+                att.setAtt_type(determineOutAttendanceStatus(userId, now));
             }
+            
             svc.insertAttendance(att);
             attIdx = att.getAtt_idx();
         }
+        
         // 인증 히스토리 기록 (성공/실패 모두)
         AttHistoryDTO hist = new AttHistoryDTO();
         hist.setAtt_idx(success ? attIdx : null); // 성공 시에만 att_idx, 실패 시 null
@@ -74,6 +83,82 @@ public class AttController {
         result.put("success", success);
         result.put("msg", success ? "인증 성공" : "인증 실패");
         return result;
+    }
+    
+    /**
+     * 출근 시 근태 상태 결정
+     */
+    private String determineInAttendanceStatus(String userId, LocalDateTime currentTime) {
+        try {
+            log.info("출근 상태 결정 시작 - userId: {}, currentTime: {}", userId, currentTime);
+            
+            // 사용자의 출퇴근 설정 조회
+            AttSettingDTO setting = svc.getAttSetting(userId);
+            log.info("사용자 설정 조회 결과: {}", setting);
+            
+            // 설정이 없으면 기본값 사용 (09:00)
+            LocalTime standardInTime = LocalTime.of(9, 0);
+            int termMinutes = 30; // 기본 30분 유효시간
+            
+            if (setting != null && setting.getSet_in_time() != null) {
+                standardInTime = setting.getSet_in_time().toLocalTime();
+                termMinutes = setting.getTerm();
+            }
+            
+            LocalTime currentInTime = currentTime.toLocalTime();
+            log.info("기준 출근시간: {}, 유효시간: {}분, 현재시간: {}", standardInTime, termMinutes, currentInTime);
+            
+            // 유효한 출근 시간 범위 계산
+            LocalTime earliestAllowedTime = standardInTime.minusMinutes(termMinutes); // 예: 08:50
+            LocalTime latestAllowedTime = standardInTime.plusMinutes(termMinutes);   // 예: 09:10
+            log.info("유효 출근 범위: {} ~ {}", earliestAllowedTime, latestAllowedTime);
+            
+            // 유효 시간 범위 내에서만 정상출근 인정
+            boolean isInRange = !currentInTime.isBefore(earliestAllowedTime) && !currentInTime.isAfter(latestAllowedTime);
+            log.info("범위 내 여부: {}", isInRange);
+            
+            if (isInRange) {
+                log.info("결과: 정상출근");
+                return "정상출근"; // 08:50 ~ 09:10 사이
+            } else {
+                log.info("결과: 지각");
+                return "지각"; // 그 외 모든 시간 (새벽, 너무 늦은 시간 포함)
+            }
+            
+        } catch (Exception e) {
+            log.error("출근 상태 결정 중 오류: ", e);
+            return "지각"; // 오류 시 지각으로 변경
+        }
+    }
+    
+    /**
+     * 퇴근 시 근태 상태 결정
+     */
+    private String determineOutAttendanceStatus(String userId, LocalDateTime currentTime) {
+        try {
+            // 사용자의 출퇴근 설정 조회
+            AttSettingDTO setting = svc.getAttSetting(userId);
+            
+            // 설정이 없으면 기본값 사용 (18:00)
+            LocalTime standardOutTime = LocalTime.of(18, 0);
+            
+            if (setting != null && setting.getSet_out_time() != null) {
+                standardOutTime = setting.getSet_out_time().toLocalTime();
+            }
+            
+            LocalTime currentOutTime = currentTime.toLocalTime();
+            
+            // 기준 퇴근 시간 기준으로 상태 결정
+            if (currentOutTime.isAfter(standardOutTime) || currentOutTime.equals(standardOutTime)) {
+                return "정상퇴근";
+            } else {
+                return "조퇴";
+            }
+            
+        } catch (Exception e) {
+            log.error("퇴근 상태 결정 중 오류: ", e);
+            return "정상퇴근"; // 오류 시 기본값
+        }
     }
     
     
@@ -268,6 +353,109 @@ public class AttController {
         }
         return result;
         
+    }
+
+    // 결석 자동 처리 API (관리자용)
+    @PostMapping("/attendance/process-absence")
+    public Map<String, Object> processAbsence(
+            @RequestBody Map<String, Object> request,
+            @RequestHeader Map<String, String> header) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // JWT 토큰 검증
+            String token = header.get("authorization");
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String loginId = (String) tokenData.get("id");
+            
+            if (loginId == null) {
+                result.put("success", false);
+                result.put("msg", "인증 실패");
+                return result;
+            }
+            
+            // 관리자 권한 체크 (필요시 추가)
+            
+            String targetDateStr = (String) request.get("targetDate");
+            if (targetDateStr != null) {
+                // 특정 날짜 처리
+                LocalDate targetDate = LocalDate.parse(targetDateStr);
+                int processedCount = svc.processAbsence(targetDate);
+                result.put("success", true);
+                result.put("msg", processedCount + "명의 직원을 결석 처리했습니다.");
+                result.put("processedCount", processedCount);
+            } else {
+                // 전날 자동 처리
+                int processedCount = svc.processYesterdayAbsence();
+                result.put("success", true);
+                result.put("msg", "전날 " + processedCount + "명의 직원을 결석 처리했습니다.");
+                result.put("processedCount", processedCount);
+            }
+            
+        } catch (Exception e) {
+            log.error("결석 처리 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "결석 처리 중 오류가 발생했습니다.");
+        }
+        
+        return result;
+    }
+
+    // 개별 결석 처리 API (관리자용)
+    @PostMapping("/attendance/process-single-absence")
+    public Map<String, Object> processSingleAbsence(
+            @RequestBody Map<String, Object> request,
+            @RequestHeader Map<String, String> header) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // JWT 토큰 검증
+            String token = header.get("authorization");
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String loginId = (String) tokenData.get("id");
+            
+            if (loginId == null) {
+                result.put("success", false);
+                result.put("msg", "인증 실패");
+                return result;
+            }
+            
+            // 요청 파라미터 검증
+            String targetUserId = (String) request.get("userId");
+            String targetDateStr = (String) request.get("targetDate");
+            
+            if (targetUserId == null || targetUserId.trim().isEmpty()) {
+                result.put("success", false);
+                result.put("msg", "사용자 ID가 필요합니다.");
+                return result;
+            }
+            
+            if (targetDateStr == null || targetDateStr.trim().isEmpty()) {
+                result.put("success", false);
+                result.put("msg", "날짜가 필요합니다.");
+                return result;
+            }
+            
+            LocalDate targetDate = LocalDate.parse(targetDateStr);
+            boolean success = svc.processSingleAbsence(targetUserId, targetDate);
+            
+            if (success) {
+                result.put("success", true);
+                result.put("msg", targetUserId + "님의 " + targetDate + "를 결석 처리했습니다.");
+            } else {
+                result.put("success", false);
+                result.put("msg", "이미 해당 날짜에 출근 기록이 존재하거나 처리에 실패했습니다.");
+            }
+            
+        } catch (Exception e) {
+            log.error("개별 결석 처리 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "개별 결석 처리 중 오류가 발생했습니다.");
+        }
+        
+        return result;
     }
 
     // 팀 근태 확인 기능 (연차만) 이거는 권한되고 나서??
