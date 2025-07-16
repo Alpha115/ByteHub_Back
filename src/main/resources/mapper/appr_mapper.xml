@@ -254,10 +254,12 @@
 	        m.email,
 	        m.hire_date,
 	        IFNULL(d.dept_name, '미배정') as dept_name,
-	        IFNULL(l.lv_name, '미배정') as level_name
+	        IFNULL(l.lv_name, '미배정') as level_name,
+	        IFNULL(lh.remain_days, 0) as remain_days
 	    FROM member m
 	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
 	    LEFT JOIN level l ON m.lv_idx = l.lv_idx
+	    LEFT JOIN leave_history lh ON m.user_id = lh.writer_id
 	    WHERE m.status = '재직'
 	    ORDER BY d.dept_name, m.name
 	</select>
