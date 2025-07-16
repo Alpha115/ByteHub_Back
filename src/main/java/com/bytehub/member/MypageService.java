@@ -31,7 +31,7 @@ public class MypageService {
             
             return member;
         } catch (Exception e) {
-            log.error("Service: 사용자 정보 조회 중 오류 발생: {}", e.getMessage(), e);
+            log.info("Service: 사용자 정보 조회 중 오류 발생: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -54,7 +54,7 @@ public class MypageService {
             
             return isValid;
         } catch (Exception e) {
-            log.error("Service: 비밀번호 검증 중 오류 발생: {}", e.getMessage(), e);
+            log.info("Service: 비밀번호 검증 중 오류 발생: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -91,7 +91,7 @@ public class MypageService {
             return success;
             
         } catch (Exception e) {
-            log.error("Service: 회원 정보 수정 중 오류 발생: {}", e.getMessage(), e);
+            log.info("Service: 회원 정보 수정 중 오류 발생: {}", e.getMessage(), e);
             return false;
         }
     }

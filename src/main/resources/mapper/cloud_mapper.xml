@@ -69,5 +69,55 @@
         ORDER BY dept_idx ASC
     </select>
     
-
+    <!-- 링크 저장 -->
+    <insert id="insertLink" parameterType="com.bytehub.cloud.LinkDTO">
+        INSERT INTO link (user_id, link_name, url)
+        VALUES (#{user_id}, #{link_name}, #{url})
+    </insert>
+    
+    <!-- 링크 목록 조회 -->
+    <select id="getLinkList" parameterType="string" resultType="map">
+        SELECT 
+            l.link_idx,
+            l.user_id,
+            l.link_name,
+            l.url,
+            m.name as uploader_name,
+            m.lv_idx,
+            m.dept_idx,
+            lev.lv_name
+        FROM link l
+        LEFT JOIN member m ON l.user_id = m.user_id
+        LEFT JOIN level lev ON m.lv_idx = lev.lv_idx
+        ORDER BY l.link_idx DESC
+    </select>
+    
+    <!-- 링크 삭제 -->
+    <delete id="deleteLink" parameterType="int">
+        DELETE FROM link WHERE link_idx = #{link_ㅑㅑdx}
+    </delete>
+    
+    <!-- 링크 수정 -->
+    <update id="updateLink" parameterType="com.bytehub.cloud.LinkDTO">
+        UPDATE link 
+        SET link_name = #{link_name}, url = #{url}
+        WHERE link_idx = #{link_idx}
+    </update>
+    
+    <!-- 개별 링크 정보 조회 -->
+    <select id="getLinkInfo" parameterType="int" resultType="map">
+        SELECT 
+            l.link_idx,
+            l.user_id,
+            l.link_name,
+            l.url,
+            m.name as uploader_name,
+            m.lv_idx,
+            m.dept_idx,
+            lev.lv_name
+        FROM link l
+        LEFT JOIN member m ON l.user_id = m.user_id
+        LEFT JOIN level lev ON m.lv_idx = lev.lv_idx
+        WHERE l.link_idx = #{linkIdx}
+    </select>
 </mapper>

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,7 +132,7 @@ public class CloudController {
             // 파일 정보 조회
             Map<String, Object> fileInfo = service.getFileInfo(file_idx);
             if (fileInfo == null) {
-                log.error("파일 정보를 찾을 수 없음: file_idx = {}", file_idx);
+                log.info("파일 정보를 찾을 수 없음: file_idx = {}", file_idx);
                 return ResponseEntity.notFound().build();
             }
             
@@ -143,7 +144,7 @@ public class CloudController {
                     file_idx, filename, filePath, file.exists(), file.exists() ? file.length() : 0);
             
             if (!file.exists()) {
-                log.error("파일이 존재하지 않음: {}", filePath);
+                log.info("파일이 존재하지 않음: {}", filePath);
                 return ResponseEntity.notFound().build();
             }
             
@@ -168,7 +169,7 @@ public class CloudController {
                     .body(resource);
                     
         } catch (IOException e) {
-            log.error("파일 다운로드 실패: {}", e.getMessage(), e);
+            log.info("파일 다운로드 실패: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -202,6 +203,9 @@ public class CloudController {
         }
     }
 
+     /**
+     * 파일 리스트 보기기
+     */
     @GetMapping("/cloud/list")
     public ResponseEntity<Map<String, Object>> getFileList(
         @RequestParam("deptIdx") int deptIdx) {
@@ -230,7 +234,7 @@ public class CloudController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            log.error("파일 목록 조회 실패: {}", e.getMessage(), e);
+            log.info("파일 목록 조회 실패: {}", e.getMessage(), e);
             response.put("success", false);
             response.put("message", "파일 목록 조회 실패: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
@@ -253,9 +257,171 @@ public class CloudController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            log.error("부서 목록 조회 실패: {}", e.getMessage(), e);
+            log.info("부서 목록 조회 실패: {}", e.getMessage(), e);
             response.put("success", false);
             response.put("message", "부서 목록 조회 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 링크 저장 API
+     */
+    @PostMapping("/cloud/link/save")
+    public ResponseEntity<Map<String, Object>> saveLink(
+            @RequestParam("linkName") String linkName,
+            @RequestParam("url") String url,
+            @RequestParam("userId") String userId) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        // 빈 값 체크
+        if (linkName == null || linkName.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "링크 이름을 입력해주세요.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        if (url == null || url.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "URL을 입력해주세요.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        // URL 형식 검증 (간단한 검증)
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            response.put("success", false);
+            response.put("message", "올바른 URL 형식이 아닙니다. (http:// 또는 https://로 시작해야 합니다)");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        try {
+            // 링크 정보 설정
+            LinkDTO linkDTO = new LinkDTO();
+            linkDTO.setLink_name(linkName.trim());
+            linkDTO.setUrl(url.trim());
+            linkDTO.setUser_id(userId);
+            
+            // 서비스에 링크 저장 요청
+            LinkDTO savedLink = service.saveLink(linkDTO);
+
+            response.put("success", true);
+            response.put("data", savedLink);
+            response.put("message", "링크 저장 성공");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.info("링크 저장 실패: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "링크 저장 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 링크 목록 조회 API
+     */
+    @GetMapping("/cloud/link/list")
+    public ResponseEntity<Map<String, Object>> getLinkList(
+        @RequestParam("userId") String userId) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            List<Map<String, Object>> links = service.getLinkList(userId);
+            
+            response.put("success", true);
+            response.put("data", links);
+            response.put("message", "링크 목록 조회 성공");
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.info("링크 목록 조회 실패: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "링크 목록 조회 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 링크 삭제 API
+     */
+    @DeleteMapping("/cloud/link/delete/{link_idx}")
+    public ResponseEntity<Map<String, Object>> deleteLink(@PathVariable int link_idx) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // DB에서 링크 정보 삭제
+            boolean deleted = service.deleteLink(link_idx);
+            
+            if (deleted) {
+                response.put("success", true);
+                response.put("message", "링크 삭제 성공");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "삭제할 링크를 찾을 수 없습니다.");
+                return ResponseEntity.notFound().build();
+            }
+            
+        } catch (Exception e) {
+            log.info("링크 삭제 실패: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "링크 삭제 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 링크 수정 API
+     */
+    @PutMapping("/cloud/link/update")
+    public ResponseEntity<Map<String, Object>> updateLink(
+            @RequestParam("linkIdx") int linkIdx,
+            @RequestParam("linkName") String linkName,
+            @RequestParam("url") String url) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        // 빈 값 체크
+        if (linkName == null || linkName.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "링크 이름을 입력해주세요.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        if (url == null || url.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "URL을 입력해주세요.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        // URL 형식 검증 (간단한 검증)
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            response.put("success", false);
+            response.put("message", "올바른 URL 형식이 아닙니다. (http:// 또는 https://로 시작해야 합니다)");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        try {
+            // 링크 정보 설정
+            LinkDTO linkDTO = new LinkDTO();
+            linkDTO.setLink_idx(linkIdx);
+            linkDTO.setLink_name(linkName.trim());
+            linkDTO.setUrl(url.trim());
+            
+            // 서비스에 링크 수정 요청
+            LinkDTO updatedLink = service.updateLink(linkDTO);
+
+            response.put("success", true);
+            response.put("data", updatedLink);
+            response.put("message", "링크 수정 성공");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.info("링크 수정 실패: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "링크 수정 실패: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

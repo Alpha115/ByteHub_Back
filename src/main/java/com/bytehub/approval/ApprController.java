@@ -91,7 +91,7 @@ public class ApprController {
 							if (uploadFile.exists()) {
 								log.info("파일 업로드 성공: {} (크기: {} bytes)", uploadPath, uploadFile.length());
 							} else {
-								log.error("파일 업로드 실패: 파일이 생성되지 않음 - {}", uploadPath);
+								                log.info("파일 업로드 실패: 파일이 생성되지 않음 - {}", uploadPath);
 							}
 
 							FileDTO fileDTO = new FileDTO();
@@ -101,7 +101,7 @@ public class ApprController {
 							// appr_idx는 service에서 set
 							fileDTOList.add(fileDTO);
 						} catch (IOException e) {
-							log.error("파일 업로드 실패: {} - {}", file.getOriginalFilename(), e.getMessage(), e);
+							            log.info("파일 업로드 실패: {} - {}", file.getOriginalFilename(), e.getMessage(), e);
 							// 파일 업로드 실패 시에도 계속 진행
 						}
 					} else {
@@ -302,7 +302,7 @@ public class ApprController {
 					.body(resource);
 					
 		} catch (IOException e) {
-			log.error("파일 다운로드 실패: {}", e.getMessage(), e);
+			            log.info("파일 다운로드 실패: {}", e.getMessage(), e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}
@@ -326,7 +326,7 @@ public class ApprController {
 			loginId = (String) tokenData.get("id");
 			log.info("수정 API - 추출된 loginId: {}", loginId);
 		} catch (Exception e) {
-			log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
+			log.info("JWT 토큰 파싱 실패: " + e.getMessage());
 			// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용
 			loginId = dto.getWriter_id();
 			log.info("JWT 파싱 실패로 인해 프론트엔드에서 전송한 사용자 ID 사용: {}", loginId);
@@ -336,7 +336,7 @@ public class ApprController {
 			service.generateLeave();
 			success = true;
 		} catch (Exception e) {
-			log.error("연차 생성 실패", e);
+			            log.info("연차 생성 실패", e);
 			success = false;
 		}
 
