@@ -39,6 +39,18 @@
 	    ORDER BY a.att_date DESC, a.in_time DESC
 	</select>
     
+    <!-- 전체 직원 근태 조회 -->
+    <select id="attListAll" resultType="com.bytehub.attendance.AttDTO">
+	    SELECT 
+	        a.att_idx, a.user_id, a.att_date, a.in_time, a.out_time, a.att_type,
+	        m.name, d.dept_name
+	    FROM attendance a
+	    JOIN member m ON a.user_id = m.user_id
+	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
+	    WHERE m.status = '재직'
+	    ORDER BY a.att_date DESC, a.in_time DESC
+	</select>
+    
     <!-- 특정 출퇴근 기록 조회 -->
     <select id="attDetail" parameterType="int" resultType="com.bytehub.attendance.AttDTO">
         SELECT att_idx, user_id, att_date, in_time, out_time, att_type

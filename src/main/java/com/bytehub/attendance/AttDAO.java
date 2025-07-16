@@ -19,6 +19,9 @@ public interface AttDAO {
     // 출근/퇴근/지각/조퇴 내역 조회 기능
     List<AttDTO> attList(String user_id);
     
+    // 전체 직원 근태 조회 기능
+    List<AttDTO> attListAll();
+    
     // 특정 출퇴근 기록 조회
     AttDTO attDetail(int att_idx);
 

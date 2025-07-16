@@ -142,6 +142,24 @@ public class AttController {
         return result;
     }
 
+    // 전체 직원 근태 조회
+    @GetMapping("/attendance/list/all")
+    public Map<String, Object> attListAll() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<AttDTO> list = svc.attListAll();
+            
+            result.put("success", true);
+            result.put("data", list);
+
+        } catch (Exception e) {
+            log.error("전체 출퇴근 기록 조회 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
+
     // 특정 출퇴근 기록 조회
     @GetMapping("/attendance/detail")
     public Map<String, Object> attDetail(@RequestParam int att_idx) {

@@ -32,6 +32,11 @@ public class AttService {
         return dao.attList(user_id);
     }
 
+    // 전체 직원 근태 조회 기능
+    public List<AttDTO> attListAll() {
+        return dao.attListAll();
+    }
+
     // 특정 출퇴근 기록 조회
     public AttDTO attDetail(int att_idx) {
         return dao.attDetail(att_idx);
