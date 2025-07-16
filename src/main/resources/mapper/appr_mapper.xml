@@ -244,5 +244,22 @@
 	    ORDER BY years DESC
 	    LIMIT 1
 	</update>
+
+	<!-- 전체 사원 연차 현황 조회 -->
+	<select id="getAllMembersLeave" resultType="map">
+	    SELECT 
+	        m.user_id as mem_idx,       
+	        m.user_id,
+	        m.name,
+	        m.email,
+	        m.hire_date,
+	        IFNULL(d.dept_name, '미배정') as dept_name,
+	        IFNULL(l.lv_name, '미배정') as level_name
+	    FROM member m
+	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
+	    LEFT JOIN level l ON m.lv_idx = l.lv_idx
+	    WHERE m.status = '재직'
+	    ORDER BY d.dept_name, m.name
+	</select>
 	
 </mapper>

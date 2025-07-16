@@ -190,7 +190,9 @@ public class ApprService {
 	public List<ApprDTO> leaveDetail(String loginId) {
 		return dao.leaveDetail(loginId);
 	}
-    
-    
+	
+	public List<Map<String, Object>> getAllMembersLeave() {
+		return dao.getAllMembersLeave();
+	}
     
 }

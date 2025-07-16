@@ -42,5 +42,8 @@ public interface ApprDAO {
     int getApprHistoryIdx(int appr_his_idx);
 	ApprDTO getApprIdx(int appr_idx);
 	void minusLeave(String writer_id);
+	
+    // 전체 사원 연차 현황 조회
+    List<Map<String, Object>> getAllMembersLeave();
     
 }

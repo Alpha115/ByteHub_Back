@@ -23,7 +23,7 @@
         WHERE file_idx = #{file_idx}
     </select>
 		
-		<!-- 게시글 수정 -->
+	<!-- 게시글 수정 -->
 	<update id="postUpdate" parameterType="com.bytehub.board.BoardDTO">
     UPDATE board
     SET category = #{category},
@@ -34,7 +34,7 @@
         file_idx = #{file_idx},
         reg_date = CURRENT_DATE
     WHERE post_idx = #{post_idx}
-    </update>
+	</update>
 	
 	<!-- 작성자 ID 가져오기 (post_idx 에 맞는) -->
     <select id="postWriter" parameterType="int" resultType="String">

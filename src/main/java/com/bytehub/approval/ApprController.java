@@ -391,7 +391,39 @@ public class ApprController {
 		return result;
 	}
 
-	// 연차 사용 시 DB 차감 기능
+	// 전체 사원 연차 현황 조회 API
+	@GetMapping("/leave/all")
+	public Map<String, Object> getAllMembersLeave(@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			// 관리자 권한 체크 (필요 시)
+			// MemberDTO user = memberDAO.getMemberById(userId);
+			// if (user.getLv_idx() > 3) {
+			//     result.put("success", false);
+			//     result.put("msg", "권한이 없습니다.");
+			//     return result;
+			// }
+			
+			List<Map<String, Object>> allMembersLeave = service.getAllMembersLeave();
+			result.put("success", true);
+			result.put("data", allMembersLeave);
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("msg", "전체 사원 연차 조회 중 오류가 발생했습니다.");
+			result.put("error", e.getMessage());
+		}
+		return result;
+	}
+
+	// 연차 사용 시 DB 차감 기능 -- 결재에 있음
 
 	// 연차 승인 시 일정 기록 기능
 

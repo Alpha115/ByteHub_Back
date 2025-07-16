@@ -3,8 +3,6 @@ package com.bytehub.board;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.bytehub.board.BoardCategory;
-
 public class BoardDTO {
 	
 	private int post_idx; // 게시글 인덱스
