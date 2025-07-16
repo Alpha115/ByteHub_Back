@@ -427,10 +427,119 @@ public class ApprController {
 		return result;
 	}
 
+	// 연차 수정 API
+	@PutMapping("/leave/update")
+	public Map<String, Object> updateLeave(@RequestBody Map<String, Object> request,
+			@RequestHeader("Authorization") String token) {
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		try {
+			// 기본 토큰 검증만
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			String targetUserId = (String) request.get("targetUserId");
+			Float newRemainDays = Float.parseFloat(request.get("remainDays").toString());
+			
+			service.updateLeave(targetUserId, newRemainDays);
+			
+			result.put("success", true);
+			result.put("msg", "연차가 수정되었습니다.");
+			
+		} catch (Exception e) {
+			log.error("연차 수정 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 수정 실패: " + e.getMessage());
+		}
+		
+		return result;
+	}
+
+	// 현재 연차 정책 조회 API
+	@GetMapping("/leave/setting/current")
+	public Map<String, Object> getCurrentLeaveSetting(@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			LeaveSettingDTO setting = service.getCurrentLeaveSetting();
+			result.put("success", true);
+			result.put("data", setting);
+			
+		} catch (Exception e) {
+			log.error("연차 정책 조회 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 정책 조회 실패: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	// 모든 연차 정책 조회 API
+	@GetMapping("/leave/setting/all")
+	public Map<String, Object> getAllLeaveSettings(@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			List<LeaveSettingDTO> settings = service.getAllLeaveSettings();
+			result.put("success", true);
+			result.put("data", settings);
+			
+		} catch (Exception e) {
+			log.error("연차 정책 목록 조회 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 정책 목록 조회 실패: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	// 연차 정책 등록/수정 API
+	@PostMapping("/leave/setting")
+	public Map<String, Object> saveLeaveSetting(@RequestBody LeaveSettingDTO setting,
+			@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			service.saveLeaveSetting(setting);
+			result.put("success", true);
+			result.put("msg", "연차 정책이 저장되었습니다.");
+			
+		} catch (Exception e) {
+			log.error("연차 정책 저장 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 정책 저장 실패: " + e.getMessage());
+		}
+		return result;
+	}
+
 	// 연차 사용 시 DB 차감 기능 -- 결재에 있음
 
 	// 연차 승인 시 일정 기록 기능
 
-	// 연 월차 설정 기능
 
 }

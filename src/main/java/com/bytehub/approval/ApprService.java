@@ -167,17 +167,18 @@ public class ApprService {
         return dao.getFileById(file_idx);
     }
     
-    // 연/월차 생성
+    // 연/월차 생성 (설정 기반)
 	public void generateLeave() {
-
+		// 현재 연차 정책 조회
+		LeaveSettingDTO setting = getCurrentLeaveSetting();
+		
 		/* 신규 입사자 (입사 1년 미만) 대상 월차 생성 
-	       1달에 1개씩, 최대 12개까지 발생 (입사월 ~ 12월까지)*/
-		dao.monthlyLeave();
+	       설정값에 따라 1달에 N개씩 발생 (입사월 ~ 12월까지)*/
+		dao.monthlyLeaveWithSetting(setting);
 
         /* 입사 1년 이상자 대상 연차 생성
-           입사 다음 해 1월 1일부터는 기본 15개 부여
-           이후 입사일 기준 1년마다 +1개씩 추가 */
-		dao.annualLeave();
+           설정값에 따라 기본 N개 + 근속년수당 N개씩 추가 */
+		dao.annualLeaveWithSetting(setting);
 		
 	}
 	
@@ -197,11 +198,52 @@ public class ApprService {
 	
 	// 선택된 사원들에게 정책 기반 연차 생성
 	public void generateLeaveForSelected(List<String> selectedMembers) {
+		// 현재 연차 정책 조회
+		LeaveSettingDTO setting = getCurrentLeaveSetting();
+		
 		// 신규 입사자(1년 미만) 월차 생성
-		dao.monthlyLeaveForSelected(selectedMembers);
+		dao.monthlyLeaveForSelectedWithSetting(selectedMembers, setting);
 		
 		// 기존 사원(1년 이상) 연차 생성  
-		dao.annualLeaveForSelected(selectedMembers);
+		dao.annualLeaveForSelectedWithSetting(selectedMembers, setting);
+	}
+	
+	// 연차 수정
+	public void updateLeave(String targetUserId, Float newRemainDays) {
+		dao.updateLeaveRemainDays(targetUserId, newRemainDays);
+	}
+	
+	// 연차 정책 관리
+	public LeaveSettingDTO getCurrentLeaveSetting() {
+		int currentYear = java.time.LocalDateTime.now().getYear();
+		LeaveSettingDTO setting = dao.getCurrentLeaveSetting(currentYear);
+		
+		// 현재 년도 정책이 없으면 기본값 반환
+		if (setting == null) {
+			setting = new LeaveSettingDTO();
+			setting.setYear(currentYear);
+			setting.setNewEmpBase(1);
+			setting.setExistingEmpBase(15);
+			setting.setAnnualIncrement(1);
+			setting.setMaxAnnual(25);
+		}
+		return setting;
+	}
+	
+	public List<LeaveSettingDTO> getAllLeaveSettings() {
+		return dao.getAllLeaveSettings();
+	}
+	
+	public void saveLeaveSetting(LeaveSettingDTO setting) {
+		LeaveSettingDTO existing = dao.getCurrentLeaveSetting(setting.getYear());
+		if (existing != null) {
+			// 기존 정책이 있으면 수정
+			setting.setLeaveSetIdx(existing.getLeaveSetIdx());
+			dao.updateLeaveSetting(setting);
+		} else {
+			// 새로운 정책 생성
+			dao.insertLeaveSetting(setting);
+		}
 	}
     
 }

@@ -303,6 +303,146 @@
               WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
           )
     </insert>
+    
+    <!-- 연차 잔여일 수정 -->
+    <update id="updateLeaveRemainDays" parameterType="Map">
+        UPDATE leave_history 
+        SET remain_days = #{newRemainDays}
+        WHERE writer_id = #{targetUserId} 
+        AND YEAR(years) = YEAR(CURDATE())
+    </update>
+    
+    <!-- 현재 연차 정책 조회 -->
+    <select id="getCurrentLeaveSetting" parameterType="int" resultType="com.bytehub.approval.LeaveSettingDTO">
+        SELECT 
+            leave_set_idx as leaveSetIdx,
+            year,
+            new_emp_base as newEmpBase,
+            existing_emp_base as existingEmpBase,
+            annual_increment as annualIncrement,
+            max_annual as maxAnnual,
+            created_date as createdDate,
+            updated_date as updatedDate
+        FROM leave_setting 
+        WHERE year = #{year}
+        LIMIT 1
+    </select>
+    
+    <!-- 모든 연차 정책 조회 -->
+    <select id="getAllLeaveSettings" resultType="com.bytehub.approval.LeaveSettingDTO">
+        SELECT 
+            leave_set_idx as leaveSetIdx,
+            year,
+            new_emp_base as newEmpBase,
+            existing_emp_base as existingEmpBase,
+            annual_increment as annualIncrement,
+            max_annual as maxAnnual,
+            created_date as createdDate,
+            updated_date as updatedDate
+        FROM leave_setting 
+        ORDER BY year DESC
+    </select>
+    
+    <!-- 연차 정책 등록 -->
+    <insert id="insertLeaveSetting" parameterType="com.bytehub.approval.LeaveSettingDTO">
+        INSERT INTO leave_setting (
+            year, new_emp_base, existing_emp_base, 
+            annual_increment, max_annual
+        ) VALUES (
+            #{year}, #{newEmpBase}, #{existingEmpBase},
+            #{annualIncrement}, #{maxAnnual}
+        )
+    </insert>
+    
+    <!-- 연차 정책 수정 -->
+    <update id="updateLeaveSetting" parameterType="com.bytehub.approval.LeaveSettingDTO">
+        UPDATE leave_setting SET
+            new_emp_base = #{newEmpBase},
+            existing_emp_base = #{existingEmpBase},
+            annual_increment = #{annualIncrement},
+            max_annual = #{maxAnnual}
+        WHERE leave_set_idx = #{leaveSetIdx}
+    </update>
+    
+    <!-- 설정 기반 신규 입사자 월차 생성 -->
+    <insert id="monthlyLeaveWithSetting" parameterType="com.bytehub.approval.LeaveSettingDTO">
+        INSERT INTO leave_history (writer_id, remain_days, years)
+        SELECT 
+            user_id,
+            #{newEmpBase} * TIMESTAMPDIFF(MONTH, hire_date, DATE_FORMAT(CURDATE(), '%Y-12-31')),
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+        FROM member 
+        WHERE status = '재직'
+          AND YEAR(hire_date) = YEAR(CURDATE())
+          AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &lt; 1
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+          )
+    </insert>
+    
+    <!-- 설정 기반 기존 사원 연차 생성 -->
+    <insert id="annualLeaveWithSetting" parameterType="com.bytehub.approval.LeaveSettingDTO">
+        INSERT INTO leave_history (writer_id, remain_days, years)
+        SELECT 
+            user_id,
+            LEAST(
+                #{existingEmpBase} + ((TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) - 1) * #{annualIncrement}),
+                #{maxAnnual}
+            ),
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+        FROM member 
+        WHERE status = '재직'
+          AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) >= 1
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+          )
+    </insert>
+    
+    <!-- 선택된 사원들 설정 기반 신규 입사자 월차 생성 -->
+    <insert id="monthlyLeaveForSelectedWithSetting" parameterType="Map">
+        INSERT INTO leave_history (writer_id, remain_days, years)
+        SELECT 
+            user_id,
+            #{setting.newEmpBase} * TIMESTAMPDIFF(MONTH, hire_date, DATE_FORMAT(CURDATE(), '%Y-12-31')),
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+        FROM member 
+        WHERE status = '재직'
+          AND YEAR(hire_date) = YEAR(CURDATE())
+          AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &lt; 1
+          AND user_id IN
+          <foreach item="memberId" collection="selectedMembers" open="(" separator="," close=")">
+              #{memberId}
+          </foreach>
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+          )
+    </insert>
+    
+    <!-- 선택된 사원들 설정 기반 기존 사원 연차 생성 -->
+    <insert id="annualLeaveForSelectedWithSetting" parameterType="Map">
+        INSERT INTO leave_history (writer_id, remain_days, years)
+        SELECT 
+            user_id,
+            LEAST(
+                #{setting.existingEmpBase} + ((TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) - 1) * #{setting.annualIncrement}),
+                #{setting.maxAnnual}
+            ),
+            STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+        FROM member 
+        WHERE status = '재직'
+          AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) >= 1
+          AND user_id IN
+          <foreach item="memberId" collection="selectedMembers" open="(" separator="," close=")">
+              #{memberId}
+          </foreach>
+          AND user_id NOT IN (
+              SELECT writer_id FROM leave_history
+              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
+          )
+    </insert>
 
 	
 </mapper>

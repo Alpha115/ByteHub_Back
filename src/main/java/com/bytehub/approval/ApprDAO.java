@@ -1,6 +1,7 @@
 package com.bytehub.approval;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 import com.bytehub.member.FileDTO;
@@ -51,5 +52,25 @@ public interface ApprDAO {
     
     // 선택된 사원들 연차 생성 (기존 사원)
     void annualLeaveForSelected(List<String> selectedMembers);
+    
+    // 연차 잔여일 수정
+    int updateLeaveRemainDays(@Param("targetUserId") String targetUserId, 
+                             @Param("newRemainDays") Float newRemainDays);
+    
+    // 연차 정책 관리
+    LeaveSettingDTO getCurrentLeaveSetting(int year);
+    List<LeaveSettingDTO> getAllLeaveSettings();
+    int insertLeaveSetting(LeaveSettingDTO setting);
+    int updateLeaveSetting(LeaveSettingDTO setting);
+    
+    // 설정 기반 연차 생성
+    void monthlyLeaveWithSetting(LeaveSettingDTO setting);
+    void annualLeaveWithSetting(LeaveSettingDTO setting);
+    
+    // 선택된 사원들 설정 기반 연차 생성
+    void monthlyLeaveForSelectedWithSetting(@Param("selectedMembers") List<String> selectedMembers, 
+                                           @Param("setting") LeaveSettingDTO setting);
+    void annualLeaveForSelectedWithSetting(@Param("selectedMembers") List<String> selectedMembers, 
+                                          @Param("setting") LeaveSettingDTO setting);
     
 }
