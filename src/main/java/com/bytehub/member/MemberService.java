@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,6 +133,10 @@ public class MemberService {
 
 	public ArrayList<Map<String, Object>> depts() {
 		return dao.depts();
+	}
+
+	public ArrayList<Map<String, Object>> users() {
+		return dao.users();
 	}
 
 

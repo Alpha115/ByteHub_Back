@@ -101,5 +101,9 @@
 	<select id="depts" resultType="map">
 		select dept_name , dept_idx from department;
 	</select>
+	
+	<select id="users" resultType="map">
+		select user_id, name, email, dept_idx from member
+	</select>
 	    
 </mapper>

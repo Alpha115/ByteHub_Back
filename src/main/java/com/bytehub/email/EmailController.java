@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,13 @@ public class EmailController {
 	public Map<String, Object> depts(){
 		resp=new HashMap<String, Object>();
 		resp.put("list", memberService.depts());
+		return resp;
+	}
+	
+	@GetMapping("/users")
+	public Map<String, Object> users(){
+		resp=new HashMap<String, Object>();
+		resp.put("list", memberService.users());
 		return resp;
 	}
 	

@@ -26,5 +26,6 @@ public interface MemberDAO {
 	MemberDTO memberInfo(String user_id);
 	//부서정보조회
 	ArrayList<Map<String, Object>> depts();
+	ArrayList<Map<String, Object>> users();
 	
 }
