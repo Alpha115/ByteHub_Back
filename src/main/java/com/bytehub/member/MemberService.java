@@ -130,6 +130,10 @@ public class MemberService {
 		return dao.memberInfo(user_id);
 	}
 
+	public ArrayList<Map<String, Object>> depts() {
+		return dao.depts();
+	}
+
 
 	
 

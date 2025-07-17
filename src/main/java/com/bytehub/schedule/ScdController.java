@@ -1,6 +1,5 @@
 package com.bytehub.schedule;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,13 +23,13 @@ public class ScdController {
 	Map<String, Object> resp = null;
 	private final ScdService svc;
 
-	// 일정(1일)일의 내용을 조회합니다.(일정정보, 해당날짜 일정 총 갯수)
-	@GetMapping("/day/{date}")
-	public Map<String, Object> day(@PathVariable Date date) {
-		resp = new HashMap<String, Object>();
-		// 아직하지말아봐
-		return resp;
-	}
+//	// 일정(1일)일의 내용을 조회합니다.(일정정보, 해당날짜 일정 총 갯수)
+//	@GetMapping("/day/{date}")
+//	public Map<String, Object> day(@PathVariable Date date) {
+//		resp = new HashMap<String, Object>();
+//		// 아직하지말아봐
+//		return resp;
+//	}
 
 	// 일정을 입력합니다.
 	@PostMapping("/insert")
@@ -72,12 +71,8 @@ public class ScdController {
 		return resp;
 	}
 	
-	// 현재 일정의 갯수를 출력합니다.
-	@GetMapping("/today/{subject}")
-	public Map<String, Object> today(@PathVariable String subject){
-		resp=new HashMap<String, Object>();
-		resp.put("today_scd", svc.today(subject));
-		return resp;
-	}
+
+	
+
 
 }

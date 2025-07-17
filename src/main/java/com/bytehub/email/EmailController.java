@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,17 @@ public class EmailController {
 	String key = "xgrk qwtn jakr hqxk";
 	String enable = "true";
 	Properties props = new Properties();
-
+	
+	
+	// 부서정보불러오기
+	@GetMapping("/depts")
+	public Map<String, Object> depts(){
+		resp=new HashMap<String, Object>();
+		resp.put("list", memberService.depts());
+		return resp;
+	}
+	
+	
 	// --------임시 비밀번호(6자리) 랜덤 발급 함수---------
 	int createPw() {
 		randomNum = (int) ((Math.random() * 90000) + 100000);

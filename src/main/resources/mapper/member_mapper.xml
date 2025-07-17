@@ -97,5 +97,9 @@
 	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
 	    WHERE m.user_id = #{user_id}
 	</select>
+	
+	<select id="depts" resultType="map">
+		select dept_name , dept_idx from department;
+	</select>
 	    
 </mapper>
