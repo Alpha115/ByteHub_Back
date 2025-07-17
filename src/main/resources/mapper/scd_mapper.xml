@@ -5,19 +5,19 @@
 <mapper namespace="com.bytehub.schedule.SchDAO">
     <!-- 쿼리 작성 -->
     <insert id="insert" parameterType="com.bytehub.schedule.ScdDTO">
-    	INSERT INTO schedule (user_id, scd_type, type_idx, subject, start_time, end_time)
-		VALUES (#{user_id}, #{scd_type}, #{type_idx}, #{subject}, #{start_time}, #{end_time})
+    	INSERT INTO schedule (user_id, scd_type, type_idx, subject, start_date, end_date)
+		VALUES (#{user_id}, #{scd_type}, #{type_idx}, #{subject}, #{start_date}, #{end_date})
     </insert>
     
     <select id="total" resultType="com.bytehub.schedule.ScdDTO">
-    	select * from schedule order by start_time
+    	select * from schedule order by start_date
     </select>
     
     <update id="update" parameterType="com.bytehub.schedule.ScdDTO">
     	update schedule set
     	subject =#{subject}
-    	start_time =#{start_time}
-    	end_time =#{end_time}
+    	start_date =#{start_date}
+    	end_date =#{end_date}
     	where type_idx = #{type_idx} and scd_type =#{scd_type}
     </update>
     
@@ -32,8 +32,8 @@
     <select id="today" resultType="int">
 	    SELECT COUNT(subject) AS cnt
 	    FROM schedule
-	    WHERE NOW() &gt; start_time
-	      AND NOW() &lt; end_time
+	    WHERE NOW() &gt; start_date
+	      AND NOW() &lt; end_date
 	</select>
     
 </mapper>
