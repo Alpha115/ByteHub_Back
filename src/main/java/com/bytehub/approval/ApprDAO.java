@@ -40,8 +40,13 @@ public interface ApprDAO {
     // 기안자의 lv_idx와 dept_idx를 받아 결재자 lv_idx 1,2(고정 1명), 3(같은 부서 팀장)만 반환
     List<ApprLineDTO> getDynamicApprLine(Map<String, Object> param);
 	
+    // 결재히스토리리 내역 조회
     int getApprHistoryIdx(int appr_his_idx);
+
+    // 결재 내역 조회
 	ApprDTO getApprIdx(int appr_idx);
+
+
 	void minusLeave(String writer_id);
 	
     // 전체 사원 연차 현황 조회
