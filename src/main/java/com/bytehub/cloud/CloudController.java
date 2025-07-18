@@ -55,7 +55,7 @@ public class CloudController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("expireDate") String expireDate,
             @RequestParam("deptIdx") int deptIdx,
-            @RequestParam("userId") String userId) {
+            @RequestParam("user_id") String user_id) {
         
         Map<String, Object> response = new HashMap<>();
         
@@ -103,7 +103,7 @@ public class CloudController {
             CloudDTO cloudDTO = new CloudDTO();
             cloudDTO.setFilename(newFilename); // 새로운 파일명 저장
             cloudDTO.setDept_idx(deptIdx);
-            cloudDTO.setUserId(userId);
+            cloudDTO.setUserId(user_id);
             
             // 서비스에 파일 저장 요청
             CloudDTO savedFile = service.saveFile(cloudDTO);
@@ -127,7 +127,7 @@ public class CloudController {
     @GetMapping("/cloud/download/{file_idx}")
     public ResponseEntity<InputStreamResource> downloadFile(
             @PathVariable int file_idx,
-            @RequestParam("userId") String userId) {
+            @RequestParam("user_id") String user_id) {
         try {
             // 파일 정보 조회
             Map<String, Object> fileInfo = service.getFileInfo(file_idx);
@@ -149,7 +149,7 @@ public class CloudController {
             }
             
             // 다운로드 로그 저장
-            service.saveDownLog(file_idx, userId);
+            service.saveDownLog(file_idx, user_id);
             
             // 파일 스트림 생성
             InputStream inputStream = new FileInputStream(file);
@@ -271,7 +271,7 @@ public class CloudController {
     public ResponseEntity<Map<String, Object>> saveLink(
             @RequestParam("linkName") String linkName,
             @RequestParam("url") String url,
-            @RequestParam("userId") String userId) {
+            @RequestParam("user_id") String user_id) {
         
         Map<String, Object> response = new HashMap<>();
         
@@ -300,7 +300,7 @@ public class CloudController {
             LinkDTO linkDTO = new LinkDTO();
             linkDTO.setLink_name(linkName.trim());
             linkDTO.setUrl(url.trim());
-            linkDTO.setUser_id(userId);
+            linkDTO.setUser_id(user_id);
             
             // 서비스에 링크 저장 요청
             LinkDTO savedLink = service.saveLink(linkDTO);
@@ -323,12 +323,12 @@ public class CloudController {
      */
     @GetMapping("/cloud/link/list")
     public ResponseEntity<Map<String, Object>> getLinkList(
-        @RequestParam("userId") String userId) {
+        @RequestParam("user_id") String user_id) {
         
         Map<String, Object> response = new HashMap<>();
         
         try {
-            List<Map<String, Object>> links = service.getLinkList(userId);
+            List<Map<String, Object>> links = service.getLinkList(user_id);
             
             response.put("success", true);
             response.put("data", links);

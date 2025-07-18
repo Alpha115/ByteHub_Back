@@ -76,19 +76,19 @@ public class CloudService {
         }
     }
     
-    public void saveDownLog(int fileIdx, String userId) {
+    public void saveDownLog(int fileIdx, String user_id) {
         try {
             DownLogDTO downLogDTO = new DownLogDTO();
             downLogDTO.setFile_idx(fileIdx);
-            downLogDTO.setUser_id(userId);
+            downLogDTO.setUser_id(user_id);
             downLogDTO.setDown_time(new Timestamp(System.currentTimeMillis()));
             
             int result = dao.insertDownLog(downLogDTO);
             
             if (result > 0) {
-                log.info("다운로드 로그 저장 성공: file_idx = {}, user_id = {}", fileIdx, userId);
+                log.info("다운로드 로그 저장 성공: file_idx = {}, user_id = {}", fileIdx, user_id);
             } else {
-                log.info("다운로드 로그 저장 실패: file_idx = {}, user_id = {}", fileIdx, userId);
+                log.info("다운로드 로그 저장 실패: file_idx = {}, user_id = {}", fileIdx, user_id);
             }
             
         } catch (Exception e) {
@@ -124,9 +124,9 @@ public class CloudService {
         }
     }
     
-    public List<Map<String, Object>> getLinkList(String userId) {
+    public List<Map<String, Object>> getLinkList(String user_id) {
         try {
-            return dao.getLinkList(userId);
+            return dao.getLinkList(user_id);
         } catch (Exception e) {
             log.info("링크 목록 조회 실패: {}", e.getMessage(), e);
             throw new RuntimeException("링크 목록 조회 실패: " + e.getMessage());

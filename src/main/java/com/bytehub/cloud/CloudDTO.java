@@ -7,7 +7,7 @@ public class CloudDTO {
     private int file_idx;
     private int dept_idx;
     private String filename;
-    private String userId;
+    private String user_id;
     private Timestamp created_at;
 
     public int getFile_idx() {
@@ -34,12 +34,12 @@ public class CloudDTO {
         this.filename = filename;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserId(String user_id) {
+        this.user_id = user_id;
     }
 
     public Timestamp getCreated_at() {

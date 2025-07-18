@@ -30,7 +30,7 @@ public interface CloudDAO {
     int insertLink(LinkDTO linkDTO);
     
     // 링크 목록 조회
-    List<Map<String, Object>> getLinkList(String userId);
+    List<Map<String, Object>> getLinkList(String user_id);
     
     // 링크 삭제
     int deleteLink(int linkIdx);
