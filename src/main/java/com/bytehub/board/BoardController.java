@@ -80,8 +80,12 @@ public class BoardController {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
             
-            // 새 파일명 생성 (UUID + 확장자)
-            String newFilename = UUID.randomUUID().toString() + extension;
+            // 파일명에서 한글/비ASCII 제거 (ASCII만 남김)
+            String asciiOriFilename = originalFilename.replaceAll("[^A-Za-z0-9._-]", "_");
+            // 저장용 파일명: timestamp_UUID + 확장자 (ASCII only)
+            String asciiTimestamp = String.valueOf(System.currentTimeMillis());
+            String asciiUUID = java.util.UUID.randomUUID().toString().replaceAll("[^A-Za-z0-9]", "");
+            String newFilename = (asciiTimestamp + "_" + asciiUUID + extension).replaceAll("[^A-Za-z0-9._-]", "_");
             
             // 파일 저장
             File saveFile = new File(dir, newFilename);
@@ -90,8 +94,8 @@ public class BoardController {
             
             // FileDTO 생성하고 DB에 저장
             FileDTO fileDTO = new FileDTO();
-            fileDTO.setOri_filename(originalFilename);
-            fileDTO.setNew_filename(newFilename);
+            fileDTO.setOri_filename(asciiOriFilename); // ASCII only
+            fileDTO.setNew_filename(newFilename);      // ASCII only
             fileDTO.setFile_type("board");
             
             log.info("DB 저장 시작: {}", fileDTO);
@@ -103,7 +107,7 @@ public class BoardController {
             if (fileResult > 0) {
                 result.put("success", true);
                 result.put("file_idx", fileDTO.getFile_idx());
-                result.put("originalName", originalFilename);
+                result.put("originalName", asciiOriFilename);
                 result.put("newName", newFilename);
                 log.info("파일 업로드 완료: {} -> {}, file_idx: {}", originalFilename, newFilename, fileDTO.getFile_idx());
             } else {
