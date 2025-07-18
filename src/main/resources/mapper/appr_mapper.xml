@@ -219,7 +219,7 @@
         ORDER BY years DESC LIMIT 1
     </select>
     
-    <!-- 연차 상세 내역 조회 -->
+    <!-- 연차 상세 내역 조회 시작 날짜, 끝날짜, 승인여부, 연차 종류 -->
     <select id="leaveDetail" resultType="com.bytehub.approval.ApprDTO">
      SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type
      FROM approval ap

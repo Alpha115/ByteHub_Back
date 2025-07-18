@@ -59,7 +59,7 @@
     </select>
     
     <!-- 출/퇴근 시간 설정 기능 : 출퇴근 기준 시간 생성 -->
-    <insert id="createAttSetting" parameterType="com.bytehub.attendance.AttSettingDTO">
+    <insert id="createAttSetting" parameterType="com.bytehub.attendance.AttSettingDTO" useGeneratedKeys="true" keyProperty="time_set_idx">
     INSERT INTO att_setting (user_id, set_in_time, set_out_time, term)
     VALUES (#{user_id}, #{set_in_time}, #{set_out_time}, #{term})
     </insert>
