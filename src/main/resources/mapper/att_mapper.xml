@@ -74,10 +74,10 @@
 	</update>
 	
 	<!-- 출/퇴근 시간 설정 기능 : 현재 적용되는 기준 시간 조회 -->
-	<select id="getAttSetting" parameterType="string" resultType="com.bytehub.attendance.AttSettingDTO">
+	<select id="getAttSetting" resultType="com.bytehub.attendance.AttSettingDTO">
 	    SELECT time_set_idx, user_id, set_in_time, set_out_time, term
 	    FROM att_setting
-	    WHERE user_id = #{user_id}
+    	ORDER BY time_set_idx DESC
 	    LIMIT 1
 	</select>
 	
