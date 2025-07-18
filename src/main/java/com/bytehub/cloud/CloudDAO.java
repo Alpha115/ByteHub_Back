@@ -1,5 +1,6 @@
 package com.bytehub.cloud;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,4 +41,8 @@ public interface CloudDAO {
     
     // 개별 링크 정보 조회
     Map<String, Object> getLinkInfo(int linkIdx);
+
+	ArrayList<CloudDTO> ColudList();
+
+	ArrayList<LinkDTO> linkList();
 }

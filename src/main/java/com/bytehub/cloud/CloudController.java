@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -424,6 +425,20 @@ public class CloudController {
             response.put("message", "링크 수정 실패: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
+    }
+    
+    @PostMapping("/colud/allList")
+    public Map<String, Object> ColudAllList(){
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	ArrayList<CloudDTO> cloudList = service.ColudList();
+    	ArrayList<LinkDTO> linkList = service.linkList();
+    	
+    	response.put("cloudList", cloudList);
+    	response.put("linkList", linkList);
+    	
+    	return response;
     }
 }
 

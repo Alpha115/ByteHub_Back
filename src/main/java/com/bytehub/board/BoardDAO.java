@@ -52,4 +52,6 @@ public interface BoardDAO {
 	
 	// 게시글의 기존 참석자 삭제
 	int deleteAttendeesByPostIdx(@Param("post_idx") int post_idx);
+
+	List<BoardDTO> allList();
 }

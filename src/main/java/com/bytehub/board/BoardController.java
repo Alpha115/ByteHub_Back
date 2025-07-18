@@ -315,6 +315,15 @@ public class BoardController {
         return result;
     }
     
+    @PostMapping("/board/allList")
+    public Map<String, Object> allList(){
+    	Map<String, Object> result = new HashMap<>();
+    	List<BoardDTO> list = svc.allList();
+    	result.put("list", list);
+    	return result;
+    }
+    
+    
     // 상단 고정 게시글 개수 조회
     @GetMapping("/post/pinnedCnt")
     public int getPinnedCnt() {

@@ -209,5 +209,19 @@ public class BoardService {
 		}
 	}
 
+	public List<BoardDTO> allList() {
+	    List<BoardDTO> boardList = dao.allList();
+
+	    for (BoardDTO board : boardList) {
+	        if (board.getCategory() == BoardCategory.MEETING) {
+	            List<String> attendees = getAttendeesByPostIdx(board.getPost_idx());
+	            board.setAttendees(attendees);
+	        } else {
+	        }
+	    }
+
+	    return boardList;
+	}
+
 
 }

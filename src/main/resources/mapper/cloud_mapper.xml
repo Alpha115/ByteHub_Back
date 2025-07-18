@@ -120,4 +120,12 @@
         LEFT JOIN level lev ON m.lv_idx = lev.lv_idx
         WHERE l.link_idx = #{linkIdx}
     </select>
+    
+    <select id="ColudList" parameterType="com.bytehub.cloud.CloudDTO">
+    	select * from cloud
+    </select>
+    
+    <select id="linkList" parameterType="com.bytehub.cloud.LinkDTO">
+    	select * from link
+    </select>
 </mapper>
