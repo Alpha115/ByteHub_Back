@@ -23,5 +23,8 @@ public class ApprDTO {
     // 연차 관련 필드
     private Date vac_start;
     private Date vac_end;
+    
+    // 승인 상태 필드 추가
+    private String appr_status;
 
 }

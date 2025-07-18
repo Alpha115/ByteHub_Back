@@ -221,11 +221,11 @@
     
     <!-- 연차 상세 내역 조회 시작 날짜, 끝날짜, 승인여부, 연차 종류 -->
     <select id="leaveDetail" resultType="com.bytehub.approval.ApprDTO">
-     SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type, ap.vac_start, ap.vac_end
-     FROM approval ap
-     JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
-     WHERE ap.writer_id = #{writer_id} AND ap.appr_type = '연차' AND ah.status = '승인완료'
-     ORDER BY ap.appr_date DESC
+   	    SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type, ap.vac_start, ap.vac_end, ah.status as appr_status
+		FROM approval ap
+		JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
+		WHERE ap.writer_id = #{writer_id} AND ap.appr_type = '연차'
+		ORDER BY ap.appr_date DESC
     </select>
     
     <select id="getApprHistoryIdx" resultType="int">
