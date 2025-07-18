@@ -92,9 +92,9 @@ public class AttController {
         try {
             log.info("출근 상태 결정 시작 - userId: {}, currentTime: {}", userId, currentTime);
             
-            // 사용자의 출퇴근 설정 조회
-            AttSettingDTO setting = svc.getAttSetting(userId);
-            log.info("사용자 설정 조회 결과: {}", setting);
+            // (모두에게 동일한) 최신 출퇴근 설정 조회
+            AttSettingDTO setting = svc.getAttSetting();
+            log.info("공용 설정 조회 결과: {}", setting);
             
             // 설정이 없으면 기본값 사용 (09:00)
             LocalTime standardInTime = LocalTime.of(9, 0);
@@ -136,8 +136,8 @@ public class AttController {
      */
     private String determineOutAttendanceStatus(String userId, LocalDateTime currentTime) {
         try {
-            // 사용자의 출퇴근 설정 조회
-            AttSettingDTO setting = svc.getAttSetting(userId);
+            // (모두에게 동일한) 최신 출퇴근 설정 조회
+            AttSettingDTO setting = svc.getAttSetting();
             
             // 설정이 없으면 기본값 사용 (18:00)
             LocalTime standardOutTime = LocalTime.of(18, 0);
@@ -308,20 +308,15 @@ public class AttController {
     
     // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회
     @GetMapping("/attendance/setting/current")
-    public Map<String, Object> getCurrentSetting(@RequestParam String user_id) {
+    public Map<String, Object> getCurrentSetting() {
         Map<String, Object> result = new HashMap<>();
         try {
-            AttSettingDTO setting = svc.getAttSetting(user_id);
-            if (setting != null) {
-                result.put("success", true);
-                result.put("data", setting);
-            } else {
-                result.put("success", false);
-                result.put("msg", "설정된 기준 시간이 없습니다.");
-            }
+            AttSettingDTO setting = svc.getAttSetting();
+            result.put("success", true);
+            result.put("data", setting);
         } catch (Exception e) {
             result.put("success", false);
-            result.put("msg", "조회 중 오류가 발생했습니다.");
+            result.put("msg", "기준 시간 조회 실패: " + e.getMessage());
         }
         return result;
     }

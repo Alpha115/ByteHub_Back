@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -178,5 +179,13 @@ public class CloudService {
             throw new RuntimeException("링크 정보 조회 실패: " + e.getMessage());
         }
     }
+
+	public ArrayList<CloudDTO> ColudList() {
+		return dao.ColudList();
+	}
+
+	public ArrayList<LinkDTO> linkList() {
+		return dao.linkList();
+	}
 }
 

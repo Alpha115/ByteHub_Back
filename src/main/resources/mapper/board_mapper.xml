@@ -102,5 +102,12 @@
         DELETE FROM attendee
         WHERE scd_type = 'MEETING' AND type_idx = #{post_idx}
     </delete>
+    
+    <select id="allList" parameterType="com.bytehub.board.BoardDTO">
+    	select b.*,f.* from board  b
+		left join file f
+		on b.file_idx = f.file_idx
+		where b.category = "MEETING"
+    </select>
 		
 </mapper>

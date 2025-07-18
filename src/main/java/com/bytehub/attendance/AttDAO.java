@@ -34,7 +34,7 @@ public interface AttDAO {
 	int updateAttSetting(AttSettingDTO dto);
 
     // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회 
-	AttSettingDTO getAttSetting(String user_id);
+	AttSettingDTO getAttSetting();
 
 	// 근태 통계
 	List<Map<String, Object>> attStat(String user_id);

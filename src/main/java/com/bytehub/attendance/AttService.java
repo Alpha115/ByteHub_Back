@@ -55,10 +55,10 @@ public class AttService {
 		return dao.updateAttSetting(dto);
 	}
 
-    // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회
-	public AttSettingDTO getAttSetting(String user_id) {
-		return dao.getAttSetting(user_id);
-	}
+    // 출/퇴근 시간 설정 기능 -- 현재 적용되는 기준 시간 조회 (가장 최근 한 줄)
+    public AttSettingDTO getAttSetting() {
+        return dao.getAttSetting();
+    }
 
 	// 근태 통계
 	public List<Map<String, Object>> attStat(String user_id) {
