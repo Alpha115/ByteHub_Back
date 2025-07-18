@@ -47,7 +47,8 @@ public interface ApprDAO {
 	ApprDTO getApprIdx(int appr_idx);
 
 
-	void minusLeave(String writer_id);
+	// 날짜 기반 연차 차감
+	int minusLeaveByDays(@Param("writer_id") String writer_id, @Param("days") double days);
 	
     // 전체 사원 연차 현황 조회
     List<Map<String, Object>> getAllMembersLeave();
