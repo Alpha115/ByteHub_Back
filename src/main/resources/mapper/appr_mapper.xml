@@ -7,8 +7,8 @@
 
 	<!-- 결재 문서 생성 -->
 	<insert id="createAppr" parameterType="com.bytehub.approval.ApprDTO" useGeneratedKeys="true" keyProperty="appr_idx">
-		INSERT INTO approval (writer_id, subject, content, appr_date, appr_type)
-		VALUES (#{writer_id}, #{subject}, #{content}, #{appr_date}, #{appr_type})
+		INSERT INTO approval (writer_id, subject, content, appr_date, appr_type, vac_start, vac_end)
+		VALUES (#{writer_id}, #{subject}, #{content}, #{appr_date}, #{appr_type}, #{vac_start}, #{vac_end})
 	</insert>
 
     <!-- 첨부 파일 정보 저장 -->
@@ -221,7 +221,7 @@
     
     <!-- 연차 상세 내역 조회 시작 날짜, 끝날짜, 승인여부, 연차 종류 -->
     <select id="leaveDetail" resultType="com.bytehub.approval.ApprDTO">
-     SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type
+     SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type, ap.vac_start, ap.vac_end
      FROM approval ap
      JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
      WHERE ap.writer_id = #{writer_id} AND ap.appr_type = '연차' AND ah.status = '승인완료'
@@ -236,11 +236,12 @@
 	    SELECT * FROM approval WHERE appr_idx = #{appr_idx}
 	</select>
 	
-	<update id="minusLeave">
+	<!-- 날짜 기반 연차 차감 -->
+	<update id="minusLeaveByDays">
 	    UPDATE leave_history
-	    SET remain_days = remain_days - 1
+	    SET remain_days = remain_days - #{days}
 	    WHERE writer_id = #{writer_id}
-	      AND remain_days > 0
+	      AND remain_days >= #{days}
 	    ORDER BY years DESC
 	    LIMIT 1
 	</update>

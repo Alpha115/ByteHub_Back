@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,9 +61,12 @@ public class ApprController {
 			appr.setAppr_type(apprType);
 			appr.setContent(content);
 			appr.setAppr_date(LocalDateTime.now());
-			// 연차일 경우 vac_start, vac_end도 저장 (필드가 있다면)
-			// appr.setVac_start(vacStart);
-			// appr.setVac_end(vacEnd);
+			
+			// 연차일 경우 시작일과 종료일 저장
+			if ("연차".equals(apprType) && vacStart != null && vacEnd != null) {
+				appr.setVac_start(Date.valueOf(vacStart));
+				appr.setVac_end(Date.valueOf(vacEnd));
+			}
 
 			// 파일 저장: FileDTO 리스트 생성
 			List<FileDTO> fileDTOList = new ArrayList<>();

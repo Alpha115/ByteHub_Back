@@ -9,8 +9,10 @@ import java.util.Map;
 import com.bytehub.member.FileDTO;
 import com.bytehub.member.MemberDAO;
 import com.bytehub.member.MemberDTO;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ApprService {
 
     @Autowired
@@ -101,11 +103,29 @@ public class ApprService {
         ApprDTO appr = dao.getApprIdx(appr_idx);
 
         if ("연차".equals(appr.getAppr_type())) {
-            dao.minusLeave(appr.getWriter_id());
+            // 연차 날짜 기반으로 차감일수 계산
+            double daysToDeduct = calculateDaysToDeduct(appr);
+            int updateResult = dao.minusLeaveByDays(appr.getWriter_id(), daysToDeduct);
+            
+            // 연차 차감 실패 시 로그
+            if (updateResult == 0) {
+                log.info("연차 차감 실패: 사용자 {}, 차감일수 {}", appr.getWriter_id(), daysToDeduct);
+            }
         }
     }
     return result;
        
+    }
+    
+    // 연차 사용량 계산 (날짜 기반)
+    private double calculateDaysToDeduct(ApprDTO appr) {
+        if (appr.getVac_start() != null && appr.getVac_end() != null) {
+            // 시작일과 종료일 사이의 일수 계산 (종료일 포함)
+            long days = java.time.temporal.ChronoUnit.DAYS.between(
+                appr.getVac_start().toLocalDate(), appr.getVac_end().toLocalDate()) + 1;
+            return (double) days;
+        }
+        return 1.0; // 기본값
     }
 
     public List<Map<String, Object>> getMyAppr(String writer_id) {
