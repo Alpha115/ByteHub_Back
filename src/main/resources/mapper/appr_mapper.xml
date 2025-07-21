@@ -219,13 +219,19 @@
         ORDER BY years DESC LIMIT 1
     </select>
     
-    <!-- 연차 상세 내역 조회 시작 날짜, 끝날짜, 승인여부, 연차 종류 -->
+    <!-- 연차 상세 내역 조회: 로그인한 사용자의 연차 신청 내역(신청일, 연차종류, 시작일, 종료일, 상태) -->
     <select id="leaveDetail" resultType="com.bytehub.approval.ApprDTO">
-   	    SELECT ap.appr_idx, ap.writer_id, ap.checker_id, ap.subject, ap.content, ap.appr_date, ap.appr_type, ap.vac_start, ap.vac_end, ah.status as appr_status
-		FROM approval ap
-		JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
-		WHERE ap.writer_id = #{writer_id} AND ap.appr_type = '연차'
-		ORDER BY ap.appr_date DESC
+        SELECT 
+            ap.appr_date,         -- 신청일
+            ap.appr_type,         -- 연차 종류
+            ap.vac_start,         -- 시작일
+            ap.vac_end,           -- 종료일
+            ah.status as appr_status -- 상태
+        FROM approval ap
+        JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
+        WHERE ap.writer_id = #{writer_id}
+          AND ap.appr_type = '연차'
+        ORDER BY ap.appr_date DESC
     </select>
     
     <select id="getApprHistoryIdx" resultType="int">
