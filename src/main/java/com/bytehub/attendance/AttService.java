@@ -133,6 +133,11 @@ public class AttService {
 	public List<Map<String, Object>> attStat(String user_id) {
 		return dao.attStat(user_id);
 	}
+
+	// 전체 직원 근태 통계
+	public List<Map<String, Object>> attStatAll() {
+		return dao.attStatAll();
+	}
 	
 	// 결석 자동 처리
 	public int processAbsence(LocalDate targetDate) {

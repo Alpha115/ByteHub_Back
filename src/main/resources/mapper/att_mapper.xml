@@ -89,6 +89,25 @@
 		GROUP BY att_type
 	</select>
 	
+	<!-- 전체 직원 근태 통계 -->
+	<select id="attStatAll" resultType="map">
+		SELECT 
+		    m.user_id as id,
+		    m.name,
+		    '-' as dept,
+		    IFNULL(SUM(CASE WHEN a.att_type = '정상출근' THEN 1 ELSE 0 END), 0) as days_present,
+		    IFNULL(SUM(CASE WHEN a.att_type = '지각' THEN 1 ELSE 0 END), 0) as late,
+		    IFNULL(SUM(CASE WHEN a.att_type = '조퇴' THEN 1 ELSE 0 END), 0) as earlyLeave,
+		    IFNULL(SUM(CASE WHEN a.att_type = '결석' THEN 1 ELSE 0 END), 0) as absent,
+		    IFNULL(SUM(CASE WHEN a.att_type = '연차' THEN 1 ELSE 0 END), 0) as annual_leave
+		FROM member m
+		LEFT JOIN attendance a ON m.user_id = a.user_id 
+		    AND a.att_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+		WHERE m.status = '재직'
+		GROUP BY m.user_id, m.name
+		ORDER BY m.name
+	</select>
+	
 	<!-- 결석 자동 처리: 특정 날짜에 출근 기록이 없는 재직 중인 직원들 조회 -->
 	<select id="getAbsentEmployees" resultType="string">
 		SELECT m.user_id 

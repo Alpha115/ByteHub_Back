@@ -38,6 +38,9 @@ public interface AttDAO {
 
 	// 근태 통계
 	List<Map<String, Object>> attStat(String user_id);
+
+	// 전체 직원 근태 통계
+	List<Map<String, Object>> attStatAll();
 	
 	// 결석 자동 처리를 위한 메서드들
 	// 특정 날짜에 출근 기록이 없는 재직 중인 직원들 조회

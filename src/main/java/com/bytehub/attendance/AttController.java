@@ -355,7 +355,7 @@ public class AttController {
         return result;
     }
 
-    // 근태 통계 있어야 함;
+    // 근태 통계 있어야 함; 이거 안쓰먄 나중에 지우기
     @GetMapping("/attendance/stat")
     public Map<String, Object> attStat(@RequestParam String user_id){
         Map<String, Object> result = new HashMap<>();
@@ -377,6 +377,38 @@ public class AttController {
             result.put("user_info", userInfo); // 부서명이랑 이름 가져오면 될 듯
 
         } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "통계 조회 실패");
+        }
+        return result;
+        
+    }
+
+    // 전체 직원 근태 통계 조회 API
+    @GetMapping("/attendance/stat/all")
+    public Map<String, Object> attStatAll(@RequestHeader Map<String, String> header){
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // JWT 토큰 검증
+            String token = header.get("authorization");
+            Map<String, Object> tokenData = JwtUtils.readToken(token);
+            String loginId = (String) tokenData.get("id");
+            
+            if (loginId == null) {
+                result.put("success", false);
+                result.put("msg", "인증 실패");
+                return result;
+            }
+
+            // 전체 직원 근태 통계 조회
+            List<Map<String, Object>> statList = svc.attStatAll();
+            
+            result.put("success", true);
+            result.put("data", statList);
+
+        } catch (Exception e) {
+            log.error("전체 직원 근태 통계 조회 실패: " + e.getMessage());
             result.put("success", false);
             result.put("msg", "통계 조회 실패");
         }
