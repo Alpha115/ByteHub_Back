@@ -9,6 +9,8 @@ import java.util.Map;
 import com.bytehub.member.FileDTO;
 import com.bytehub.member.MemberDAO;
 import com.bytehub.member.MemberDTO;
+import com.bytehub.schedule.ScdService;
+import com.bytehub.schedule.ScdDTO;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -20,6 +22,9 @@ public class ApprService {
 
     @Autowired
     private MemberDAO memberDAO;
+
+    @Autowired
+    private ScdService scdService;
 	
 
     public int createApprWithLineAndFiles(ApprDTO appr, List<FileDTO> fileList) {
@@ -110,6 +115,15 @@ public class ApprService {
             // 연차 차감 실패 시 로그
             if (updateResult == 0) {
                 log.info("연차 차감 실패: 사용자 {}, 차감일수 {}", appr.getWriter_id(), daysToDeduct);
+            } else {
+                // 연차 차감 성공 시 일정 생성
+                try {
+                    createScheduleForLeave(appr);
+                    log.info("연차 일정 생성 완료: 사용자 {}, 기간 {} ~ {}", 
+                             appr.getWriter_id(), appr.getVac_start(), appr.getVac_end());
+                } catch (Exception e) {
+                    log.error("연차 일정 생성 실패: 사용자 {}, 오류: {}", appr.getWriter_id(), e.getMessage());
+                }
             }
         }
     }
@@ -126,6 +140,19 @@ public class ApprService {
             return (double) days;
         }
         return 1.0; // 기본값
+    }
+
+    // 연차 승인 시 일정 생성
+    private void createScheduleForLeave(ApprDTO appr) {
+        ScdDTO schedule = new ScdDTO();
+        schedule.setUser_id(appr.getWriter_id());
+        schedule.setScd_type("연차");
+        schedule.setType_idx(appr.getAppr_idx());
+        schedule.setSubject(appr.getSubject() + " (연차)");
+        schedule.setStart_date(appr.getVac_start());
+        schedule.setEnd_date(appr.getVac_end());
+        
+        scdService.insert(schedule);
     }
 
     public List<Map<String, Object>> getMyAppr(String writer_id) {
