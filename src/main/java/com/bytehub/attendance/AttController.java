@@ -41,10 +41,26 @@ public class AttController {
         String inputCode = (String) req.get("input_code");
         String expectedCode = (String) req.get("expected_code");
         String mode = (String) req.get("mode"); // "in" or "out"
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        // 1. 인증 시도 전 잠금 상태 체크
+        Map<String, Object> lockStatus = svc.chkAuthLock(userId);
+        if ((Boolean) lockStatus.get("locked")) {
+            result.put("success", false);
+            result.put("locked", true);
+            result.put("msg", lockStatus.get("message"));
+            result.put("remainingMinutes", lockStatus.get("remainingMinutes"));
+            return result;
+        }
+        
         boolean success = inputCode != null && inputCode.equals(expectedCode);
 
         Integer attIdx = null;
         if (success) {
+            // 2. 인증 성공 처리
+            svc.handleAuthSuccess(userId);
+            
             // 출근/퇴근 기록 생성
             AttDTO att = new AttDTO();
             att.setUser_id(userId);
@@ -65,6 +81,9 @@ public class AttController {
             
             svc.insertAttendance(att);
             attIdx = att.getAtt_idx();
+        } else {
+            // 3. 인증 실패 처리
+            svc.handleAuthFailure(userId);
         }
         
         // 인증 히스토리 기록 (성공/실패 모두)
@@ -79,9 +98,24 @@ public class AttController {
         hist.setCert_time(LocalDateTime.now());
         svc.insertAttHistory(hist);
 
-        Map<String, Object> result = new HashMap<>();
         result.put("success", success);
+        result.put("locked", false);
         result.put("msg", success ? "인증 성공" : "인증 실패");
+        return result;
+    }
+    
+    // 인증 잠금 상태 체크 API
+    @GetMapping("/attendance/auth-status")
+    public Map<String, Object> checkAuthStatus(@RequestParam String user_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Map<String, Object> lockStatus = svc.chkAuthLock(user_id);
+            result.put("success", true);
+            result.putAll(lockStatus);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "상태 확인 실패");
+        }
         return result;
     }
     

@@ -5,14 +5,83 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class AttService {
     private final AttDAO dao;
+    
+    // 인증 실패 제한을 위한 메모리 저장소
+    private final Map<String, FailureInfo> failureMap = new ConcurrentHashMap<>(); // ConcurrentHashMap은 동시 접근 해도 ㄱㅊ다고 해서 사용
+	 	
+    
+    // 실패 정보 클래스
+    private static class FailureInfo {
+        int failCount = 0;
+        LocalDateTime lockUntil = null;
+        LocalDateTime lastFailTime = null;
+        
+        boolean isLocked() {
+            return lockUntil != null && LocalDateTime.now().isBefore(lockUntil);
+        }
+        
+        void reset() {
+            failCount = 0;
+            lockUntil = null;
+            lastFailTime = null;
+        }
+    }
+    
+    // 인증 시도 전 잠금 상태 체크
+    public Map<String, Object> chkAuthLock(String userId) {
+        Map<String, Object> result = new ConcurrentHashMap<>();
+        
+        FailureInfo info = failureMap.get(userId);
+        if (info != null && info.isLocked()) {
+            long remainingMinutes = java.time.Duration.between(LocalDateTime.now(), info.lockUntil).toMinutes();
+            result.put("locked", true);
+            result.put("message", remainingMinutes + "분 후 다시 시도해주세요.");
+            result.put("remainingMinutes", remainingMinutes);
+        } else {
+            result.put("locked", false);
+        }
+        
+        return result;
+    }
+    
+    // 인증 실패 처리
+    public void handleAuthFailure(String userId) {
+        FailureInfo info = failureMap.computeIfAbsent(userId, k -> new FailureInfo());
+        
+        // 5분 이내 실패가 아니면 카운트 리셋
+        if (info.lastFailTime != null && 
+            java.time.Duration.between(info.lastFailTime, LocalDateTime.now()).toMinutes() >= 5) {
+            info.reset();
+        }
+        
+        info.failCount++;
+        info.lastFailTime = LocalDateTime.now();
+        
+        // 5회 실패 시 10분 잠금
+        if (info.failCount >= 5) {
+            info.lockUntil = LocalDateTime.now().plusMinutes(10);
+            log.warn("사용자 {}의 인증이 10분간 잠금되었습니다. ({}회 실패)", userId, info.failCount);
+        }
+        
+        log.info("사용자 {} 인증 실패 - 현재 {}회 실패", userId, info.failCount);
+    }
+    
+    // 인증 성공 처리
+    public void handleAuthSuccess(String userId) {
+        // 성공 시 실패 정보 완전 삭제
+        failureMap.remove(userId);
+        log.info("사용자 {} 인증 성공 - 실패 정보 초기화", userId);
+    }
 
     // 출퇴근 기록 생성 
     public int insertAttendance(AttDTO dto) {

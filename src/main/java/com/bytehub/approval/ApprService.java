@@ -99,6 +99,9 @@ public class ApprService {
 
     int result = dao.updateStatus(param);
 
+
+
+
     // 결재가 승인될 때만 연차 차감
     String status = (String) param.get("status");
     if ("승인완료".equals(status)) {
