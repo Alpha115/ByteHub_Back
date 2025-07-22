@@ -260,6 +260,10 @@ public class AttController {
         }
         return result;
     }
+    
+    // 한달간 출근/퇴근/지각/조퇴 내역 조회 기능
+    
+  
 
     // 전체 직원 근태 조회
     @GetMapping("/attendance/list/all")
@@ -418,10 +422,7 @@ public class AttController {
 
     
 
-    // 팀 근태 확인 기능 (연차만) 이거는 권한되고 나서??
 
-    // 시간 되면 인증번호 시도 제한 및 잠금 기능;
-    
    
 
 }
