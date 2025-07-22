@@ -105,6 +105,16 @@ public class CloudService {
         }
     }
     
+    // 파일별 다운로드 횟수 조회
+    public List<Map<String, Object>> getFileDownCount() {
+        try {
+            return dao.getFileDownCount();
+        } catch (Exception e) {
+            log.info("파일별 다운로드 횟수 조회 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("파일별 다운로드 횟수 조회 실패: " + e.getMessage());
+        }
+    }
+    
     public LinkDTO saveLink(LinkDTO linkDTO) {
         try {
             // DB에 링크 정보 저장
