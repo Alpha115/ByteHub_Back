@@ -38,6 +38,20 @@
 	    WHERE a.user_id = #{user_id}
 	    ORDER BY a.att_date DESC, a.in_time DESC
 	</select>
+	
+	<!-- 월별 출근/퇴근/지각/조퇴 내역 조회 기능 -->
+	
+	<select id="monthlyList" resultType="com.bytehub.attendance.AttDTO">
+	    SELECT 
+	        a.att_idx, a.user_id, a.att_date, a.in_time, a.out_time, a.att_type,
+	        m.name, d.dept_name
+	    FROM attendance a
+	    JOIN member m ON a.user_id = m.user_id
+	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
+	    WHERE a.user_id = #{user_id}
+	      AND DATE_FORMAT(a.att_date, '%Y-%m') = #{yearMonth}
+	    ORDER BY a.att_date DESC, a.in_time DESC
+	</select>
     
     <!-- 전체 직원 근태 조회 -->
     <select id="attListAll" resultType="com.bytehub.attendance.AttDTO">
@@ -108,5 +122,17 @@
 		ORDER BY m.name
 	</select>
 	
+    <!-- 최근 30일 출근/퇴근/지각/조퇴 내역 조회 기능 -->
+    <select id="recent30days" resultType="com.bytehub.attendance.AttDTO">
+        SELECT 
+            a.att_idx, a.user_id, a.att_date, a.in_time, a.out_time, a.att_type,
+            m.name, d.dept_name
+        FROM attendance a
+        JOIN member m ON a.user_id = m.user_id
+        LEFT JOIN department d ON m.dept_idx = d.dept_idx
+        WHERE a.user_id = #{user_id}
+          AND a.att_date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
+        ORDER BY a.att_date DESC, a.in_time DESC
+    </select>
 	
 </mapper>

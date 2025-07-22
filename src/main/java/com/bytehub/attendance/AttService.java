@@ -103,6 +103,11 @@ public class AttService {
     public List<AttDTO> attList(String user_id) {
         return dao.attList(user_id);
     }
+    
+    // 월별 출근/퇴근/지각/조퇴 내역 조회 기능
+    public List<AttDTO> monthlyList(String user_id, String yearMonth) {
+		return dao.monthlyList(user_id, yearMonth);
+	}
 
     // 전체 직원 근태 조회 기능
     public List<AttDTO> attListAll() {
@@ -138,6 +143,11 @@ public class AttService {
 	public List<Map<String, Object>> attStatAll() {
 		return dao.attStatAll();
 	}
+
+    // 최근 30일 출근/퇴근/지각/조퇴 내역 조회 기능
+    public List<AttDTO> recent30days(String user_id) {
+        return dao.recent30days(user_id);
+    }
 	
 	
 }

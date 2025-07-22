@@ -18,6 +18,9 @@ public interface AttDAO {
     // 출퇴근 기록 수정
     int attUpdate(AttDTO dto);
     
+    // 월별 출근/퇴근/지각/조퇴 내역 조회 기능
+ 	List<AttDTO> monthlyList(@Param("user_id") String user_id, @Param("yearMonth") String yearMonth);
+    
     // 출근/퇴근/지각/조퇴 내역 조회 기능
     List<AttDTO> attList(String user_id);
     
@@ -41,6 +44,9 @@ public interface AttDAO {
 
 	// 전체 직원 근태 통계
 	List<Map<String, Object>> attStatAll();
+
+    // 최근 30일 출근/퇴근/지각/조퇴 내역 조회 기능
+    List<AttDTO> recent30days(String user_id);
 	
 	
 }

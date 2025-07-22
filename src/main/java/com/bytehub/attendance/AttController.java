@@ -261,8 +261,21 @@ public class AttController {
         return result;
     }
     
-    // 한달간 출근/퇴근/지각/조퇴 내역 조회 기능
-    
+    // 월별 출근/퇴근/지각/조퇴 내역 조회 기능
+    @GetMapping("/attendance/monthlyList")
+    public Map<String, Object> monthlyList(@RequestParam String user_id, @RequestParam String yearMonth) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<AttDTO> list = svc.monthlyList(user_id, yearMonth);
+            result.put("success", true);
+            result.put("data", list);
+        } catch (Exception e) {
+            log.error("월별 출퇴근 기록 조회 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
   
 
     // 전체 직원 근태 조회
@@ -418,6 +431,22 @@ public class AttController {
         }
         return result;
         
+    }
+
+    // 최근 30일 출근/퇴근/지각/조퇴 내역 조회 기능
+    @GetMapping("/attendance/recent30days")
+    public Map<String, Object> recent30days(@RequestParam String user_id) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<AttDTO> list = svc.recent30days(user_id);
+            result.put("success", true);
+            result.put("data", list);
+        } catch (Exception e) {
+            log.error("최근 30일 출퇴근 기록 조회 실패: " + e.getMessage());
+            result.put("success", false);
+            result.put("msg", "조회 중 오류가 발생했습니다.");
+        }
+        return result;
     }
 
     
