@@ -243,7 +243,7 @@ public class AttController {
     }
     
 
-    // 출근/퇴근/지각/조퇴/결석 내역 조회 기능
+    // 출근/퇴근/지각/조퇴 내역 조회 기능
     @GetMapping("/attendance/list")
     public Map<String, Object> attList(@RequestParam String user_id) {
         Map<String, Object> result = new HashMap<>();
@@ -416,108 +416,7 @@ public class AttController {
         
     }
 
-    // 결석 자동 처리 API (관리자용)
-    @PostMapping("/attendance/process-absence")
-    public Map<String, Object> processAbsence(
-            @RequestBody Map<String, Object> request,
-            @RequestHeader Map<String, String> header) {
-        
-        Map<String, Object> result = new HashMap<>();
-        
-        try {
-            // JWT 토큰 검증
-            String token = header.get("authorization");
-            Map<String, Object> tokenData = JwtUtils.readToken(token);
-            String loginId = (String) tokenData.get("id");
-            
-            if (loginId == null) {
-                result.put("success", false);
-                result.put("msg", "인증 실패");
-                return result;
-            }
-            
-            // 관리자 권한 체크 (필요시 추가)
-            
-            String targetDateStr = (String) request.get("targetDate");
-            if (targetDateStr != null) {
-                // 특정 날짜 처리
-                LocalDate targetDate = LocalDate.parse(targetDateStr);
-                int processedCount = svc.processAbsence(targetDate);
-                result.put("success", true);
-                result.put("msg", processedCount + "명의 직원을 결석 처리했습니다.");
-                result.put("processedCount", processedCount);
-            } else {
-                // 전날 자동 처리
-                int processedCount = svc.processYesterdayAbsence();
-                result.put("success", true);
-                result.put("msg", "전날 " + processedCount + "명의 직원을 결석 처리했습니다.");
-                result.put("processedCount", processedCount);
-            }
-            
-        } catch (Exception e) {
-            log.error("결석 처리 실패: " + e.getMessage());
-            result.put("success", false);
-            result.put("msg", "결석 처리 중 오류가 발생했습니다.");
-        }
-        
-        return result;
-    }
-
-    // 개별 결석 처리 API (관리자용)
-    @PostMapping("/attendance/process-single-absence")
-    public Map<String, Object> processSingleAbsence(
-            @RequestBody Map<String, Object> request,
-            @RequestHeader Map<String, String> header) {
-        
-        Map<String, Object> result = new HashMap<>();
-        
-        try {
-            // JWT 토큰 검증
-            String token = header.get("authorization");
-            Map<String, Object> tokenData = JwtUtils.readToken(token);
-            String loginId = (String) tokenData.get("id");
-            
-            if (loginId == null) {
-                result.put("success", false);
-                result.put("msg", "인증 실패");
-                return result;
-            }
-            
-            // 요청 파라미터 검증
-            String targetUserId = (String) request.get("userId");
-            String targetDateStr = (String) request.get("targetDate");
-            
-            if (targetUserId == null || targetUserId.trim().isEmpty()) {
-                result.put("success", false);
-                result.put("msg", "사용자 ID가 필요합니다.");
-                return result;
-            }
-            
-            if (targetDateStr == null || targetDateStr.trim().isEmpty()) {
-                result.put("success", false);
-                result.put("msg", "날짜가 필요합니다.");
-                return result;
-            }
-            
-            LocalDate targetDate = LocalDate.parse(targetDateStr);
-            boolean success = svc.processSingleAbsence(targetUserId, targetDate);
-            
-            if (success) {
-                result.put("success", true);
-                result.put("msg", targetUserId + "님의 " + targetDate + "를 결석 처리했습니다.");
-            } else {
-                result.put("success", false);
-                result.put("msg", "이미 해당 날짜에 출근 기록이 존재하거나 처리에 실패했습니다.");
-            }
-            
-        } catch (Exception e) {
-            log.error("개별 결석 처리 실패: " + e.getMessage());
-            result.put("success", false);
-            result.put("msg", "개별 결석 처리 중 오류가 발생했습니다.");
-        }
-        
-        return result;
-    }
+    
 
     // 팀 근태 확인 기능 (연차만) 이거는 권한되고 나서??
 

@@ -42,17 +42,5 @@ public interface AttDAO {
 	// 전체 직원 근태 통계
 	List<Map<String, Object>> attStatAll();
 	
-	// 결석 자동 처리를 위한 메서드들
-	// 특정 날짜에 출근 기록이 없는 재직 중인 직원들 조회
-	List<String> getAbsentEmployees(@Param("targetDate") LocalDate targetDate);
 	
-	// 결석 기록 일괄 생성
-	int insertAbsenceRecords(@Param("targetDate") LocalDate targetDate, @Param("userIds") List<String> userIds);
-	
-	// 개별 결석 처리를 위한 메서드들
-	// 특정 사용자의 특정 날짜 출근 기록 존재 여부 확인
-	int checkAttendanceExists(@Param("userId") String userId, @Param("targetDate") LocalDate targetDate);
-	
-	// 개별 결석 기록 생성
-	int insertSingleAbsenceRecord(@Param("userId") String userId, @Param("targetDate") LocalDate targetDate);
 }
