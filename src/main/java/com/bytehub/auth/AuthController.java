@@ -55,9 +55,9 @@ public class AuthController {
 		Map<String, Object> payload = JwtUtils.readToken(token);
 		String loginId = (String) payload.get("id");
 		
-		if (!loginId.equals("") && loginId.equals(user_id)) {
+//		if (!loginId.equals("") && loginId.equals(user_id)) {
 			resp.put("my_auth", service.grantId(user_id));
-		}
+//		}
 		return resp;
 	}
 
