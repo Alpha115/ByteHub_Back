@@ -441,5 +441,27 @@ public class CloudController {
     	
     	return response;
     }
+    
+    /**
+     * 파일별 다운로드 횟수 조회 API
+     */
+    @GetMapping("/cloud/download/count")
+    public ResponseEntity<Map<String, Object>> getFileDownCount() {
+        Map<String, Object> resp = new HashMap<>();
+        
+        try {
+            List<Map<String, Object>> counts = service.getFileDownCount();
+            resp.put("success", true);
+            resp.put("data", counts);
+            resp.put("message", "파일별 다운로드 횟수 조회 성공");
+            return ResponseEntity.ok(resp);
+            
+        } catch (Exception e) {
+            log.error("파일별 다운로드 횟수 조회 실패: {}", e.getMessage(), e);
+            resp.put("success", false);
+            resp.put("message", "파일별 다운로드 횟수 조회 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(resp);
+        }
+    }
 }
 

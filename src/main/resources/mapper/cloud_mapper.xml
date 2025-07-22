@@ -128,4 +128,28 @@
     <select id="linkList" parameterType="com.bytehub.cloud.LinkDTO">
     	select * from link
     </select>
+    
+    <!-- 파일별 다운로드 횟수 조회 -->
+    <select id="getFileDownCount" resultType="map">
+        SELECT 
+            c.file_idx,
+            c.filename,
+            c.dept_idx,
+            d.dept_name,
+            COUNT(dl.file_idx) as download_count,
+            CASE 
+                WHEN COUNT(dl.file_idx) >= 0 THEN GROUP_CONCAT(DISTINCT dl.user_id)
+                ELSE NULL
+            END as user_ids,
+            CASE 
+                WHEN COUNT(dl.file_idx) >= 0 THEN GROUP_CONCAT(DISTINCT DATE_FORMAT(dl.down_time, '%Y-%m-%d %H:%i:%s'))
+                ELSE NULL
+            END as download_times
+        FROM cloud c
+        LEFT JOIN download_log dl ON c.file_idx = dl.file_idx
+        LEFT JOIN department d ON c.dept_idx = d.dept_idx
+        GROUP BY c.file_idx, c.filename, c.dept_idx, d.dept_name
+        HAVING COUNT(dl.file_idx) > 0
+        ORDER BY download_count DESC
+    </select>
 </mapper>

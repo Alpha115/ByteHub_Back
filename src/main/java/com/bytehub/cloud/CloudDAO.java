@@ -45,4 +45,7 @@ public interface CloudDAO {
 	ArrayList<CloudDTO> ColudList();
 
 	ArrayList<LinkDTO> linkList();
+	
+	// 파일별 다운로드 횟수 조회
+	List<Map<String, Object>> getFileDownCount();
 }
