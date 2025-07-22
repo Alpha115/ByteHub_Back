@@ -28,4 +28,8 @@
     	select * from auth where user_id=#{param1}
     </select>
     
+    <select id="paeneol" resultType="int">
+    	select count(*) from auth where user_id = #{param1} and access_type = 'paeneol'
+    </select>
+    
 </mapper>

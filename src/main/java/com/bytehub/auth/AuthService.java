@@ -43,4 +43,10 @@ public class AuthService {
 		return dao.grantId(user_id);
 	}
 
+
+	public boolean paeneol(String user_id) {
+		int row = dao.paeneol(user_id);
+		return row > 0;
+	}
+
 }

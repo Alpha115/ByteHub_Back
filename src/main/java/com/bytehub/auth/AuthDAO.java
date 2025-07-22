@@ -16,4 +16,6 @@ public interface AuthDAO {
 
 	String searchAuth(Map<String, Object> map);
 
+	int paeneol(String user_id);
+
 }
