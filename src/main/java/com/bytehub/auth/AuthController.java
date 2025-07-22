@@ -56,7 +56,7 @@ public class AuthController {
 		String loginId = (String) payload.get("id");
 		
 		if (!loginId.equals("") && loginId.equals(user_id)) {
-			resp.put("admin", service.paeneol(user_id));
+			resp.put("my_auth", service.grantId(user_id));
 		}
 		return resp;
 	}
