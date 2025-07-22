@@ -179,6 +179,7 @@ public class BoardService {
 			for (String attendee : attendees) {
 				if (attendee != null && !attendee.trim().isEmpty()) {
 					int result = dao.insertAttendee(attendee.trim(), "MEETING", post_idx);
+					dao.grantAttendee(attendee, "board", post_idx);
 					if (result <= 0) {
 						log.error("참석자 저장 실패: {}", attendee);
 						return false;
@@ -202,6 +203,7 @@ public class BoardService {
 	public boolean deleteAttendeesByPostIdx(int post_idx) {
 		try {
 			int result = dao.deleteAttendeesByPostIdx(post_idx);
+			dao.deleteAttendeesAuth(post_idx);
 			log.info("참석자 삭제 완료 - post_idx: {}, 삭제된 행 수: {}", post_idx, result);
 			return true; // 삭제할 참석자가 없어도 성공으로 처리
 		} catch (Exception e) {

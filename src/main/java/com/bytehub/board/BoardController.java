@@ -206,11 +206,11 @@ public class BoardController {
 	    // JWT 토큰에서 로그인 ID 추출 (try-catch로 JWT 오류 처리)
 	    try {
 	    	String token = header.get("authorization");
-	    	log.info("수정 API - 받은 토큰: {}", token);
+//	    	log.info("수정 API - 받은 토큰: {}", token);
 	    	Map<String, Object> tokenData = JwtUtils.readToken(token);
-	    	log.info("수정 API - 토큰 파싱 결과: {}", tokenData);
+//	    	log.info("수정 API - 토큰 파싱 결과: {}", tokenData);
 	    	loginId = (String) tokenData.get("id");
-	    	log.info("수정 API - 추출된 loginId: {}", loginId);
+//	    	log.info("수정 API - 추출된 loginId: {}", loginId);
 	    } catch (Exception e) {
 	    	log.warn("JWT 토큰 파싱 실패: " + e.getMessage());
 	    	// JWT 토큰 파싱 실패 시 프론트엔드에서 전송한 사용자 ID 사용

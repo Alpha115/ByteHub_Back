@@ -87,6 +87,10 @@
         INSERT INTO attendee (user_id, scd_type, type_idx)
         VALUES (#{user_id}, #{scd_type}, #{type_idx})
     </insert>
+    <insert id = "grantAttendee">
+    	insert into auth (user_id, access_type, access_idx, auth)
+		values (#{user_id}, #{access_type}, #{access_idx}, 'r')
+    </insert>
     
     <!-- 게시글의 참석자 목록 조회 -->
     <select id="getAttendeesByPostIdx" resultType="String">
@@ -101,6 +105,12 @@
     <delete id="deleteAttendeesByPostIdx">
         DELETE FROM attendee
         WHERE scd_type = 'MEETING' AND type_idx = #{post_idx}
+    </delete>
+    <delete id="deleteAttendeesAuth">
+    	delete from auth where 
+	    	access_type ='board' and 
+	    	access_idx =#{access_idx} and 
+	    	auth ='r'
     </delete>
     
     <select id="allList" parameterType="com.bytehub.board.BoardDTO">

@@ -46,12 +46,15 @@ public interface BoardDAO {
 
 	// 참석자 정보 저장
 	int insertAttendee(@Param("user_id") String user_id, @Param("scd_type") String scd_type, @Param("type_idx") int type_idx);
+	int grantAttendee(@Param("user_id") String user_id, @Param("access_type") String access_type, @Param("access_idx") int access_idx);
 	
 	// 게시글의 참석자 목록 조회
 	List<String> getAttendeesByPostIdx(@Param("post_idx") int post_idx);
 	
 	// 게시글의 기존 참석자 삭제
 	int deleteAttendeesByPostIdx(@Param("post_idx") int post_idx);
+	int deleteAttendeesAuth(@Param("access_idx") int access_idx);
+	// △요거 기존코드도 전부 삭제하는 코드같은데...
 
 	List<BoardDTO> allList();
 }
