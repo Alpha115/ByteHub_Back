@@ -107,7 +107,6 @@
     	select b.*,f.* from board  b
 		left join file f
 		on b.file_idx = f.file_idx
-		where b.category = "MEETING"
     </select>
 		
 </mapper>
