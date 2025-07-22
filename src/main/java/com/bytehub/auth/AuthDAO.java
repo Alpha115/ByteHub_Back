@@ -14,4 +14,6 @@ public interface AuthDAO {
 
 	ArrayList<AuthDTO> grantId(String user_id);
 
+	String searchAuth(Map<String, Object> map);
+
 }

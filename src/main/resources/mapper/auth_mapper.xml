@@ -9,6 +9,14 @@
 		values (#{user_id}, #{access_type}, #{access_idx}, #{auth})
     </insert>
     
+    <select id="searchAuth" parameterType="map">
+    	select count(user_id) from auth where 
+		user_id=#{user_id} and 
+		access_type = #{access_type} and 
+		access_idx = #{access_idx} and 
+		auth = #{auth}
+    </select>
+    
     <delete id="delAuth" parameterType="map">
     	delete from auth where 
     	user_id = #{user_id}

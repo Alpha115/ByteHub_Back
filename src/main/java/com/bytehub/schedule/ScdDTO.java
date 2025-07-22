@@ -11,7 +11,6 @@ public class ScdDTO {
 	private String scd_type;
 	private int type_idx;
 	private String subject;
-	// db에는 datetime 형태로 저장되어 있네…
 	private Date start_date;
 	private Date end_date;
 	

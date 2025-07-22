@@ -19,18 +19,23 @@ public class AuthService {
 	@Transactional
 	public boolean grant(ArrayList<Map<String, Object>> info) {
 		int row = 0;
-		// 여기에서 update 하기
 		// 중복되는거 좀 없었으면 좋겠는디...
-		for (Map<String, Object> map : info) {
-			if((boolean) map.get("checked")) {
-				row+=dao.addAuth(map);
+		try {
+			for (Map<String, Object> map : info) {
+				if ((boolean) map.get("checked")) {
+					if (dao.searchAuth(map).equals("0")) { // 해당 권한이 존재하지 않을 경우
+						row += dao.addAuth(map);
+					}
+				}
+				else {
+					log.info("deleted.");
+					row+=dao.delAuth(map);
+				}
 			}
-			else {
-				log.info("deleted.");
-				row+=dao.delAuth(map);
-			}
+		} catch (Exception e) {
+			return false;
 		}
-		return row > 0;
+		return true;	
 	}
 	
 
