@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,14 +29,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bytehub.member.FileDTO;
 import com.bytehub.utils.JwtUtils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class ApprController {
 
-	@Autowired
 	private ApprService service;
 
 	/**

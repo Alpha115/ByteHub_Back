@@ -1,17 +1,17 @@
 package com.bytehub.member;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service    
+@RequiredArgsConstructor
 public class MypageService {
 
-    @Autowired
-    private MemberDAO dao;
+    private final MemberDAO dao;
     
     // BCryptPasswordEncoder 직접 생성
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

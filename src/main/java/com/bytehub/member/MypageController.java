@@ -3,7 +3,6 @@ package com.bytehub.member;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytehub.utils.JwtUtils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/mypage")
+@RequiredArgsConstructor
 public class MypageController {
 
-    @Autowired
-    private MypageService service;
+    private final MypageService service;
 
     // 내 정보 조회 (토큰에서 userId 추출)
     @GetMapping("/info")

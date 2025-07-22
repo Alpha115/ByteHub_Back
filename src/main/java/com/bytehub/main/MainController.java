@@ -6,20 +6,21 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bytehub.member.MemberService;
 
 @Slf4j
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 public class MainController {
 
 	// ▼ json 형식의 response
 	Map<String, Object> resp = null;
 
-	@Autowired MemberService service;
+	private final MemberService service;
 
 	@GetMapping("/")
 	public Map<String, Object> home() {

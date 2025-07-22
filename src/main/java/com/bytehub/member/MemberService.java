@@ -2,21 +2,21 @@ package com.bytehub.member;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 	
-	@Autowired MemberDAO dao;
+	private final MemberDAO dao;
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	public boolean login(Map<String, String> info) {

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -30,14 +29,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class CloudController {
 
-    @Autowired CloudService service;
+    private final CloudService service;
 
     // 파일 크기 제한 (100MB)
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;

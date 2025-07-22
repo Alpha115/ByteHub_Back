@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,14 +30,16 @@ import java.nio.file.Paths;
 import com.bytehub.member.FileDTO;
 import com.bytehub.utils.JwtUtils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class BoardController {
 
-    @Autowired BoardService svc;
+    private final BoardService svc;
     
     @Value("${spring.servlet.multipart.location:./uploads}")
     private String uploadPath;

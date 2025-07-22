@@ -1,6 +1,5 @@
 package com.bytehub.approval;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -12,18 +11,17 @@ import com.bytehub.member.MemberDTO;
 import com.bytehub.schedule.ScdService;
 import com.bytehub.schedule.ScdDTO;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ApprService {
 
-    @Autowired
     private ApprDAO dao;
 
-    @Autowired
     private MemberDAO memberDAO;
 
-    @Autowired
     private ScdService scdService;
 	
 

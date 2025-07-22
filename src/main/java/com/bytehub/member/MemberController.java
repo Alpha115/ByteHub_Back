@@ -1,7 +1,8 @@
 package com.bytehub.member;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -15,9 +16,10 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 @RestController
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class MemberController {
-    @Autowired
-    private MemberService service;
+  
+    private final MemberService service;
 
     Map<String, Object> result = null;
 

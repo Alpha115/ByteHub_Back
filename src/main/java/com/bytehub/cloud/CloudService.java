@@ -1,12 +1,10 @@
 package com.bytehub.cloud;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +12,10 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CloudService {
-    
-    @Autowired
-    private CloudDAO dao;
+
+    private final CloudDAO dao;
     
     public CloudDTO saveFile(CloudDTO cloudDTO) {
         try {
