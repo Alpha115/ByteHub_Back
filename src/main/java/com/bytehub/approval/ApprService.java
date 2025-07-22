@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApprService {
 
-    private ApprDAO dao;
+    private final ApprDAO dao;
 
-    private MemberDAO memberDAO;
+    private final MemberDAO memberDAO;
 
-    private ScdService scdService;
+    private final ScdService scdService;
 	
 
     public int createApprWithLineAndFiles(ApprDTO appr, List<FileDTO> fileList) {

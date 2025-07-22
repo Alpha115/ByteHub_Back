@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ApprController {
 
-	private ApprService service;
+	private final ApprService service;
 
 	/**
 	 * 결재 문서 생성 API
