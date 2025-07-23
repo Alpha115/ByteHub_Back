@@ -36,12 +36,12 @@ public class SecurityConfig implements WebMvcConfigurer {
 		
 		ArrayList<String> excludeURL=new ArrayList<String>();
 		// ★여기에다가 어떤 url에서 로그인 체크 제외할건지 설정하시면 됩니다~
-		excludeURL.add("/");
+		excludeURL.add("/**");
 		
 		ArrayList<String> addCheckURL=new ArrayList<String>();
 		// ★여기에다가 어떤 url을 체크할건지 설정하시면 됩니다
 		// USAGE: addCheckURL.add("/example");
-		addCheckURL.add("/*");
+//		addCheckURL.add("/*");
 		
 		registry.addInterceptor(checker).excludePathPatterns(excludeURL).addPathPatterns(addCheckURL);
 		
