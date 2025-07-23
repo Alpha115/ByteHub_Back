@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytehub.member.FileDTO;
+import com.bytehub.schedule.ScdDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +31,12 @@ public class ProjectService {
 	@Transactional
 	public boolean create(ProjectDataDTO data, MultipartFile[] files) {
 	    boolean result = dao.insertProject(data.getProj()) > 0;
+        ScdDTO scd = new ScdDTO();
 
 	    if (result) {
+	        
 	        int projectIdx = data.getProj().getProject_idx();
-
+	        
 	        // 1. 파일 저장 후 연결
 	        if (files != null && files.length > 0) {
 	            List<FileDTO> savedFiles = saveFiles(files); // 디스크 업로드 + DB 저장
@@ -48,6 +51,15 @@ public class ProjectService {
 	                dao.insertProjectEmp(projectIdx, userId);
 	            }
 	        }
+	        
+	    	// 3. 일정에 추가
+	        scd.setUser_id(data.getProj().getUser_id());
+	        scd.setScd_type("project");
+	        scd.setType_idx(projectIdx);
+	        scd.setSubject(data.getProj().getSubject());
+	        scd.setStart_date(data.getProj().getStart_date());
+	        scd.setEnd_date(data.getProj().getEnd_date());
+	        dao.insertScd(scd);
 	    }
 
 	    return result;
@@ -86,6 +98,7 @@ public class ProjectService {
 	@Transactional
 	public boolean edit(ProjectDataDTO data, MultipartFile[] files) {
 	    boolean result = dao.updateProject(data.getProj()) > 0;
+	    ScdDTO scd=new ScdDTO();
 
 	    if (result) {
 	        int projectIdx = data.getProj().getProject_idx();
@@ -112,6 +125,14 @@ public class ProjectService {
 	                dao.insertProjectFile(projectIdx, file.getFile_idx());
 	            }
 	        }
+	        
+	        //일정 변경
+	        scd.setUser_id(data.getProj().getUser_id());
+	        scd.setType_idx(projectIdx);
+	        scd.setSubject(data.getProj().getSubject());
+	        scd.setStart_date(data.getProj().getStart_date());
+	        scd.setEnd_date(data.getProj().getEnd_date());
+	        dao.updateScd(scd);
 	    }
 	    return result;
 	}
@@ -145,8 +166,12 @@ public class ProjectService {
 		return dao.empListByProject();
 	}
 
+	@Transactional
 	public boolean projectDelete(ProjectDTO dto) {
 		int row = dao.projectDelete(dto);
+		if(row > 0) {
+			dao.deleteScd(dto.getProject_idx());
+		}
 		return row > 0 ? true : false;
 	}
 

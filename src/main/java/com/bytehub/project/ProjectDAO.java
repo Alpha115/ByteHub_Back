@@ -7,12 +7,15 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.bytehub.member.FileDTO;
+import com.bytehub.schedule.ScdDTO;
 
 @Mapper
 public interface ProjectDAO {
 
 	  	int insertProject(ProjectDTO proj);
 	    int updateProject(ProjectDTO proj);
+	    int insertScd(ScdDTO scd);
+	    int updateScd(ScdDTO scd);
 
 	    ProjectDTO selectProjectById(int project_idx);
 	    List<ProjectDTO> selectAllProjects();
@@ -31,5 +34,6 @@ public interface ProjectDAO {
 		ArrayList<ProjectFileDTO> fileListByProject();
 		ArrayList<ProjectEmpDTO> empListByProject();
 		int projectDelete(ProjectDTO dto);
+		int deleteScd(int project_idx);
 	
 }

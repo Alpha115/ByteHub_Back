@@ -23,6 +23,21 @@
             dept_idx = #{dept_idx}
         WHERE project_idx = #{project_idx}
     </update>
+    
+    <insert id="insertScd" parameterType="com.bytehub.schedule.ScdDTO">
+    	insert into schedule (user_id, scd_type, type_idx, subject, start_time, end_time)
+			values (#{user_id}, 'project', #{type_idx}, #{subject}, #{start_time}, #{end_time})
+    </insert>
+    
+    <update id="updateScd" parameterType="com.bytehub.schedule.ScdDTO">
+    	UPDATE schedule
+			SET
+			    user_id = #{user_id},
+			    subject = #{subject},
+			    start_time = #{start_time},
+			    end_time = #{end_time}
+			WHERE type_idx = #{type_idx}
+    </update>
 
     <!-- 프로젝트-멤버 연결 -->
     <insert id="insertProjectEmp" parameterType="map">
@@ -121,6 +136,13 @@
 	  	SET status = true
 	  	WHERE project_idx = #{project_idx}
 	  </update>
+    
+    <delete id="deleteScd">
+    	DELETE FROM schedule
+		WHERE scd_type = 'project'
+ 		 AND type_idx = #{type_idx}
+    </delete>
+    
     
 
 </mapper>

@@ -39,8 +39,8 @@ public class ScdService {
 		return row > 0;
 	}
 
-	public int today(String subject) {
-		return dao.today(subject);
-	}
+//	public int today(String subject) {
+//		return dao.today(subject);
+//	}
 
 }
