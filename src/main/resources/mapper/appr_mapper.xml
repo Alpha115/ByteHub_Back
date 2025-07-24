@@ -453,15 +453,17 @@
     
     <select id="leaveTeam" resultType="map">
     	select
-		    appr_idx,
-		    writer_id,
+		    ap.appr_idx,
+		    ap.writer_id,
 		    (select name from member where user_id = ap.writer_id) as name,
-		    subject,
-		    vac_start,
-		    vac_end
+		    ap.subject,
+		    ap.vac_start,
+		    ap.vac_end
 		from approval ap
-		where writer_id in (select user_id from member where dept_idx = #{param1});
-    </select>
+		where ap.appr_idx in (select appr_idx from appr_history ah where status ='승인' 
+			and appr_his_idx = (select MAX(appr_his_idx) from appr_history where status = '승인'))
+			and ap.writer_id in (select user_id from member where dept_idx=#{param1})
+		    </select>
 
 	
 </mapper>
