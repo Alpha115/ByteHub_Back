@@ -109,7 +109,7 @@ public class ApprController {
 							// 파일 업로드 실패 시에도 계속 진행
 						}
 					} else {
-						log.warn("빈 파일 발견: {}", file.getOriginalFilename());
+						log.info("빈 파일 발견: {}", file.getOriginalFilename());
 					}
 				}
 			} else {
