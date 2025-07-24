@@ -43,8 +43,8 @@ public class CloudController {
     // 파일 크기 제한 (100MB)
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;
     
-    // 파일 저장 경로 (application.properties 설정 사용)
-    private static final String UPLOAD_DIR = "C:/upload/cloud";
+    // 파일 저장 경로 (크로스 플랫폼 지원)
+    private static final String UPLOAD_DIR = System.getProperty("user.home") + "/upload/cloud";
 
     /**
      * 파일 업로드 API
@@ -428,7 +428,7 @@ public class CloudController {
         }
     }
     
-    @PostMapping("/colud/allList")
+    @PostMapping("/cloud/allList")
     public Map<String, Object> ColudAllList(){
     	
     	Map<String, Object> response = new HashMap<>();

@@ -94,7 +94,7 @@
     
     <!-- 링크 삭제 -->
     <delete id="deleteLink" parameterType="int">
-        DELETE FROM link WHERE link_idx = #{link_ㅑㅑdx}
+        DELETE FROM link WHERE link_idx = #{link_idx}
     </delete>
     
     <!-- 링크 수정 -->
