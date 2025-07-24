@@ -15,11 +15,12 @@ public interface SchDAO {
 	// user_id는 변경불가
 	int update(ScdDTO info);
 
-	int delete(int type_idx, String scd_type);
-
-	// 같은제목이면 다삭제되니 주의
-	int deleteBySubject(String subject);
-
 	int today(String subject);
+
+//	ScdDTO detail(ScdDTO info);
+
+	int delete(ScdDTO info);
+
+	int delete(int idx);
 
 }

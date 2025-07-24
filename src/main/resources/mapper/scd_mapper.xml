@@ -15,18 +15,15 @@
     
     <update id="update" parameterType="com.bytehub.schedule.ScdDTO">
     	update schedule set
-    	subject =#{subject}
-    	start_date =#{start_date}
-    	end_date =#{end_date}
-    	where type_idx = #{type_idx} and scd_type =#{scd_type}
+	    	subject = #{subject},
+	    	start_date = #{start_date},
+	    	end_date = #{end_date}
+    	where scd_idx = #{scd_idx}
     </update>
     
     <delete id="delete">
-    	delete from schedule where type_idx=#{param1} and scd_type=#{param2}
-    </delete>
-    
-    <delete id="deleteBySubject">
-    	delete from schedule where subject=#{param1}
+    	delete from schedule 
+    	where scd_idx = #{param1}
     </delete>
     
     <select id="today" resultType="int">

@@ -38,6 +38,7 @@ public class ScdController {
 		resp.put("success", svc.insert(info));
 		return resp;
 	}
+	
 
 	// 일정을 수정합니다.
 	@PostMapping("/edit")
@@ -47,18 +48,11 @@ public class ScdController {
 		return resp;
 	}
 	
-	// 일정을 삭제합니다. (type가 있는 경우)
-	@GetMapping("/del/{scd_type}/{type_idx}")
-	public Map<String, Object> delete(@PathVariable String scd_type, @PathVariable int type_idx){
+	// 삭제
+	@GetMapping("/del/{idx}")
+	public Map<String, Object> deleteBySub(@PathVariable int idx){
 		resp = new HashMap<String, Object>();
-		resp.put("success", svc.delete(type_idx, scd_type));
-		return resp;
-	}
-	
-	@GetMapping("/del/{subject}")
-	public Map<String, Object> deleteBySub(@PathVariable String subject){
-		resp = new HashMap<String, Object>();
-		resp.put("success", svc.delete(subject));
+		resp.put("success", svc.delete(idx));
 		return resp;
 	}
 

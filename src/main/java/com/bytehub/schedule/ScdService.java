@@ -27,20 +27,10 @@ public class ScdService {
 		int row = dao.update(info);
 		return row > 0;
 	}
-
-	public boolean delete(int type_idx, String scd_type) {
-		int row = dao.delete(type_idx, scd_type);
-		return row > 0;
-	}
-
 	// 오버로드
-	public boolean delete(String subject) {
-		int row = dao.deleteBySubject(subject);
+	public boolean delete(int idx) {
+		int row = dao.delete(idx);
 		return row > 0;
 	}
-
-//	public int today(String subject) {
-//		return dao.today(subject);
-//	}
 
 }

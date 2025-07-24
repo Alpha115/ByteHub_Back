@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class ScdDTO {
 
+	private int scd_idx;
 	private String user_id;
 	private String scd_type;
 	private int type_idx;
