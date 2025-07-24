@@ -3,6 +3,7 @@ package com.bytehub.approval;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import com.bytehub.member.FileDTO;
@@ -293,5 +294,10 @@ public class ApprService {
 			dao.insertLeaveSetting(setting);
 		}
 	}
+
+	public ArrayList<Map<String, Object>> leaveTeam(int idx) {
+		return dao.leaveTeam(idx);
+	}
+	// {writer_id:"user01", appr_idx: 1, name:"lee", subject: "제목", vac start / end}
     
 }

@@ -450,6 +450,18 @@
               WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
           )
     </insert>
+    
+    <select id="leaveTeam" resultType="map">
+    	select
+		    appr_idx,
+		    writer_id,
+		    (select name from member where user_id = ap.writer_id) as name,
+		    subject,
+		    vac_start,
+		    vac_end
+		from approval ap
+		where writer_id in (select user_id from member where dept_idx = #{param1});
+    </select>
 
 	
 </mapper>

@@ -545,5 +545,11 @@ public class ApprController {
 
 	// 연차 승인 시 일정 기록 기능
 
+	@GetMapping("/leave/team/{idx}")
+	public Map<String, Object> leaveTeam(@PathVariable int idx) {
+		Map<String, Object> resp = new HashMap<String, Object>();
+		resp.put("list", service.leaveTeam(idx));
+		return resp;
+	}
 
 }

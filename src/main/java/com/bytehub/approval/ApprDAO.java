@@ -2,6 +2,8 @@ package com.bytehub.approval;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.bytehub.member.FileDTO;
@@ -78,5 +80,6 @@ public interface ApprDAO {
                                            @Param("setting") LeaveSettingDTO setting);
     void annualLeaveForSelectedWithSetting(@Param("selectedMembers") List<String> selectedMembers, 
                                           @Param("setting") LeaveSettingDTO setting);
+	ArrayList<Map<String, Object>> leaveTeam(int idx);
     
 }
