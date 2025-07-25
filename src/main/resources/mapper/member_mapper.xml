@@ -99,7 +99,7 @@
 	</select>
 	
 	<select id="depts" resultType="map">
-		select dept_name , dept_idx from department;
+		select dept_name , dept_idx from department where status = 1 
 	</select>
 	
 	<select id="users" resultType="map">
