@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.bytehub.member.FileDTO;
+import com.bytehub.notification.NotiService;
 import com.bytehub.utils.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardController {
 
     private final BoardService svc;
+    private final NotiService notiService;
     
     @Value("${spring.servlet.multipart.location:./uploads}")
     private String uploadPath;
@@ -182,6 +184,28 @@ public class BoardController {
     	
     	log.info("서비스 호출 전 - DTO: {}", dto);
     	success = svc.postWrite(dto, null);
+    	
+    	// 회의록 작성 성공 시 참석자들에게 알림 전송
+    	if(success && dto.getCategory() == BoardCategory.MEETING && dto.getAttendees() != null) {
+    		log.info("회의록 참석자 알림 전송 시작 - post_idx: {}, attendees: {}", dto.getPost_idx(), dto.getAttendees());
+    		for (String attendeeId : dto.getAttendees()) {
+    			if (attendeeId != null && !attendeeId.trim().isEmpty() && !attendeeId.equals(loginId)) {
+    				notiService.sendNotification(attendeeId.trim(), "MEETING_INVITE", 
+    					"회의록 초대", 
+    					loginId + "님이 회의록 '" + dto.getSubject() + "'에 초대했습니다.");
+    				log.info("참석자 알림 전송 완료: {} -> {}", attendeeId, dto.getSubject());
+    			}
+    		}
+    	}
+    	
+    	// 공지사항 작성 성공 시 모든 사용자에게 알림 전송
+    	if(success && dto.getCategory() == BoardCategory.NOTICE) {
+    		log.info("공지사항 알림 전송 시작 - post_idx: {}, subject: {}", dto.getPost_idx(), dto.getSubject());
+    		notiService.sendNotification("all", "BOARD_NOTICE", 
+    			"새 공지사항", 
+    			loginId + "님이 '" + dto.getSubject() + "' 공지사항을 등록했습니다.");
+    		log.info("공지사항 알림 전송 완료: {}", dto.getSubject());
+    	}
     	
         result.put("idx", dto.getPost_idx()); // 작성한 게시글 idx 가져오기
         result.put("success", success); // 성공 여부

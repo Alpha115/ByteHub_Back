@@ -12,6 +12,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.bytehub.member.MemberDAO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NotiService {
     
     private final SimpMessagingTemplate messagingTemplate;
+    private final MemberDAO memberDAO;
     
     // 메모리 기반 알림 저장소
     private final Map<String, List<NotiDTO>> userNotifications = new ConcurrentHashMap<>();
@@ -29,16 +32,37 @@ public class NotiService {
      * 특정 사용자에게 알림 전송
      */
     public void sendNotification(String user_id, String type, String title, String content) {
-        NotiDTO notification = new NotiDTO(user_id, type, title, content);
-        notification.setNotification_id(UUID.randomUUID().toString());
-        
-        // 메모리에 저장
-        userNotifications.computeIfAbsent(user_id, k -> new ArrayList<>()).add(notification);
-        
-        // WebSocket으로 실시간 전송
-        sendToUser(user_id, notification);
-        
-        log.info("알림 전송: {} -> {} (타입: {})", title, user_id, type);
+        if ("all".equals(user_id)) {
+            // 모든 사용자에게 알림 전송 (작성자 제외)
+            List<String> allUsers = getAllUserIds();
+            String writerId = extractWriterIdFromContent(content); // 내용에서 작성자 ID 추출
+            
+            for (String userId : allUsers) {
+                if (!userId.equals(writerId)) { // 작성자 제외
+                    NotiDTO notification = new NotiDTO(userId, type, title, content);
+                    notification.setNotification_id(UUID.randomUUID().toString());
+                    
+                    // 메모리에 저장
+                    userNotifications.computeIfAbsent(userId, k -> new ArrayList<>()).add(notification);
+                    
+                    // WebSocket으로 실시간 전송
+                    sendToUser(userId, notification);
+                }
+            }
+            log.info("전체 사용자 알림 전송 (작성자 제외): {} (타입: {})", title, type);
+        } else {
+            // 개별 사용자에게 알림 전송
+            NotiDTO notification = new NotiDTO(user_id, type, title, content);
+            notification.setNotification_id(UUID.randomUUID().toString());
+            
+            // 메모리에 저장
+            userNotifications.computeIfAbsent(user_id, k -> new ArrayList<>()).add(notification);
+            
+            // WebSocket으로 실시간 전송
+            sendToUser(user_id, notification);
+            
+            log.info("알림 전송: {} -> {} (타입: {})", title, user_id, type);
+        }
     }
     
     /**
@@ -141,5 +165,36 @@ public class NotiService {
             "채팅방 초대",
             inviterId + "님이 " + chatName + " 채팅방에 초대했습니다."
         );
+    }
+    
+    /**
+     * 모든 사용자 ID 목록 조회
+     */
+    private List<String> getAllUserIds() {
+        try {
+            ArrayList<Map<String, Object>> users = memberDAO.users();
+            return users.stream()
+                .map(user -> (String) user.get("user_id"))
+                .filter(userId -> userId != null && !userId.isEmpty())
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("사용자 목록 조회 실패: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * 알림 내용에서 작성자 ID 추출
+     * 예: "user123님이 '공지사항 제목' 공지사항을 등록했습니다." → "user123"
+     */
+    private String extractWriterIdFromContent(String content) {
+        try {
+            if (content != null && content.contains("님이")) {
+                return content.substring(0, content.indexOf("님이"));
+            }
+        } catch (Exception e) {
+            log.warn("작성자 ID 추출 실패: {}", e.getMessage());
+        }
+        return null;
     }
 } 

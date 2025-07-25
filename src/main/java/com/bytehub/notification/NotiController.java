@@ -361,4 +361,30 @@ public class NotiController {
         }
         return result;
     }
+
+    // 11. 회의록 작성 시 참석자들에게 알림 전송
+    @PostMapping("/board/meeting/invite")
+    public Map<String, Object> sendMeetingInvite(@RequestBody Map<String, Object> meeting) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String writerId = (String) meeting.get("writer_id");
+            String subject = (String) meeting.get("subject");
+            List<String> attendees = (List<String>) meeting.get("attendees");
+            
+            for (String attendeeId : attendees) {
+                if (!attendeeId.equals(writerId)) {
+                    notiService.sendNotification(attendeeId, "MEETING_INVITE", 
+                        "회의록 초대", 
+                        writerId + "님이 회의록 '" + subject + "'에 초대했습니다.");
+                }
+            }
+            
+            result.put("success", true);
+            result.put("message", "회의록 초대 알림이 전송되었습니다.");
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "회의록 초대 알림 전송 실패: " + e.getMessage());
+        }
+        return result;
+    }
 } 
