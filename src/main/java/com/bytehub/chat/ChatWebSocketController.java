@@ -1,11 +1,12 @@
 package com.bytehub.chat;
 
-import java.time.LocalDateTime;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+
+import com.bytehub.notification.NotiService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class ChatWebSocketController {
 
     private final ChatService chatService;
+    private final NotiService notiService;
 
     @MessageMapping("/chat/{chat_idx}")
     @SendTo("/topic/chat/{chat_idx}")
