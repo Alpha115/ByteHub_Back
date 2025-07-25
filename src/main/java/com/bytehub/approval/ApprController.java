@@ -48,7 +48,7 @@ public class ApprController {
 	 */
 	@PostMapping("/appr/create")
 	public Map<String, Object> createApproval(@RequestParam("writer_id") String writerId,
-			@RequestParam("subject") String subject, @RequestParam("content") String content,
+			@RequestParam String subject, @RequestParam String content,
 			@RequestParam("appr_type") String apprType,
 			@RequestParam(value = "vac_start", required = false) String vacStart,
 			@RequestParam(value = "vac_end", required = false) String vacEnd,
@@ -310,8 +310,10 @@ public class ApprController {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
+	
+	// -------------------------------------------------------- 연차 --------------------------------------------------------
 
-	// 연차/월차 자동 생성 API (전체 또는 선택 사원)
+	// 연차/월차 부여 API (전체 또는 선택 사원)
 	@PostMapping("/leave/generate")
 	public Map<String, Object> generateLeave(@RequestBody Map<String, Object> request,
 			@RequestHeader("Authorization") String token) {
@@ -332,12 +334,12 @@ public class ApprController {
 			List<String> selectedMembers = (List<String>) request.get("selectedMembers");
 			
 			if (selectedMembers == null || selectedMembers.isEmpty()) {
-				// 전체 사원 대상 연차 생성 (기존 방식)
+				// 전체 사원 대상 연차 생성
 				service.generateLeave();
 				result.put("success", true);
 				result.put("msg", "전체 사원 연차/월차 생성 완료");
 			} else {
-				// 선택된 사원들만 대상 연차 생성 (새로운 방식)
+				// 선택된 사원들만 대상 연차 생성
 				service.generateLeaveForSelected(selectedMembers);
 				result.put("success", true);
 				result.put("msg", selectedMembers.size() + "명의 사원 연차/월차 생성 완료");

@@ -216,7 +216,9 @@ public class ApprService {
         return dao.getFileById(file_idx);
     }
     
-    // 연/월차 생성 (설정 기반)
+    // -------------------------------------------------------- 연차 --------------------------------------------------------
+    
+    // 연/월차 부여 (설정 기반)
 	public void generateLeave() {
 		// 현재 연차 정책 조회
 		LeaveSettingDTO setting = getCurrentLeaveSetting();
@@ -298,6 +300,5 @@ public class ApprService {
 	public ArrayList<Map<String, Object>> leaveTeam(int idx) {
 		return dao.leaveTeam(idx);
 	}
-	// {writer_id:"user01", appr_idx: 1, name:"lee", subject: "제목", vac start / end}
     
 }
