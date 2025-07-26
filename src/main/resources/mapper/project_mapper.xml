@@ -25,8 +25,8 @@
     </update>
     
     <insert id="insertScd" parameterType="com.bytehub.schedule.ScdDTO">
-    	insert into schedule (user_id, scd_type, type_idx, subject, start_time, end_time)
-			values (#{user_id}, 'project', #{type_idx}, #{subject}, #{start_time}, #{end_time})
+    	insert into schedule (user_id, scd_type, type_idx, subject, start_date, end_date)
+			values (#{user_id}, 'project', #{type_idx}, #{subject}, #{start_date}, #{end_date})
     </insert>
     
     <update id="updateScd" parameterType="com.bytehub.schedule.ScdDTO">
@@ -34,8 +34,8 @@
 			SET
 			    user_id = #{user_id},
 			    subject = #{subject},
-			    start_time = #{start_time},
-			    end_time = #{end_time}
+			    start_date = #{start_date},
+			    end_date = #{end_date}
 			WHERE type_idx = #{type_idx}
     </update>
 
