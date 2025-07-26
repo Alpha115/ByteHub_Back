@@ -49,7 +49,7 @@ public class CloudController {
     /**
      * 파일 업로드 API
      * - multipart/form-data 형식으로 파일을 업로드 받음
-     * - 파일 크기 제한: 10MB
+     * - 파일 크기 제한: 100MB
      * - 업로드 시 user_id, dept_idx, 파일명, 시간 정보 저장
      */
     @PostMapping("/cloud/upload")
@@ -180,12 +180,14 @@ public class CloudController {
      * 파일 삭제 API
      */
     @DeleteMapping("/cloud/delete/{file_idx}")
-    public ResponseEntity<Map<String, Object>> deleteFile(@PathVariable int file_idx) {
+    public ResponseEntity<Map<String, Object>> deleteFile(
+            @PathVariable int file_idx,
+            @RequestParam("user_id") String user_id) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // DB에서 파일 정보 삭제
-            boolean deleted = service.deleteFile(file_idx);
+            // DB에서 파일 정보 삭제 (삭제 로그 포함)
+            boolean deleted = service.deleteFile(file_idx, user_id);
             
             if (deleted) {
                 response.put("success", true);

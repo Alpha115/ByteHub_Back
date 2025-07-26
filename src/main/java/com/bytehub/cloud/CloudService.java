@@ -56,13 +56,20 @@ public class CloudService {
         }
     }
     
-    public boolean deleteFile(int fileIdx) {
+    public boolean deleteFile(int fileIdx, String user_id) {
         try {
+            // 삭제 전 파일 정보 조회 (로그용)
+            Map<String, Object> fileInfo = dao.getFileInfo(fileIdx);
+            
             // DB에서 파일 정보 삭제
             int result = dao.deleteCloudFile(fileIdx);
             
             if (result > 0) {
                 log.info("파일 삭제 성공: file_idx = {}", fileIdx);
+                
+                // 삭제 로그 저장
+                saveDeleteLog(fileIdx, user_id, fileInfo);
+                
                 return true;
             } else {
                 log.info("파일 삭제 실패: file_idx = {}", fileIdx);
@@ -93,6 +100,36 @@ public class CloudService {
         } catch (Exception e) {
             log.info("다운로드 로그 저장 실패: {}", e.getMessage(), e);
             // 로그 저장 실패는 다운로드 자체를 막지 않도록 예외를 던지지 않음
+        }
+    }
+    
+    public void saveDeleteLog(int fileIdx, String user_id, Map<String, Object> fileInfo) {
+        try {
+            // 삭제 로그 DTO 생성 (DownLogDTO를 재사용하거나 별도 DTO 생성)
+            DownLogDTO deleteLogDTO = new DownLogDTO();
+            deleteLogDTO.setFile_idx(fileIdx);
+            deleteLogDTO.setUser_id(user_id);
+            deleteLogDTO.setDown_time(new Timestamp(System.currentTimeMillis())); // 삭제 시간으로 사용
+            
+            // 파일 정보 추가 (파일명 등)
+            if (fileInfo != null) {
+                String filename = (String) fileInfo.get("filename");
+                log.info("파일 삭제 로그 저장: file_idx = {}, filename = {}, user_id = {}", 
+                    fileIdx, filename, user_id);
+            }
+            
+            // 삭제 로그 저장 (다운로드 로그와 동일한 테이블 사용)
+            int result = dao.insertDownLog(deleteLogDTO);
+            
+            if (result > 0) {
+                log.info("삭제 로그 저장 성공: file_idx = {}, user_id = {}", fileIdx, user_id);
+            } else {
+                log.info("삭제 로그 저장 실패: file_idx = {}, user_id = {}", fileIdx, user_id);
+            }
+            
+        } catch (Exception e) {
+            log.info("삭제 로그 저장 실패: {}", e.getMessage(), e);
+            // 로그 저장 실패는 삭제 자체를 막지 않도록 예외를 던지지 않음
         }
     }
     
