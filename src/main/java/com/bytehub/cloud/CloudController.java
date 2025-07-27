@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bytehub.notification.NotiService;
+import com.bytehub.member.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CloudController {
 
     private final CloudService service;
+    private final NotiService notiService;
 
     // 파일 크기 제한 (100MB)
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;
@@ -109,6 +112,23 @@ public class CloudController {
             
             // 서비스에 파일 저장 요청
             CloudDTO savedFile = service.saveFile(cloudDTO);
+
+            // 파일 업로드 성공 시 같은 부서 멤버들에게 실시간 알림 전송
+            try {
+                // 사용자 정보 조회하여 부서명 가져오기
+                MemberDTO userInfo = service.getUserDeptInfo(user_id);
+                String deptName = userInfo != null && userInfo.getDept_name() != null ? 
+                    userInfo.getDept_name() : "팀";
+                
+                notiService.sendFileUploadNotification(
+                    user_id,
+                    oriFilename, // 원본 파일명 사용
+                    deptName,
+                    deptIdx
+                );
+            } catch (Exception e) {
+                log.error("파일 업로드 알림 전송 실패: {}", e.getMessage());
+            }
 
             response.put("success", true);
             response.put("data", savedFile);
@@ -308,6 +328,24 @@ public class CloudController {
             
             // 서비스에 링크 저장 요청
             LinkDTO savedLink = service.saveLink(linkDTO);
+
+            // 링크 저장 성공 시 같은 부서 멤버들에게 실시간 알림 전송
+            try {
+                // 사용자 정보 조회하여 부서 정보 가져오기
+                MemberDTO userInfo = service.getUserDeptInfo(user_id);
+                String deptName = userInfo != null && userInfo.getDept_name() != null ? 
+                    userInfo.getDept_name() : "팀";
+                int userDeptIdx = userInfo != null ? userInfo.getDept_idx() : 1;
+                
+                notiService.sendLinkSaveNotification(
+                    user_id,
+                    linkName,
+                    deptName,
+                    userDeptIdx
+                );
+            } catch (Exception e) {
+                log.error("링크 저장 알림 전송 실패: {}", e.getMessage());
+            }
 
             response.put("success", true);
             response.put("data", savedLink);

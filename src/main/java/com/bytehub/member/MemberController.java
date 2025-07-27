@@ -2,6 +2,7 @@ package com.bytehub.member;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.bytehub.notification.NotiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpSession;
 public class MemberController {
   
     private final MemberService service;
+    private final NotiService notiService;
 
     Map<String, Object> result = null;
 
@@ -114,7 +116,18 @@ public class MemberController {
     public Map<String, Object> memberUpdate(@RequestBody MemberDTO dto){
         Map<String, Object> result = new HashMap<>();
         boolean suc = service.memberUpdate(dto);
-        result.put("suc",suc);
+        
+        if (suc) {
+            result.put("success", true);
+            result.put("message", "멤버 정보가 성공적으로 업데이트되었습니다.");
+            log.info("멤버 정보 업데이트 성공: {}", dto.getUser_id());
+        } else {
+            result.put("success", false);
+            result.put("message", "멤버 정보 업데이트에 실패했습니다.");
+            log.info("멤버 정보 업데이트 실패: {}", dto.getUser_id());
+        }
+        
+        result.put("suc", suc);
         return result;
     }
     

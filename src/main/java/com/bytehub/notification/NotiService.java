@@ -168,6 +168,128 @@ public class NotiService {
     }
     
     /**
+     * 결재 문서 생성 알림 전송 (결재자들에게)
+     */
+    public void sendApprovalRequestNotification(String checkerId, String writerName, String subject, String apprType) {
+        sendNotification(
+            checkerId,
+            "APPROVAL_REQUEST",
+            "결재 요청",
+            writerName + "님이 " + apprType + " 결재를 요청했습니다: " + subject
+        );
+    }
+    
+    /**
+     * 결재 상태 변경 알림 전송 (기안자에게)
+     */
+    public void sendApprovalStatusNotification(String writerId, String checkerName, String subject, String status) {
+        String statusText = "";
+        switch (status) {
+            case "승인":
+                statusText = "승인";
+                break;
+            case "반려":
+                statusText = "반려";
+                break;
+            case "승인완료":
+                statusText = "최종 승인 완료";
+                break;
+            default:
+                statusText = status;
+        }
+        
+        sendNotification(
+            writerId,
+            "APPROVAL_STATUS",
+            "결재 상태 변경",
+            checkerName + "님이 " + subject + " 결재를 " + statusText + "했습니다."
+        );
+    }
+    
+    /**
+     * 파일 업로드 알림 전송 (같은 부서 멤버들에게)
+     */
+    public void sendFileUploadNotification(String userId, String fileName, String deptName, int deptIdx) {
+        // 같은 부서의 모든 사용자에게 알림 전송
+        List<String> deptMembers = getDeptMemberIds(deptIdx);
+        for (String memberId : deptMembers) {
+            if (!memberId.equals(userId)) { // 업로드한 사용자 제외
+                sendNotification(
+                    memberId,
+                    "FILE_UPLOAD",
+                    "새 파일 업로드",
+                    userId + "님이 " + deptName + " 팀 파일함에 " + fileName + " 파일을 업로드했습니다."
+                );
+            }
+        }
+    }
+    
+    /**
+     * 링크 저장 알림 전송 (같은 부서 멤버들에게)
+     */
+    public void sendLinkSaveNotification(String userId, String linkName, String deptName, int deptIdx) {
+        // 같은 부서의 모든 사용자에게 알림 전송
+        List<String> deptMembers = getDeptMemberIds(deptIdx);
+        for (String memberId : deptMembers) {
+            if (!memberId.equals(userId)) { // 저장한 사용자 제외
+                sendNotification(
+                    memberId,
+                    "LINK_SAVE",
+                    "새 링크 저장",
+                    userId + "님이 " + deptName + " 팀 파일함에 " + linkName + " 링크를 저장했습니다."
+                );
+            }
+        }
+    }
+    
+    /**
+     * 특정 부서의 모든 사용자 ID 조회
+     */
+    private List<String> getDeptMemberIds(int deptIdx) {
+        try {
+            ArrayList<Map<String, Object>> allUsers = memberDAO.users();
+            return allUsers.stream()
+                .filter(user -> {
+                    Object deptIdxObj = user.get("dept_idx");
+                    return deptIdxObj != null && deptIdxObj.toString().equals(String.valueOf(deptIdx));
+                })
+                .map(user -> (String) user.get("user_id"))
+                .filter(userId -> userId != null && !userId.isEmpty())
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("부서 사용자 목록 조회 실패: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * 멤버 정보 변경 알림 전송 (본인에게)
+     */
+    public void sendMemberInfoChangeNotification(String userId, String changeType, String oldValue, String newValue) {
+        String changeText = "";
+        switch (changeType) {
+            case "DEPT":
+                changeText = "부서가 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                break;
+            case "LEVEL":
+                changeText = "직급이 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                break;
+            case "AUTHORITY":
+                changeText = "권한이 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                break;
+            default:
+                changeText = changeType + "이(가) " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+        }
+        
+        sendNotification(
+            userId,
+            "MEMBER_INFO_CHANGE",
+            "멤버 정보 변경",
+            changeText
+        );
+    }
+    
+    /**
      * 모든 사용자 ID 목록 조회
      */
     private List<String> getAllUserIds() {

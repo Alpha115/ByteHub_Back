@@ -11,6 +11,7 @@ import com.bytehub.member.MemberDAO;
 import com.bytehub.member.MemberDTO;
 import com.bytehub.schedule.ScdService;
 import com.bytehub.schedule.ScdDTO;
+import com.bytehub.notification.NotiService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ public class ApprService {
     private final MemberDAO memberDAO;
 
     private final ScdService scdService;
+    private final NotiService notiService;
 	
 
     public int createApprWithLineAndFiles(ApprDTO appr, List<FileDTO> fileList) {
@@ -63,6 +65,19 @@ public class ApprService {
                 dao.insertFile(fileDTO);
             }
         }
+        
+        // 5. 결재자들에게 실시간 알림 전송
+        for (ApprLineDTO line : apprLineList) {
+            if (!line.getUser_id().equals(appr.getWriter_id())) {
+                notiService.sendApprovalRequestNotification(
+                    line.getUser_id(),
+                    writer.getName(),
+                    appr.getSubject(),
+                    appr.getAppr_type()
+                );
+            }
+        }
+        
         return appr_idx;
     }
 
@@ -92,11 +107,51 @@ public class ApprService {
             history.put("check_time", LocalDateTime.now());
             dao.appr_checker(history);
         }
+        
+        // 결재자들에게 실시간 알림 전송
+        for (ApprLineDTO line : apprLineList) {
+            if (!line.getUser_id().equals(appr.getWriter_id())) {
+                notiService.sendApprovalRequestNotification(
+                    line.getUser_id(),
+                    writer.getName(),
+                    appr.getSubject(),
+                    appr.getAppr_type()
+                );
+            }
+        }
+        
         return appr_idx;
     }
     public int updateStatus(Map<String, Object> param) {
 
     int result = dao.updateStatus(param);
+    
+    // 결재 상태 변경 시 기안자에게 실시간 알림 전송
+    if (result > 0) {
+        try {
+            // 결재자 정보 조회
+            String checkerId = (String) param.get("checker_id");
+            MemberDTO checker = memberDAO.getMemberById(checkerId);
+            String checkerName = checker != null ? checker.getName() : "결재자";
+            
+            // 결재 문서 정보 조회
+            int appr_his_idx = (int) param.get("appr_his_idx");
+            int appr_idx = dao.getApprHistoryIdx(appr_his_idx);
+            ApprDTO appr = dao.getApprIdx(appr_idx);
+            
+            if (appr != null) {
+                String status = (String) param.get("status");
+                notiService.sendApprovalStatusNotification(
+                    appr.getWriter_id(),
+                    checkerName,
+                    appr.getSubject(),
+                    status
+                );
+            }
+        } catch (Exception e) {
+            log.error("결재 상태 알림 전송 실패: {}", e.getMessage());
+        }
+    }
 
 
 

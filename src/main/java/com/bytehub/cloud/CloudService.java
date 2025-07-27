@@ -2,6 +2,8 @@ package com.bytehub.cloud;
 
 import org.springframework.stereotype.Service;
 
+import com.bytehub.member.MemberDAO;
+import com.bytehub.member.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +18,7 @@ import java.util.Map;
 public class CloudService {
 
     private final CloudDAO dao;
+    private final MemberDAO memberDAO;
     
     public CloudDTO saveFile(CloudDTO cloudDTO) {
         try {
@@ -229,8 +232,20 @@ public class CloudService {
 		return dao.ColudList();
 	}
 
-	public ArrayList<LinkDTO> linkList() {
-		return dao.linkList();
-	}
+	    public ArrayList<LinkDTO> linkList() {
+        return dao.linkList();
+    }
+    
+    /**
+     * 사용자의 부서 정보 조회
+     */
+    public MemberDTO getUserDeptInfo(String userId) {
+        try {
+            return memberDAO.memberInfo(userId);
+        } catch (Exception e) {
+            log.error("사용자 부서 정보 조회 실패: {}", e.getMessage());
+            return null;
+        }
+    }
 }
 
