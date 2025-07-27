@@ -12,7 +12,7 @@ public class NotiDTO {
     private String type;             // 알림 타입
     private String title;            // 알림 제목
     private String content;          // 알림 내용
-    private String target_url;        // 클릭 시 이동할 URL (선택적)
+    private String target_url;        // 클릭 시 이동할 URL
     private boolean isRead;          // 읽음 여부
     private LocalDateTime createdAt; // 생성 시간
     

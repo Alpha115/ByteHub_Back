@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
-@RequestMapping("/notification")
 @Slf4j
 public class NotiController {
     
@@ -36,7 +35,7 @@ public class NotiController {
     /**
      * 사용자의 미확인 알림 조회
      */
-    @GetMapping("/unread")
+    @GetMapping("notification/unread")
     public Map<String, Object> getUnreadNotifications(@RequestParam String user_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -54,7 +53,7 @@ public class NotiController {
     /**
      * 사용자의 모든 알림 조회
      */
-    @GetMapping("/all")
+    @GetMapping("notification/all")
     public Map<String, Object> getAllNotifications(@RequestParam String user_id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -72,7 +71,7 @@ public class NotiController {
     /**
      * 알림을 읽음 처리
      */
-    @PostMapping("/read/{notificationId}")
+    @PostMapping("notification/read/{notificationId}")
     public Map<String, Object> markAsRead(@PathVariable String notificationId, @RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -90,7 +89,7 @@ public class NotiController {
     /**
      * 특정 알림 삭제
      */
-    @DeleteMapping("/{notificationId}")
+    @DeleteMapping("notification/{notificationId}")
     public Map<String, Object> deleteNotification(@PathVariable String notificationId, @RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -108,7 +107,7 @@ public class NotiController {
     /**
      * 사용자의 모든 알림 삭제
      */
-    @DeleteMapping("/all")
+    @DeleteMapping("notification/all")
     public Map<String, Object> deleteAllNotifications(@RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -123,7 +122,7 @@ public class NotiController {
         return result;
     }
 
-    @PostMapping("/send")
+    @PostMapping("notification/send")
     public Map<String, Object> sendNoti(@RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -143,7 +142,7 @@ public class NotiController {
         return result;
 }
     // 1. 채팅방 초대 시
-    @PostMapping("/chat/invite")
+    @PostMapping("notification/chat/invite")
     public Map<String, Object> inviteToChat(@RequestBody Map<String, Object> invite) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -153,7 +152,7 @@ public class NotiController {
             
             // 채팅방 초대 로직...
             
-            // 알림 전송
+            // 알림 전송 (채팅방 이름 포함)
             notiService.sendChatInviteNotification(targetUserId, chatName, inviterId);
             
             result.put("success", true);
@@ -166,14 +165,15 @@ public class NotiController {
     }
 
     // 2. 채팅 메시지 전송 시
-    @PostMapping("/chat/message")
+    @PostMapping("notification/chat/message")
     public Map<String, Object> sendChatMessage(@RequestBody ChatMessageDTO message) {
         Map<String, Object> result = new HashMap<>();
         try {
             // 채팅 메시지 저장...
             
-            // 채팅방의 다른 멤버들에게 알림
-            notiService.sendChatNotification(message.getUser_id(), message.getUser_id(), "채팅방", message.getContent());
+            // 채팅방의 다른 멤버들에게 알림 (채팅방 이름 포함)
+            String chatName = "채팅방"; // 기본값, 필요시 chat_idx로 채팅방 이름 조회 가능
+            notiService.sendChatNotification(message.getUser_id(), message.getUser_id(), chatName, message.getContent());
             
             result.put("success", true);
             result.put("message", "채팅 메시지 알림이 전송되었습니다.");
@@ -184,29 +184,9 @@ public class NotiController {
         return result;
     }
 
-    // 3. 출근/퇴근 완료 시
-    @PostMapping("/attendance/complete")
-    public Map<String, Object> completeAttendance(@RequestBody AttDTO attendance) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            // 출근/퇴근 처리...
-            
-            // 관리자에게 알림
-            notiService.sendNotification("admin", "ATTENDANCE_COMPLETE", 
-                attendance.getAtt_type() + " 완료", 
-                attendance.getUser_id() + "님이 " + attendance.getAtt_type() + "을 완료했습니다.");
-            
-            result.put("success", true);
-            result.put("message", "근태 처리 완료 알림이 전송되었습니다.");
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", "근태 처리 실패: " + e.getMessage());
-        }
-        return result;
-    }
 
     // 4. 프로젝트 초대 시
-    @PostMapping("/project/invite")
+    @PostMapping("notification/project/invite")
     public Map<String, Object> inviteToProject(@RequestBody Map<String, Object> invite) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -231,7 +211,7 @@ public class NotiController {
     }
 
     // 5. 결재 생성 시
-    @PostMapping("/approval/create")
+    @PostMapping("notification/approval/create")
     public Map<String, Object> createApproval(@RequestBody ApprDTO approval) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -252,7 +232,7 @@ public class NotiController {
     }
 
     // 6. 결재 상태 변경 시
-    @PostMapping("/approval/update-status")
+    @PostMapping("notification/approval/update-status")
     public Map<String, Object> updateApprovalStatus(@RequestBody Map<String, Object> status) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -275,32 +255,8 @@ public class NotiController {
         return result;
     }
 
-    // 7. 비상연락망 이메일 발송 시
-    @PostMapping("/emergency/send-email")
-    public Map<String, Object> sendEmergencyEmail(@RequestBody Map<String, Object> email) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            String recipientId = (String) email.get("recipient_id");
-            String subject = (String) email.get("subject");
-            
-            // 이메일 발송...
-            
-            // 수신자에게 알림
-            notiService.sendNotification(recipientId, "EMERGENCY_EMAIL", 
-                "비상 연락망 이메일", 
-                "비상 연락망 관련 이메일이 발송되었습니다: " + subject);
-            
-            result.put("success", true);
-            result.put("message", "비상 연락망 이메일 알림이 전송되었습니다.");
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", "비상 연락망 이메일 발송 실패: " + e.getMessage());
-        }
-        return result;
-    }
-
     // 8. 파일/링크 업로드 시
-    @PostMapping("/cloud/upload")
+    @PostMapping("notification/files/upload")
     public Map<String, Object> uploadFile(@RequestBody CloudDTO file) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -321,7 +277,7 @@ public class NotiController {
     }
 
     // 9. 공지사항 등록 시
-    @PostMapping("/board/create")
+    @PostMapping("notification/board/create")
     public Map<String, Object> createNotice(@RequestBody BoardDTO notice) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -342,7 +298,7 @@ public class NotiController {
     }
 
     // 10. 사용자 정보 수정 시
-    @PostMapping("/member/update")
+    @PostMapping("notification/member/update")
     public Map<String, Object> updateMember(@RequestBody MemberDTO member) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -363,7 +319,7 @@ public class NotiController {
     }
 
     // 11. 회의록 작성 시 참석자들에게 알림 전송
-    @PostMapping("/board/meeting/invite")
+    @PostMapping("notification/meeting/invite")
     public Map<String, Object> sendMeetingInvite(@RequestBody Map<String, Object> meeting) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -386,5 +342,84 @@ public class NotiController {
             result.put("message", "회의록 초대 알림 전송 실패: " + e.getMessage());
         }
         return result;
+    }
+    
+    /**
+     * 알림 클릭 시 URL로 이동하는 기능
+     */
+    @PostMapping("/click/{notificationId}")
+    public Map<String, Object> handleNotificationClick(@PathVariable String notificationId, @RequestBody Map<String, String> request) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String user_id = request.get("user_id");
+            
+            // 알림 정보 조회
+            NotiDTO notification = notiService.getNotificationById(notificationId, user_id);
+            
+            if (notification == null) {
+                result.put("success", false);
+                result.put("message", "알림을 찾을 수 없습니다.");
+                return result;
+            }
+            
+            // 알림을 읽음 처리
+            notiService.markAsRead(user_id, notificationId);
+            
+            // 알림 타입에 따른 URL 생성
+            String targetUrl = generateTargetUrl(notification);
+            
+            result.put("success", true);
+            result.put("target_url", targetUrl);
+            result.put("notification_type", notification.getType());
+            result.put("message", "알림 클릭 처리 완료");
+            
+            log.info("알림 클릭 처리: notificationId={}, user_id={}, targetUrl={}", notificationId, user_id, targetUrl);
+            
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "알림 클릭 처리 실패: " + e.getMessage());
+            log.info("알림 클릭 처리 실패: {}", e.getMessage(), e);
+        }
+        return result;
+    }
+    
+    /**
+     * 알림 타입에 따른 URL 생성
+     */
+    private String generateTargetUrl(NotiDTO notification) {
+        // 알림에 저장된 target_url이 있으면 우선 사용
+        if (notification.getTarget_url() != null && !notification.getTarget_url().isEmpty()) {
+            return notification.getTarget_url();
+        }
+        
+        // 알림 타입에 따른 기본 URL 생성
+        switch (notification.getType()) {
+            case "CHAT_MESSAGE":
+            case "CHAT_INVITE":
+                return "/component/chating"; // 채팅 페이지로 이동
+                
+            case "APPROVAL_REQUEST":
+            case "APPROVAL_STATUS":
+                return "/component/approval"; // 결재 페이지로 이동
+                
+            case "FILE_UPLOAD":
+            case "LINK_SAVE":
+                return "/component/files"; // 클라우드 페이지로 이동
+                
+            case "BOARD_NOTICE":
+                return "/component/board"; // 게시판 페이지로 이동
+                
+            case "MEMBER_INFO_CHANGE":
+                return "/component/mypage"; // 마이페이지로 이동
+                
+            case "PROJECT_INVITE":
+                return "/component/project"; // 프로젝트 페이지로 이동
+                
+            case "MEETING_INVITE":
+                return "/component/meeting"; // 회의록 페이지로 이동
+                
+            default:
+                return "/component/main"; // 기본 홈페이지로 이동
+        }
     }
 } 

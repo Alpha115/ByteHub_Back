@@ -32,6 +32,13 @@ public class NotiService {
      * 특정 사용자에게 알림 전송
      */
     public void sendNotification(String user_id, String type, String title, String content) {
+        sendNotification(user_id, type, title, content, null);
+    }
+    
+    /**
+     * 특정 사용자에게 알림 전송 (target_url 포함)
+     */
+    public void sendNotification(String user_id, String type, String title, String content, String target_url) {
         if ("all".equals(user_id)) {
             // 모든 사용자에게 알림 전송 (작성자 제외)
             List<String> allUsers = getAllUserIds();
@@ -41,6 +48,7 @@ public class NotiService {
                 if (!userId.equals(writerId)) { // 작성자 제외
                     NotiDTO notification = new NotiDTO(userId, type, title, content);
                     notification.setNotification_id(UUID.randomUUID().toString());
+                    notification.setTarget_url(target_url);
                     
                     // 메모리에 저장
                     userNotifications.computeIfAbsent(userId, k -> new ArrayList<>()).add(notification);
@@ -54,6 +62,7 @@ public class NotiService {
             // 개별 사용자에게 알림 전송
             NotiDTO notification = new NotiDTO(user_id, type, title, content);
             notification.setNotification_id(UUID.randomUUID().toString());
+            notification.setTarget_url(target_url);
             
             // 메모리에 저장
             userNotifications.computeIfAbsent(user_id, k -> new ArrayList<>()).add(notification);
@@ -91,6 +100,20 @@ public class NotiService {
      */
     public List<NotiDTO> getAllNotifications(String user_id) {
         return userNotifications.getOrDefault(user_id, new ArrayList<>());
+    }
+    
+    /**
+     * 특정 알림 조회
+     */
+    public NotiDTO getNotificationById(String notificationId, String user_id) {
+        List<NotiDTO> notifications = userNotifications.get(user_id);
+        if (notifications != null) {
+            return notifications.stream()
+                .filter(n -> n.getNotification_id().equals(notificationId))
+                .findFirst()
+                .orElse(null);
+        }
+        return null;
     }
     
     /**
@@ -151,7 +174,8 @@ public class NotiService {
             user_id,
             "CHAT_MESSAGE",
             "새로운 채팅 메시지",
-            sender_id + "님이 " + chat_name + "에서 메시지를 보냈습니다: " + message
+            sender_id + "님이 " + chat_name + "에서 메시지를 보냈습니다: " + message,
+            "/chat"
         );
     }
     
@@ -163,7 +187,8 @@ public class NotiService {
             userId,
             "CHAT_INVITE",
             "채팅방 초대",
-            inviterId + "님이 " + chatName + " 채팅방에 초대했습니다."
+            inviterId + "님이 " + chatName + " 채팅방에 초대했습니다.",
+            "/chat"
         );
     }
     
@@ -175,7 +200,8 @@ public class NotiService {
             checkerId,
             "APPROVAL_REQUEST",
             "결재 요청",
-            writerName + "님이 " + apprType + " 결재를 요청했습니다: " + subject
+            writerName + "님이 " + apprType + " 결재를 요청했습니다: " + subject,
+            "/approval"
         );
     }
     
@@ -202,7 +228,8 @@ public class NotiService {
             writerId,
             "APPROVAL_STATUS",
             "결재 상태 변경",
-            checkerName + "님이 " + subject + " 결재를 " + statusText + "했습니다."
+            checkerName + "님이 " + subject + " 결재를 " + statusText + "했습니다.",
+            "/approval"
         );
     }
     
@@ -218,7 +245,8 @@ public class NotiService {
                     memberId,
                     "FILE_UPLOAD",
                     "새 파일 업로드",
-                    userId + "님이 " + deptName + " 팀 파일함에 " + fileName + " 파일을 업로드했습니다."
+                    userId + "님이 " + deptName + " 팀 파일함에 " + fileName + " 파일을 업로드했습니다.",
+                    "/cloud"
                 );
             }
         }
@@ -236,7 +264,8 @@ public class NotiService {
                     memberId,
                     "LINK_SAVE",
                     "새 링크 저장",
-                    userId + "님이 " + deptName + " 팀 파일함에 " + linkName + " 링크를 저장했습니다."
+                    userId + "님이 " + deptName + " 팀 파일함에 " + linkName + " 링크를 저장했습니다.",
+                    "/cloud"
                 );
             }
         }
@@ -285,7 +314,8 @@ public class NotiService {
             userId,
             "MEMBER_INFO_CHANGE",
             "멤버 정보 변경",
-            changeText
+            changeText,
+            "/mypage"
         );
     }
     
