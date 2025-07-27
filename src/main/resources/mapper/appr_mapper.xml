@@ -213,10 +213,18 @@
     
     <!-- 개인 연차 조회 -->
     <select id="myLeave" resultType="com.bytehub.approval.LeaveHistoryDTO">
-        SELECT * 
-        FROM leave_history
-        WHERE writer_id = #{writer_id}
-        ORDER BY years DESC LIMIT 1
+        SELECT 
+            #{writer_id} as writer_id,
+            CURDATE() as years,
+            IFNULL(
+                (SELECT remain_days 
+                 FROM leave_history 
+                 WHERE writer_id = #{writer_id} 
+                 ORDER BY years DESC 
+                 LIMIT 1), 
+                0
+            ) as remain_days
+        FROM DUAL
     </select>
     
     <!-- 연차 상세 내역 조회: 로그인한 사용자의 연차 신청 내역(신청일, 연차종류, 시작일, 종료일, 상태) -->
