@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytehub.member.FileDTO;
 import com.bytehub.schedule.ScdDTO;
+import com.bytehub.notification.NotiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectService {
 
 	private final ProjectDAO dao;
+	private final NotiService notiService;
 
 	 @Value("${spring.servlet.multipart.location}")
 	 private String uploadDir;
@@ -45,10 +47,23 @@ public class ProjectService {
 	            }
 	        }
 
-	        // 2. 멤버 연결
+	        // 2. 멤버 연결 및 초대 알림 전송
 	        if (data.getUser_id() != null) {
 	            for (String userId : data.getUser_id()) {
 	                dao.insertProjectEmp(projectIdx, userId);
+	                
+	                // 프로젝트 생성자와 다른 사용자에게만 알림 전송
+	                if (!userId.equals(data.getProj().getUser_id())) {
+	                    try {
+	                        notiService.sendProjectInviteNotification(
+	                            userId,
+	                            data.getProj().getSubject(),
+	                            data.getProj().getUser_id() // 프로젝트 생성자 ID
+	                        );
+	                    } catch (Exception e) {
+	                        log.info("프로젝트 초대 알림 전송 실패: {}", e.getMessage());
+	                    }
+	                }
 	            }
 	        }
 	        

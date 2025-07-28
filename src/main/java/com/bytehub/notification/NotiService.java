@@ -175,7 +175,7 @@ public class NotiService {
             "CHAT_MESSAGE",
             "새로운 채팅 메시지",
             sender_id + "님이 " + chat_name + "에서 메시지를 보냈습니다: " + message,
-            "/chat"
+            "/component/chating"
         );
     }
     
@@ -188,7 +188,7 @@ public class NotiService {
             "CHAT_INVITE",
             "채팅방 초대",
             inviterId + "님이 " + chatName + " 채팅방에 초대했습니다.",
-            "/chat"
+            "/component/chating"
         );
     }
     
@@ -201,7 +201,7 @@ public class NotiService {
             "APPROVAL_REQUEST",
             "결재 요청",
             writerName + "님이 " + apprType + " 결재를 요청했습니다: " + subject,
-            "/approval"
+            "/component/approval"
         );
     }
     
@@ -229,7 +229,7 @@ public class NotiService {
             "APPROVAL_STATUS",
             "결재 상태 변경",
             checkerName + "님이 " + subject + " 결재를 " + statusText + "했습니다.",
-            "/approval"
+            "/component/approval"
         );
     }
     
@@ -246,7 +246,7 @@ public class NotiService {
                     "FILE_UPLOAD",
                     "새 파일 업로드",
                     userId + "님이 " + deptName + " 팀 파일함에 " + fileName + " 파일을 업로드했습니다.",
-                    "/cloud"
+                    "/component/files"
                 );
             }
         }
@@ -265,7 +265,7 @@ public class NotiService {
                     "LINK_SAVE",
                     "새 링크 저장",
                     userId + "님이 " + deptName + " 팀 파일함에 " + linkName + " 링크를 저장했습니다.",
-                    "/cloud"
+                    "/component/files"
                 );
             }
         }
@@ -295,6 +295,8 @@ public class NotiService {
      * 멤버 정보 변경 알림 전송 (본인에게)
      */
     public void sendMemberInfoChangeNotification(String userId, String changeType, String oldValue, String newValue) {
+        
+        
         String changeText = "";
         switch (changeType) {
             case "DEPT":
@@ -315,7 +317,20 @@ public class NotiService {
             "MEMBER_INFO_CHANGE",
             "멤버 정보 변경",
             changeText,
-            "/mypage"
+            "/component/mypage"
+        );
+    }
+    
+    /**
+     * 프로젝트 초대 알림 전송
+     */
+    public void sendProjectInviteNotification(String userId, String projectName, String inviterName) {
+        sendNotification(
+            userId,
+            "PROJECT_INVITE",
+            "프로젝트 초대",
+            inviterName + "님이 " + projectName + " 프로젝트에 초대했습니다.",
+            "/component/project"
         );
     }
     

@@ -197,9 +197,7 @@ public class NotiController {
             // 프로젝트 초대 로직...
             
             // 초대받은 사용자에게 알림
-            notiService.sendNotification(targetUserId, "PROJECT_INVITE", 
-                "프로젝트 초대", 
-                inviterId + "님이 " + projectName + " 프로젝트에 초대했습니다.");
+            notiService.sendProjectInviteNotification(targetUserId, projectName, inviterId);
             
             result.put("success", true);
             result.put("message", "프로젝트 초대 알림이 전송되었습니다.");
@@ -265,8 +263,9 @@ public class NotiController {
             // 같은 부서 사용자들에게 알림
             notiService.sendNotification("dept_" + file.getDept_idx(), "FILE_UPLOAD", 
                 "파일 업로드", 
-                file.getUser_id() + "님이 " + file.getFilename() + " 파일을 업로드했습니다.");
-            
+                file.getUser_id() + "님이 " + file.getFilename() + " 파일을 업로드했습니다.",
+                "/component/files"); // target_url 추가
+                
             result.put("success", true);
             result.put("message", "파일 업로드 알림이 전송되었습니다.");
         } catch (Exception e) {
