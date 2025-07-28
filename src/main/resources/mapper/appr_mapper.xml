@@ -465,6 +465,7 @@
 		    ap.writer_id,
 		    (select name from member where user_id = ap.writer_id) as name,
 		    ap.subject,
+		    ap.appr_type,
 		    ap.vac_start,
 		    ap.vac_end
 		from approval ap
