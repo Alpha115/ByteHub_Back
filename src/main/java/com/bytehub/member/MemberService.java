@@ -131,25 +131,21 @@ public class MemberService {
 			if (success && oldInfo != null) {
 				// 부서 변경 감지
 				if (dto.getDept_idx() != 0 && oldInfo.getDept_idx() != dto.getDept_idx()) {
-					String oldDeptName = getDeptName(oldInfo.getDept_idx());
-					String newDeptName = getDeptName(dto.getDept_idx());
 					notiService.sendMemberInfoChangeNotification(
 						dto.getUser_id(), 
 						"DEPT", 
-						oldDeptName, 
-						newDeptName
+						"이전 부서", 
+						"새 부서"
 					);
 				}
 				
 				// 직급 변경 감지
 				if (dto.getLv_idx() != 0 && oldInfo.getLv_idx() != dto.getLv_idx()) {
-					String oldLevelName = getLevelName(oldInfo.getLv_idx());
-					String newLevelName = getLevelName(dto.getLv_idx());
 					notiService.sendMemberInfoChangeNotification(
 						dto.getUser_id(), 
 						"LEVEL", 
-						oldLevelName, 
-						newLevelName
+						"이전 직급", 
+						"새 직급"
 					);
 				}
 			}
@@ -161,44 +157,7 @@ public class MemberService {
 		}
 	}
 	
-	/**
-	 * 부서명 조회
-	 */
-	private String getDeptName(int deptIdx) {
-		try {
-			ArrayList<Map<String, Object>> depts = dao.depts();
-			return depts.stream()
-				.filter(dept -> dept.get("dept_idx").equals(deptIdx))
-				.map(dept -> (String) dept.get("dept_name"))
-				.findFirst()
-				.orElse("알 수 없는 부서");
-		} catch (Exception e) {
-			log.info("부서명 조회 실패: {}", e.getMessage());
-			return "알 수 없는 부서";
-		}
-	}
-	
-	/**
-	 * 직급명 조회
-	 */
-	private String getLevelName(int lvIdx) {
-		try {
-			// 직급 정보는 보통 별도 테이블에 있지만, 여기서는 간단히 매핑
-			switch (lvIdx) {
-				case 1: return "사장";
-				case 2: return "이사";
-				case 3: return "부장";
-				case 4: return "팀장";
-				case 5: return "대리";
-				case 6: return "사원";
-				case 7: return "인턴";
-				default: return "알 수 없는 직급";
-			}
-		} catch (Exception e) {
-			log.info("직급명 조회 실패: {}", e.getMessage());
-			return "알 수 없는 직급";
-		}
-	}
+
 
 	public boolean memberDelete(MemberDTO dto) {
 		int row = dao.memberDelete(dto);

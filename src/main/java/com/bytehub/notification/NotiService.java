@@ -300,16 +300,13 @@ public class NotiService {
         String changeText = "";
         switch (changeType) {
             case "DEPT":
-                changeText = "부서가 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                changeText = "부서가 변경되었습니다.";
                 break;
             case "LEVEL":
-                changeText = "직급이 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
-                break;
-            case "AUTHORITY":
-                changeText = "권한이 " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                changeText = "직급이 변경되었습니다.";
                 break;
             default:
-                changeText = changeType + "이(가) " + oldValue + "에서 " + newValue + "로 변경되었습니다.";
+                changeText = changeType + "이(가) 변경되었습니다.";
         }
         
         sendNotification(
