@@ -5,15 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.bytehub.attendance.AttService;
 import com.bytehub.member.MemberService;
@@ -43,11 +41,6 @@ public class EmailController {
 	Properties props = new Properties();
 
 
-    EmailController(AttService attService) {
-        this.attService = attService;
-    }
-	
-	
 	// 부서정보불러오기
 	@GetMapping("/depts")
 	public Map<String, Object> depts(){
@@ -71,7 +64,6 @@ public class EmailController {
 	}
 
 	// ---------비밀번호 재설정 서비스---------
-	@Service
 	@RequiredArgsConstructor
 	public class PasswordResetService {
 
