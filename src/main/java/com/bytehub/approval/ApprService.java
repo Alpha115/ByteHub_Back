@@ -355,5 +355,22 @@ public class ApprService {
 	public ArrayList<Map<String, Object>> leaveTeam(int idx) {
 		return dao.leaveTeam(idx);
 	}
+	
+	// 연차 삭제 (remain_days를 0으로)
+	public int deleteLeaveRemain(List<String> selectedMembers) {
+		log.info("연차 삭제 요청 (remain_days=0) - 선택된 사원: {}", selectedMembers);
+		
+		try {
+			// leave_history 테이블에서 선택된 사원들의 remain_days를 0으로 업데이트
+			int updatedCount = dao.deleteLeaveRemain(selectedMembers);
+			
+			log.info("연차 삭제 완료 - 업데이트된 사원 수: {}", updatedCount);
+			return updatedCount;
+			
+		} catch (Exception e) {
+			log.error("연차 삭제 중 오류 발생: {}", e.getMessage(), e);
+			return 0;
+		}
+	}
     
 }

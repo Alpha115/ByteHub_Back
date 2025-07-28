@@ -554,4 +554,45 @@ public class ApprController {
 		return resp;
 	}
 
+	// 연차 삭제 (remain_days를 0으로) API
+	@PostMapping("/leave/delete-remain")
+	public Map<String, Object> deleteLeaveRemain(@RequestBody Map<String, Object> request,
+												@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		
+		try {
+			// JWT 토큰 검증
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			@SuppressWarnings("unchecked")
+			List<String> selectedMembers = (List<String>) request.get("selectedMembers");
+			
+			if (selectedMembers == null || selectedMembers.isEmpty()) {
+				result.put("success", false);
+				result.put("msg", "삭제할 사원을 선택해주세요.");
+				return result;
+			}
+			
+			// 연차 삭제 실행 (remain_days를 0으로)
+			int deletedCount = service.deleteLeaveRemain(selectedMembers);
+			
+			result.put("success", true);
+			result.put("msg", selectedMembers.size() + "명의 연차가 삭제되었습니다.");
+			result.put("deletedCount", deletedCount);
+			
+		} catch (Exception e) {
+			log.error("연차 삭제 실패: ", e);
+			result.put("success", false);
+			result.put("msg", "연차 삭제 중 오류가 발생했습니다: " + e.getMessage());
+		}
+		
+		return result;
+	}
+
 }

@@ -81,5 +81,8 @@ public interface ApprDAO {
     void annualLeaveForSelectedWithSetting(@Param("selectedMembers") List<String> selectedMembers, 
                                           @Param("setting") LeaveSettingDTO setting);
 	ArrayList<Map<String, Object>> leaveTeam(int idx);
+	
+	// 연차 삭제 (remain_days를 0으로)
+	int deleteLeaveRemain(List<String> selectedMembers);
     
 }

@@ -388,12 +388,10 @@
             STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
         FROM member 
         WHERE status = '재직'
-          AND YEAR(hire_date) = YEAR(CURDATE())
+          AND YEAR(hire_date = YEAR(CURDATE())
           AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &lt; 1
-          AND user_id NOT IN (
-              SELECT writer_id FROM leave_history
-              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
-          )
+        ON DUPLICATE KEY UPDATE
+            remain_days = VALUES(remain_days)
     </insert>
     
     <!-- 설정 기반 기존 사원 연차 생성 -->
@@ -409,10 +407,8 @@
         FROM member 
         WHERE status = '재직'
           AND TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) >= 1
-          AND user_id NOT IN (
-              SELECT writer_id FROM leave_history
-              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
-          )
+        ON DUPLICATE KEY UPDATE
+            remain_days = VALUES(remain_days)
     </insert>
     
     <!-- 선택된 사원들 설정 기반 신규 입사자 월차 생성 -->
@@ -430,10 +426,8 @@
           <foreach item="memberId" collection="selectedMembers" open="(" separator="," close=")">
               #{memberId}
           </foreach>
-          AND user_id NOT IN (
-              SELECT writer_id FROM leave_history
-              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
-          )
+        ON DUPLICATE KEY UPDATE
+            remain_days = VALUES(remain_days)
     </insert>
     
     <!-- 선택된 사원들 설정 기반 기존 사원 연차 생성 -->
@@ -453,10 +447,8 @@
           <foreach item="memberId" collection="selectedMembers" open="(" separator="," close=")">
               #{memberId}
           </foreach>
-          AND user_id NOT IN (
-              SELECT writer_id FROM leave_history
-              WHERE years = STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-01-01'), '%Y-%m-%d')
-          )
+        ON DUPLICATE KEY UPDATE
+            remain_days = VALUES(remain_days)
     </insert>
     
     <select id="leaveTeam" resultType="map">
@@ -474,5 +466,13 @@
 			and ap.writer_id in (select user_id from member where dept_idx=#{param1})
 		    </select>
 
+    <!-- 연차 삭제 (remain_days를 0으로) -->
+    <delete id="deleteLeaveRemain" parameterType="list">
+        DELETE FROM leave_history 
+        WHERE writer_id IN
+        <foreach item="memberId" collection="list" open="(" separator="," close=")">
+            #{memberId}
+        </foreach>
+    </delete>
 	
 </mapper>
