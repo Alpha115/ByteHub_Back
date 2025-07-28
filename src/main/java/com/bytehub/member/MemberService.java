@@ -173,7 +173,7 @@ public class MemberService {
 				.findFirst()
 				.orElse("알 수 없는 부서");
 		} catch (Exception e) {
-			log.error("부서명 조회 실패: {}", e.getMessage());
+			log.info("부서명 조회 실패: {}", e.getMessage());
 			return "알 수 없는 부서";
 		}
 	}
@@ -195,7 +195,7 @@ public class MemberService {
 				default: return "알 수 없는 직급";
 			}
 		} catch (Exception e) {
-			log.error("직급명 조회 실패: {}", e.getMessage());
+			log.info("직급명 조회 실패: {}", e.getMessage());
 			return "알 수 없는 직급";
 		}
 	}
