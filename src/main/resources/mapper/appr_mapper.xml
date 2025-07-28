@@ -468,8 +468,8 @@
 		    ap.vac_start,
 		    ap.vac_end
 		from approval ap
-		where ap.appr_idx in (select appr_idx from appr_history ah where status ='승인' 
-			and appr_his_idx = (select MAX(appr_his_idx) from appr_history where status = '승인'))
+		where ap.appr_idx in (select appr_idx from appr_history ah where status ='승인완료' 
+			and appr_his_idx = (select MAX(appr_his_idx) from appr_history where status = '승인완료'))
 			and ap.writer_id in (select user_id from member where dept_idx=#{param1})
 		    </select>
 
