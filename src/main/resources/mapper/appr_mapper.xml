@@ -227,20 +227,7 @@
         FROM DUAL
     </select>
     
-    <!-- 연차 상세 내역 조회: 로그인한 사용자의 연차 신청 내역(신청일, 연차종류, 시작일, 종료일, 상태) -->
-    <select id="leaveDetail" resultType="com.bytehub.approval.ApprDTO">
-        SELECT 
-            ap.appr_date,         -- 신청일
-            ap.appr_type,         -- 연차 종류
-            ap.vac_start,         -- 시작일
-            ap.vac_end,           -- 종료일
-            ah.status as appr_status -- 상태
-        FROM approval ap
-        JOIN appr_history ah ON ap.appr_idx = ah.appr_idx
-        WHERE ap.writer_id = #{writer_id}
-          AND ap.appr_type = '연차'
-        ORDER BY ap.appr_date DESC
-    </select>
+
     
     <select id="getApprHistoryIdx" resultType="int">
     SELECT appr_idx FROM appr_history WHERE appr_his_idx = #{appr_his_idx}
@@ -474,5 +461,33 @@
             #{memberId}
         </foreach>
     </delete>
+    
+    <!-- 연차 상세보기 조회 (로그인한 사용자의 연차 신청 내역) -->
+    <select id="getLeaveDetail" resultType="map">
+        SELECT 
+            a.appr_idx,
+            a.writer_id,
+            a.subject,
+            a.content,
+            a.appr_date,
+            a.appr_type,
+            a.vac_start,
+            a.vac_end,
+            CASE 
+                WHEN EXISTS (SELECT 1 FROM appr_history h2 WHERE h2.appr_idx = a.appr_idx AND h2.status = '반려') THEN '반려'
+                WHEN NOT EXISTS (SELECT 1 FROM appr_history h3 WHERE h3.appr_idx = a.appr_idx AND h3.status = '대기중') THEN '승인완료'
+                ELSE '대기중'
+            END as final_status,
+            m.name as writer_name,
+            d.dept_name,
+            l.lv_name as level_name
+        FROM approval a
+        JOIN member m ON a.writer_id = m.user_id
+        LEFT JOIN department d ON m.dept_idx = d.dept_idx
+        LEFT JOIN level l ON m.lv_idx = l.lv_idx
+        WHERE a.writer_id = #{writer_id}
+          AND a.appr_type = '연차'
+        ORDER BY a.appr_date DESC
+    </select>
 	
 </mapper>

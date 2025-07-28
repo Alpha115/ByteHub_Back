@@ -36,8 +36,7 @@ public interface ApprDAO {
     // 개인 잔여 연차 조회
     List<LeaveHistoryDTO> myLeave(String writer_id);
 	
-    // 연차 상세 내역 조회
-    List<ApprDTO> leaveDetail(String loginId);
+
 
     // 기안자의 lv_idx와 dept_idx를 받아 결재자 lv_idx 1,2(고정 1명), 3(같은 부서 팀장)만 반환
     List<ApprLineDTO> getDynamicApprLine(Map<String, Object> param);
@@ -84,5 +83,8 @@ public interface ApprDAO {
 	
 	// 연차 삭제 (remain_days를 0으로)
 	int deleteLeaveRemain(List<String> selectedMembers);
+	
+	// 연차 상세보기 조회
+	List<Map<String, Object>> getLeaveDetail(String writer_id);
     
 }

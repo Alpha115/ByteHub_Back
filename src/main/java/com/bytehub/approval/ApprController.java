@@ -378,26 +378,7 @@ public class ApprController {
 		return result;
 	}
 
-	// 연차 상세 내역 조회 (GET)
-	@GetMapping("/leave/detail")
-	public Map<String, Object> leaveDetail(@RequestHeader("Authorization") String token) {
-		Map<String, Object> result = new HashMap<>();
 
-		Map<String, Object> tokenData = JwtUtils.readToken(token);
-		String userId = (String) tokenData.get("id");
-		if (userId == null) {
-			result.put("success", false);
-			result.put("msg", "유효하지 않은 토큰입니다.");
-			return result;
-		}
-
-		List<ApprDTO> leaveList = service.leaveDetail(userId);
-		
-		result.put("success", true);
-		result.put("data", leaveList);
-		
-		return result;
-	}
 
 
 
@@ -592,6 +573,34 @@ public class ApprController {
 			result.put("msg", "연차 삭제 중 오류가 발생했습니다: " + e.getMessage());
 		}
 		
+		return result;
+	}
+	
+	/**
+	 * 연차 상세보기 조회 API
+	 * - 로그인한 사용자의 연차 신청 내역 조회
+	 * - 결재 상태와 상세 정보 포함
+	 */
+	@GetMapping("/leave/detail")
+	public Map<String, Object> getLeaveDetail(@RequestHeader("Authorization") String token) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			// JWT 토큰 검증
+			Map<String, Object> tokenData = JwtUtils.readToken(token);
+			String userId = (String) tokenData.get("id");
+			if (userId == null) {
+				result.put("success", false);
+				result.put("msg", "유효하지 않은 토큰입니다.");
+				return result;
+			}
+			
+			List<Map<String, Object>> leaveDetail = service.getLeaveDetail(userId);
+			result.put("success", true);
+			result.put("data", leaveDetail);
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("msg", "연차 상세보기 조회 실패: " + e.getMessage());
+		}
 		return result;
 	}
 

@@ -26,5 +26,8 @@ public class ApprDTO {
     
     // 승인 상태 필드 추가
     private String appr_status;
+    
+    // step 필드 추가
+    private int step;
 
 }

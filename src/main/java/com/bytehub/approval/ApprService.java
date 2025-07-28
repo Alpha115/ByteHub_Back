@@ -293,10 +293,7 @@ public class ApprService {
         return dao.myLeave(loginId);
     }
 
-    // 연차 상세 내역 조회
-	public List<ApprDTO> leaveDetail(String loginId) {
-		return dao.leaveDetail(loginId);
-	}
+
 	
 	public List<Map<String, Object>> getAllMembersLeave() {
 		return dao.getAllMembersLeave();
@@ -371,6 +368,11 @@ public class ApprService {
 			log.error("연차 삭제 중 오류 발생: {}", e.getMessage(), e);
 			return 0;
 		}
+	}
+	
+	// 연차 상세보기 조회
+	public List<Map<String, Object>> getLeaveDetail(String writer_id) {
+		return dao.getLeaveDetail(writer_id);
 	}
     
 }
