@@ -49,6 +49,7 @@ public class NotiService {
                     NotiDTO notification = new NotiDTO(userId, type, title, content);
                     notification.setNotification_id(UUID.randomUUID().toString());
                     notification.setTarget_url(target_url);
+                    notification.setCreatedAt(LocalDateTime.now()); // 명시적으로 생성 시간 설정
                     
                     // 메모리에 저장
                     userNotifications.computeIfAbsent(userId, k -> new ArrayList<>()).add(notification);
@@ -63,6 +64,7 @@ public class NotiService {
             NotiDTO notification = new NotiDTO(user_id, type, title, content);
             notification.setNotification_id(UUID.randomUUID().toString());
             notification.setTarget_url(target_url);
+            notification.setCreatedAt(LocalDateTime.now()); // 명시적으로 생성 시간 설정
             
             // 메모리에 저장
             userNotifications.computeIfAbsent(user_id, k -> new ArrayList<>()).add(notification);
