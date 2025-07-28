@@ -346,7 +346,7 @@ public class NotiController {
     /**
      * 알림 클릭 시 URL로 이동하는 기능
      */
-    @PostMapping("/click/{notificationId}")
+    @PostMapping("click/{notificationId}")
     public Map<String, Object> handleNotificationClick(@PathVariable String notificationId, @RequestBody Map<String, String> request) {
         Map<String, Object> result = new HashMap<>();
         try {
