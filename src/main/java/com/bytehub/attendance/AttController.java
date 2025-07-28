@@ -54,7 +54,27 @@ public class AttController {
             return result;
         }
         
-        boolean success = inputCode != null && inputCode.equals(expectedCode);
+        // 디버깅용 로그
+        log.info("인증 시도 - userId: {}, mode: {}, inputCode: {}, expectedCode: {}", 
+                userId, mode, inputCode, expectedCode);
+        
+        // mode에 따라 다른 검증 로직 적용
+        boolean success = false;
+        
+        if ("in".equals(mode)) {
+            // 출근 모드: 출근용 인증번호와 비교
+            success = inputCode != null && inputCode.equals(expectedCode);
+            log.info("출근 모드 인증 결과: {}", success);
+        } else if ("out".equals(mode)) {
+            // 퇴근 모드: 퇴근용 인증번호와 비교
+            success = inputCode != null && inputCode.equals(expectedCode);
+            log.info("퇴근 모드 인증 결과: {}", success);
+        } else {
+            // 잘못된 모드
+            success = false;
+            log.warn("잘못된 모드: {}", mode);
+        }
+        
 
         Integer attIdx = null;
         if (success) {
@@ -447,6 +467,12 @@ public class AttController {
             result.put("msg", "조회 중 오류가 발생했습니다.");
         }
         return result;
+    }
+
+    // 디버깅용: 현재 저장된 인증번호 확인
+    @GetMapping("/attendance/debug/otp")
+    public Map<String, Object> debugOtp(@RequestParam String user_id) {
+        return svc.getDebugOtpInfo(user_id);
     }
 
     

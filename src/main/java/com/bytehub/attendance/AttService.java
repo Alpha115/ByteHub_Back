@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +19,9 @@ public class AttService {
     
     // 인증 실패 제한을 위한 메모리 저장소
     private final Map<String, FailureInfo> failureMap = new ConcurrentHashMap<>(); // ConcurrentHashMap은 동시 접근 해도 ㄱㅊ다고 해서 사용
-	 	
+    
+    // 인증번호 저장소 (userId -> {inOtp, outOtp, expireTime})
+    private final Map<String, OtpInfo> otpMap = new ConcurrentHashMap<>();
     
     // 실패 정보 클래스
     private static class FailureInfo {
@@ -34,6 +37,39 @@ public class AttService {
             failCount = 0;
             lockUntil = null;
             lastFailTime = null;
+        }
+    }
+    
+    // 인증번호 정보 클래스
+    private static class OtpInfo {
+        String inOtp;
+        String outOtp;
+        LocalDateTime expireTime;
+        
+        boolean isExpired() {
+            return LocalDateTime.now().isAfter(expireTime);
+        }
+        
+        boolean isValid(String inputCode, String mode) {
+            if (isExpired()) {
+                log.warn("인증번호가 만료되었습니다. expireTime: {}, 현재시간: {}", expireTime, LocalDateTime.now());
+                return false;
+            }
+            if (inputCode == null) {
+                log.warn("입력된 인증번호가 null입니다.");
+                return false;
+            }
+            if ("in".equals(mode)) {
+                boolean result = inputCode.equals(inOtp);
+                log.info("출근 모드 검증 - 입력: {}, 저장된 출근용: {}, 결과: {}", inputCode, inOtp, result);
+                return result;
+            } else if ("out".equals(mode)) {
+                boolean result = inputCode.equals(outOtp);
+                log.info("퇴근 모드 검증 - 입력: {}, 저장된 퇴근용: {}, 결과: {}", inputCode, outOtp, result);
+                return result;
+            }
+            log.warn("잘못된 모드: {}", mode);
+            return false;
         }
     }
     
@@ -81,6 +117,69 @@ public class AttService {
         // 성공 시 실패 정보 완전 삭제
         failureMap.remove(userId);
         log.info("사용자 {} 인증 성공 - 실패 정보 초기화", userId);
+    }
+    
+    // 인증번호 저장
+    public void saveOtp(String userId, String inOtp, String outOtp) {
+        OtpInfo otpInfo = new OtpInfo();
+        otpInfo.inOtp = inOtp;
+        otpInfo.outOtp = outOtp;
+        otpInfo.expireTime = LocalDateTime.now().plusMinutes(10); // 10분 유효
+        otpMap.put(userId, otpInfo);
+        log.info("사용자 {} 인증번호 저장 - 출근용: {}, 퇴근용: {}", userId, inOtp, outOtp);
+    }
+    
+    // 인증번호 검증
+    public boolean verifyOtp(String userId, String inputCode, String mode) {
+        log.info("=== 인증번호 검증 시작 ===");
+        log.info("사용자 ID: {}", userId);
+        log.info("입력된 인증번호: {}", inputCode);
+        log.info("모드: {}", mode);
+        
+        OtpInfo otpInfo = otpMap.get(userId);
+        if (otpInfo == null) {
+            log.warn("사용자 {}의 저장된 인증번호가 없습니다.", userId);
+            log.info("현재 저장된 모든 인증번호: {}", otpMap.keySet());
+            return false;
+        }
+        
+        log.info("저장된 인증번호 정보 - 출근용: {}, 퇴근용: {}, 만료시간: {}", 
+                otpInfo.inOtp, otpInfo.outOtp, otpInfo.expireTime);
+        
+        boolean isValid = otpInfo.isValid(inputCode, mode);
+        log.info("인증번호 검증 결과: {}", isValid);
+        
+        if (isValid) {
+            // 성공 시 인증번호 삭제 (1회 사용)
+            otpMap.remove(userId);
+            log.info("사용자 {} 인증번호 사용 완료 - 삭제됨", userId);
+        }
+        
+        log.info("=== 인증번호 검증 완료 ===");
+        return isValid;
+    }
+    
+    // 만료된 인증번호 정리
+    public void cleanupExpiredOtps() {
+        otpMap.entrySet().removeIf(entry -> entry.getValue().isExpired());
+    }
+    
+    // 디버깅용: 저장된 인증번호 확인
+    public Map<String, Object> getDebugOtpInfo(String userId) {
+        Map<String, Object> result = new HashMap<>();
+        OtpInfo otpInfo = otpMap.get(userId);
+        if (otpInfo != null) {
+            result.put("success", true);
+            result.put("inOtp", otpInfo.inOtp);
+            result.put("outOtp", otpInfo.outOtp);
+            result.put("expireTime", otpInfo.expireTime);
+            result.put("isExpired", otpInfo.isExpired());
+        } else {
+            result.put("success", false);
+            result.put("msg", "저장된 인증번호가 없습니다.");
+            result.put("allKeys", otpMap.keySet());
+        }
+        return result;
     }
 
     // 출퇴근 기록 생성 

@@ -1,20 +1,21 @@
 package com.bytehub.email;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ArrayList;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.bytehub.attendance.AttService;
 import com.bytehub.member.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/email")
 public class EmailController {
 
-	Map<String, Object> resp = null;
-
+    private final AttService attService;
 	private final EmailService service;
 	private final MemberService memberService;
+	
 	int randomNum = -1;
-
+	
 	// ---------이메일서비스 초기값---------
 	String host = "smtp.gmail.com";
 	String port = "587";
@@ -40,19 +41,24 @@ public class EmailController {
 	String key = "xgrk qwtn jakr hqxk";
 	String enable = "true";
 	Properties props = new Properties();
+
+
+    EmailController(AttService attService) {
+        this.attService = attService;
+    }
 	
 	
 	// 부서정보불러오기
 	@GetMapping("/depts")
 	public Map<String, Object> depts(){
-		resp=new HashMap<String, Object>();
+		Map<String, Object> resp=new HashMap<String, Object>();
 		resp.put("list", memberService.depts());
 		return resp;
 	}
 	
 	@GetMapping("/users")
 	public Map<String, Object> users(){
-		resp=new HashMap<String, Object>();
+		Map<String, Object> resp=new HashMap<String, Object>();
 		resp.put("list", memberService.users());
 		return resp;
 	}
@@ -129,7 +135,7 @@ public class EmailController {
 	// ---------비상연락망 메일 돌리기---------
 	@PostMapping("/emergency")
 	public Map<String, Object> emergencySendEmail(@RequestBody Map<String, Object> info) {
-		resp = new HashMap<String, Object>();
+		Map<String, Object> resp = new HashMap<String, Object>();
 		Map<String, Object> mail = new HashMap<String, Object>();
 
 //		String sender=(String) info.get("sender");	// 이메일 발신자가 있네요...내용에 넣을예정
@@ -156,7 +162,7 @@ public class EmailController {
 	// 근태 인증번호 발송 OR 재발송
 	@PostMapping("/attendance")
 	public Map<String, Object> attMail(@RequestBody Map<String, Object> info) {
-		resp = new HashMap<String, Object>();
+		Map<String, Object> resp = new HashMap<String, Object>();
 		Map<String, Object> mail = new HashMap<String, Object>();
 		
 		// user_id로 member 테이블에서 이메일 조회
