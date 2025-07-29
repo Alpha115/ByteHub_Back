@@ -150,14 +150,14 @@ public class AttController {
             AttSettingDTO setting = svc.getAttSetting();
             log.info("공용 설정 조회 결과: {}", setting);
             
-            // 설정이 없으면 기본값 사용 (09:00)
-            LocalTime standardInTime = LocalTime.of(9, 0);
-            int termMinutes = 30; // 기본 30분 유효시간
-            
-            if (setting != null && setting.getSet_in_time() != null) {
-                standardInTime = setting.getSet_in_time().toLocalTime();
-                termMinutes = setting.getTerm();
+            // 설정이 없으면 오류 처리
+            if (setting == null || setting.getSet_in_time() == null) {
+                log.error("출퇴근 기준 시간이 설정되지 않았습니다.");
+                return "설정오류"; // 설정이 없으면 특별한 상태로 반환
             }
+            
+            LocalTime standardInTime = setting.getSet_in_time().toLocalTime();
+            int termMinutes = setting.getTerm();
             
             LocalTime currentInTime = currentTime.toLocalTime();
             log.info("기준 출근시간: {}, 유효시간: {}분, 현재시간: {}", standardInTime, termMinutes, currentInTime);
@@ -181,7 +181,7 @@ public class AttController {
             
         } catch (Exception e) {
             log.error("출근 상태 결정 중 오류: ", e);
-            return "지각"; // 오류 시 지각으로 변경
+            return "설정오류"; // 오류 시 설정오류로 변경
         }
     }
     
@@ -193,13 +193,13 @@ public class AttController {
             // (모두에게 동일한) 최신 출퇴근 설정 조회
             AttSettingDTO setting = svc.getAttSetting();
             
-            // 설정이 없으면 기본값 사용 (18:00)
-            LocalTime standardOutTime = LocalTime.of(18, 0);
-            
-            if (setting != null && setting.getSet_out_time() != null) {
-                standardOutTime = setting.getSet_out_time().toLocalTime();
+            // 설정이 없으면 오류 처리
+            if (setting == null || setting.getSet_out_time() == null) {
+                log.error("출퇴근 기준 시간이 설정되지 않았습니다.");
+                return "설정오류"; // 설정이 없으면 특별한 상태로 반환
             }
             
+            LocalTime standardOutTime = setting.getSet_out_time().toLocalTime();
             LocalTime currentOutTime = currentTime.toLocalTime();
             
             // 기준 퇴근 시간 기준으로 상태 결정
@@ -211,7 +211,7 @@ public class AttController {
             
         } catch (Exception e) {
             log.error("퇴근 상태 결정 중 오류: ", e);
-            return "정상퇴근"; // 오류 시 기본값
+            return "설정오류"; // 오류 시 설정오류로 변경
         }
     }
     
