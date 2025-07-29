@@ -247,7 +247,7 @@
 	    LIMIT 1
 	</update>
 
-	<!-- 전체 사원 연차 현황 조회 -->
+	<!-- leaveedit : 전체 사원 연차 현황 조회 -->
 	<select id="getAllMembersLeave" resultType="map">
 	    SELECT 
 	        m.user_id as mem_idx,       
@@ -261,15 +261,7 @@
 	    FROM member m
 	    LEFT JOIN department d ON m.dept_idx = d.dept_idx
 	    LEFT JOIN level l ON m.lv_idx = l.lv_idx
-	    LEFT JOIN (
-	        SELECT lh1.writer_id, lh1.remain_days
-	        FROM leave_history lh1
-	        INNER JOIN (
-	            SELECT writer_id, MAX(years) as max_years
-	            FROM leave_history
-	            GROUP BY writer_id
-	        ) lh2 ON lh1.writer_id = lh2.writer_id AND lh1.years = lh2.max_years
-	    ) lh ON m.user_id = lh.writer_id
+	    LEFT JOIN leave_history lh ON m.user_id = lh.writer_id
 	    WHERE m.status = '재직'
 	    ORDER BY d.dept_name, m.name
 	</select>
