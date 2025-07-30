@@ -13,7 +13,6 @@ import java.util.Map;
 import com.bytehub.utils.JwtUtils;
 import javax.servlet.http.HttpSession;
 
-@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping("/member")

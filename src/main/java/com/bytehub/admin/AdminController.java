@@ -3,7 +3,6 @@ package com.bytehub.admin;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
